@@ -1,0 +1,481 @@
+<?xml version="1.0"?>
+<level>
+	<physicsScale value="20" />
+	<physics>
+		<aabb>
+			<min x="0" y="0" />
+			<max x="100" y="100" />
+		</aabb>
+		<gravity x="0" y="0" />
+		<doSleep value="true" />		
+	</physics>
+	<objects>
+		<gameObject>
+			<name value="background" /><renderPriority value="0" />
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="0" y="0" />
+					<vertex x="0" y="2000" />
+					<vertex x="2000" y="2000" />
+					<vertex x="2000" y="0" />
+					</shape>
+					<color r="0.0" g="1.0" b="0.0" a="1.0" />
+				</component>
+			</components>			
+		</gameObject>
+		<physicsObject>
+			<name value="wall1"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="0" y="0" />
+					<vertex x="0.5" y="0" />
+					<vertex x="0.5" y="100" />
+					<vertex x="0" y="100" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="0" y="0" />
+					<vertex x="10" y="0" />
+					<vertex x="10" y="2000" />
+					<vertex x="0" y="2000" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>
+		<physicsObject>
+			<name value="wall2"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="0.5" y="99.5" />
+					<vertex x="90" y="99.5" />
+					<vertex x="90" y="100" />
+					<vertex x="0.5" y="100" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+						<vertex x="10" y="1990" />
+						<vertex x="1800" y="1990" />
+						<vertex x="1800" y="2000" />
+						<vertex x="10" y="2000" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>		
+		<physicsObject>
+			<name value="wall3"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="99.5" y="45" />
+					<vertex x="99.5" y="0" />
+					<vertex x="100" y="0" />
+					<vertex x="100" y="45" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="1990" y="900" />
+					<vertex x="1990" y="0" />
+					<vertex x="2000" y="0" />
+					<vertex x="2000" y="900" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>			
+		<physicsObject>
+			<name value="wall4"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="60" y="5" />
+					<vertex x="60" y="0" />
+					<vertex x="99.5" y="0" />
+					<vertex x="99.5" y="5" />	
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="1200" y="100" />
+					<vertex x="1200" y="0" />
+					<vertex x="1990" y="0" />
+					<vertex x="1990" y="100" />	
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>			
+		<!-- **************************************************************************************** -->
+		<physicsObject>
+			<name value="obstacle1"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="32.5" y="3.75" />
+					<vertex x="37.5" y="3.75" />
+					<vertex x="37.5" y="25" />
+					<vertex x="32.5" y="25" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="650" y="75" />
+					<vertex x="750" y="75" />
+					<vertex x="750" y="500" />
+					<vertex x="650" y="500" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>			
+		<physicsObject>
+			<name value="obstacle2"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="60" y="5" />
+					<vertex x="65" y="5" />
+					<vertex x="65" y="20" />
+					<vertex x="60" y="20" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="1200" y="100" />
+					<vertex x="1300" y="100" />
+					<vertex x="1300" y="400" />
+					<vertex x="1200" y="400" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>	
+		<physicsObject>
+			<name value="obstacle3"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="0.5" y="35" />
+					<vertex x="12.5" y="35" />
+					<vertex x="12.5" y="50" />
+					<vertex x="0.5" y="50" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="10" y="700" />
+					<vertex x="250" y="700" />
+					<vertex x="250" y="1000" />
+					<vertex x="10" y="1000" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>
+		<physicsObject>
+			<name value="obstacle4"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="90" y="100" />
+					<vertex x="90" y="45" />
+					<vertex x="100" y="45" />
+					<vertex x="100" y="100" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="1800" y="2000" />
+					<vertex x="1800" y="900" />
+					<vertex x="1990" y="900" />
+					<vertex x="1990" y="2000" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>			
+		<physicsObject>
+			<name value="obstacle5"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="0.5" y="0" />					
+					<vertex x="32.5" y="0" />
+					<vertex x="32.5" y="0.5" />
+					<vertex x="0.5" y="0.5" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="10" y="0" />					
+					<vertex x="650" y="0" />
+					<vertex x="650" y="10" />
+					<vertex x="10" y="10" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>			
+		<physicsObject>
+			<name value="obstacle6"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="32.5" y="0" />					
+					<vertex x="60" y="0" />
+					<vertex x="60" y="3.75" />
+					<vertex x="32.5" y="3.75" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="650" y="0" />					
+					<vertex x="1200" y="0" />
+					<vertex x="1200" y="75" />
+					<vertex x="650" y="75" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>							
+		<physicsObject>
+			<name value="obstacle7"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="12.50" y="80" />					
+					<vertex x="25" y="45" />
+					<vertex x="27.5" y="45" />
+					<vertex x="27.5" y="80" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="250" y="1600" />					
+					<vertex x="500" y="900" />
+					<vertex x="550" y="900" />
+					<vertex x="550" y="1600" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>	
+		<physicsObject>
+			<name value="obstacle8"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="40" y="50" />					
+					<vertex x="50" y="50" />
+					<vertex x="50" y="51" />
+					<vertex x="40" y="51" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="800" y="1000" />					
+					<vertex x="1000" y="1000" />
+					<vertex x="1000" y="1020" />
+					<vertex x="800" y="1020" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>			
+		<physicsObject>
+			<name value="obstacle9"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="50" y="42.5" />					
+					<vertex x="75" y="42.5" />
+					<vertex x="75" y="51" />
+					<vertex x="50" y="51" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="1000" y="850" />					
+					<vertex x="1500" y="850" />
+					<vertex x="1500" y="1020" />
+					<vertex x="1000" y="1020" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>	
+		<physicsObject>
+			<name value="obstacle10"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="50" y="37.5" />					
+					<vertex x="51" y="37.5" />
+					<vertex x="51" y="42.5" />
+					<vertex x="50" y="42.5" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="1000" y="750" />					
+					<vertex x="1020" y="750" />
+					<vertex x="1020" y="850" />
+					<vertex x="1000" y="850" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>	
+		<physicsObject>
+			<name value="obstacle11"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="75" y="37.5" />					
+					<vertex x="80" y="37.5" />
+					<vertex x="80" y="57.5" />
+					<vertex x="75" y="57.5" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="1500" y="750" />					
+					<vertex x="1600" y="750" />
+					<vertex x="1600" y="1150" />
+					<vertex x="1500" y="1150" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>
+		<physicsObject>
+			<name value="obstacle12"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="55" y="90" />					
+					<vertex x="70" y="90" />
+					<vertex x="70" y="92.5" />
+					<vertex x="55" y="92.5" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="1100" y="1800" />					
+					<vertex x="1400" y="1800" />
+					<vertex x="1400" y="1850" />
+					<vertex x="1100" y="1850" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>						
+		<physicsObject>
+			<name value="obstacle13"/><renderPriority value="1" /><type value="static" />
+			<bodyDef><position x="0" y="0" /></bodyDef>
+			<shapeDef type="polygon">
+				<vertices>
+					<vertex x="67.5" y="80" />					
+					<vertex x="70" y="80" />
+					<vertex x="70" y="90" />
+					<vertex x="67.5" y="90" />
+				</vertices>
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<shape type="polygon">
+					<vertex x="1350" y="1600" />					
+					<vertex x="1400" y="1600" />
+					<vertex x="1400" y="1800" />
+					<vertex x="1350" y="1800" />
+					</shape>
+					<color r="1.0" g="1.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>						
+					
+		<!-- **************************************************************************************** -->
+		
+		<physicsObject>
+			<name value="agent1"/><renderPriority value="100" />	
+			<type value="dynamic" />
+		
+			<bodyDef>
+				<position x="5" y="5" />
+			</bodyDef>
+		
+			<shapeDef type="circle">
+				<density value="0.2" />
+				<friction value="0.5" />
+				<restitution value="0.25" />
+				<radius value="0.5" />
+			</shapeDef>
+		
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual">
+					<renderPriority value="99" />
+					<shape type="circle">
+						<center x="0" y="0"/>
+						<radius value="10" />
+					</shape>
+					<color r="1.0" g="0.0" b="0.0" a="1.0" />
+				</component>
+				<component className="edu.arizona.simulator.ww2d.object.component.SpriteVisual">
+					<renderPriority value="100" />
+					<image name="data/images/half-circle.png" scale="0.625" />
+				</component>
+				<component className="edu.arizona.simulator.ww2d.object.component.TopDownControl" />
+				<component className="edu.arizona.simulator.ww2d.object.component.HealthComponent" >
+					<health value="10" />
+				</component>
+			</components>
+		</physicsObject>
+		<physicsObject>
+			<name value="health1"/>
+			<renderPriority value="1" />
+			<type value="static" />
+		
+			<bodyDef>
+				<position x="11.25" y="11.25" />
+			</bodyDef>
+		
+			<shapeDef type="polygon">
+				<isSensor value="true" />
+				<FilterData category="8" mask="32767" groupIndex="-8" />
+				<vertices>
+					<vertex x="-.5" y="-.5" />
+					<vertex x=".5" y="-.5" />
+					<vertex x=".5" y=".5" />
+					<vertex x="-.5" y=".5" />
+				</vertices>
+			</shapeDef>
+		
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.trigger.HealthTrigger" />
+			</components>
+		</physicsObject>	
+	</objects>
+</level>
