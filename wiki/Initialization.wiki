@@ -50,13 +50,3 @@ This agent has seven components.  The ShapeVisual component specifies how to ren
 The next component is the GoalBehavior component.  There are two competing goals that are added to the component, specifically wander and kick ball.  Goals are selected based on insistence and when this agent sees a ball, it will want to kick it (given that it has enough energy).
 
 The BehaviorControl component provides the mechanisms to move the agent around the screen.  PerceptionComponent gives the agent eyes, ears and an ability to smell.  The InternalComponent gives the agent a limited amount of energy.  Energy is lost by moving quickly and energy is gained by eating food.
-
-Add your content here.
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
