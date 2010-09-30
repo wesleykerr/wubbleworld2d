@@ -198,7 +198,7 @@ public class PursueGoal implements Goal {
 		desireability += 0.30f * (space.get(Variable.agreeableness).get(Float.class) - 0.5f);
 
 		desireability += 0.1f * (0.5f - space.getBounded(Variable.valence).getValue());
-		desireability += 0.1f * (0.5f - space.getBounded(Variable.valence).getValue());
+		desireability += 0.1f * (0.5f - space.getBounded(Variable.arousal).getValue());
 		
 		desireability += 0.15f * ((ourEnergy - leastHealth) / 100);
 		desireability -= 0.15f * (1 - energy.getValue() / energy.getMax());
