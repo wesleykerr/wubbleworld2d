@@ -1,5 +1,6 @@
 package edu.arizona.simulator.ww2d.blackboard.ks;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dom4j.Element;
@@ -7,12 +8,14 @@ import org.jbox2d.common.Vec2;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.BoundedEntry;
+import edu.arizona.simulator.ww2d.blackboard.entry.DistanceEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 import edu.arizona.simulator.ww2d.logging.FluentStore;
 import edu.arizona.simulator.ww2d.logging.StateDatabase;
 import edu.arizona.simulator.ww2d.object.GameObject;
+import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.EventListener;
@@ -88,16 +91,24 @@ public class ReplayKnowledgeSource implements KnowledgeSource {
 		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 
 		float scale = systemSpace.get(Variable.physicsScale).get(Float.class);
-		
-		// for each of the dynamic physics objects we are going to update their positions
-		// the static objects will be fixed valued.
+
+		// For all of the objects we record the location in the world.  
+		// For some objects (such as the background) this is meaningless but 
+		// I can imagine something visual that needs to be recorded, so I'm doing it
+		// anyways.
 		for (GameObject obj : objectSpace.getAll()) { 
 			Vec2 pos = obj.getPosition();
 			
 			_fluentStore.record("x", obj.getName(), pos.x);
 			_fluentStore.record("y", obj.getName(), pos.y);
 			_fluentStore.record("heading", obj.getName(), obj.getHeading());
-			
+		}
+		
+		// For each of the physics objects we need to record some information about
+		// distances since it's harder to recreate later.
+		List<PhysicsObject> physics = new ArrayList<PhysicsObject>(objectSpace.getPhysicsObjects());
+		for (int i = 0; i < physics.size(); ++i) { 
+			PhysicsObject obj = physics.get(i);
 			if (obj.getType() == ObjectType.cognitiveAgent || obj.getType() == ObjectType.reactiveAgent) { 
 				AgentSpace agentSpace = Blackboard.inst().getSpace(AgentSpace.class, obj.getName());
 				BoundedEntry energy = agentSpace.getBounded(Variable.energy);
@@ -121,11 +132,30 @@ public class ReplayKnowledgeSource implements KnowledgeSource {
 				
 				// now we need to loop over all of the sonars and record their values....
 				List<SonarReading> sonar = agentSpace.get(Variable.sonar).get(List.class);
-				for (int i = 0; i < sonar.size(); i+=10) { 
-					SonarReading reading = sonar.get(i);
+				for (int j = 0; j < sonar.size(); j+=10) { 
+					SonarReading reading = sonar.get(j);
 					_fluentStore.record("sonar_" + reading.getName(), obj.getName(), reading.getDistance()*scale);
 				}
 			}
+			
+			// Now record distances
+			for (int j = i+1; j < physics.size(); ++j) { 
+				PhysicsObject other = physics.get(j);
+				DistanceEntry de = objectSpace.findOrAddDistance(obj, other);
+				_fluentStore.record("distance", obj.getName() + " " + other.getName(), de.getDistance());
+			}
+		}
+		
+		
+		
+		for (GameObject obj : objectSpace.getAll()) { 
+			Vec2 pos = obj.getPosition();
+			
+			_fluentStore.record("x", obj.getName(), pos.x);
+			_fluentStore.record("y", obj.getName(), pos.y);
+			_fluentStore.record("heading", obj.getName(), obj.getHeading());
+			
+			
 			
 		}
 		_fluentStore.update();
