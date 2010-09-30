@@ -27,7 +27,6 @@
 				</component>
 			</components>			
 		</gameObject>
-		</gameObject>
 		<physicsObject name="wall1" renderPriority="1" type="wall" >
 			<bodyDef x="0.25" y="50" />
 			<shapeDef type="polygon">
