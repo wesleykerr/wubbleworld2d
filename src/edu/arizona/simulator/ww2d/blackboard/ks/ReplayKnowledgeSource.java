@@ -62,6 +62,14 @@ public class ReplayKnowledgeSource implements KnowledgeSource {
 			} 
 		});
 		
+		EventManager.inst().registerForAll(EventType.UPDATE_END, new EventListener() { 
+			@Override
+			public void onEvent(Event e) { 
+				postUpdate();
+			}
+		});
+
+		
 		EventManager.inst().registerForAll(EventType.FINISH, new EventListener() { 
 			@Override
 			public void onEvent(Event e) {
@@ -86,6 +94,9 @@ public class ReplayKnowledgeSource implements KnowledgeSource {
 	public void update() { 		
 		if (_init) 
 			init();
+	}
+	
+	public void postUpdate() {
 
 		Space systemSpace = Blackboard.inst().getSpace("system");
 		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
