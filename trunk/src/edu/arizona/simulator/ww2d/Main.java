@@ -31,7 +31,7 @@ public class Main extends StateBasedGame {
 
 		addState(new SplashState(_fengWrapper, States.MainMenuState.ordinal()));
 		addState(new MainMenuState(_fengWrapper));
-		addState(new GameplayState(_fengWrapper, "data/levels/Room-Box.xml", "data/levels/Agents-User.xml"));
+		addState(new GameplayState(_fengWrapper, "data/levels/Room-Columns.xml", "data/levels/Agents-Default.xml"));
 
 		enterState(States.SplashState.ordinal());
 	}

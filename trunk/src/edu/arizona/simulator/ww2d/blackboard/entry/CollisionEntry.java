@@ -11,6 +11,7 @@ public class CollisionEntry extends Entry {
     private static Logger logger = Logger.getLogger( CollisionEntry.class );
 
 	private String _id;
+	private String _key;
 	private String _name;
 	
 	private PhysicsObject _obj1;
@@ -42,6 +43,7 @@ public class CollisionEntry extends Entry {
 		_processed = false;
 		
 		_id = cp.id.features.toString();
+		_key = key(cp);
 	}
 	
 	public void update(ContactPoint cp) { 
@@ -57,6 +59,10 @@ public class CollisionEntry extends Entry {
 		_tangentImpulse = cr.tangentImpulse;
 		
 		_processed = false;
+	}
+	
+	public String key() { 
+		return _key;
 	}
 	
 	public String getId() { 
@@ -112,4 +118,33 @@ public class CollisionEntry extends Entry {
 	public void classify() {
 		
 	}
+	
+	public static String key(ContactPoint cp) { 
+		PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
+		PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
+		
+		String name = "";
+		if (obj1.getName().compareTo(obj2.getName()) < 0) { 
+			name = obj1.getName() + " " + obj2.getName();
+		} else { 
+			name = obj2.getName() + " " + obj1.getName();
+		}
+
+		return name + cp.id.features.toString();
+	}
+	
+	public static String key(ContactResult cp) { 
+		PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
+		PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
+		
+		String name = "";
+		if (obj1.getName().compareTo(obj2.getName()) < 0) { 
+			name = obj1.getName() + " " + obj2.getName();
+		} else { 
+			name = obj2.getName() + " " + obj1.getName();
+		}
+
+		return name + cp.id.features.toString();
+	}
+	
 }

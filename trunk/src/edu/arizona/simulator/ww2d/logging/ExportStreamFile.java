@@ -18,6 +18,20 @@ public class ExportStreamFile {
 	 * @param args
 	 */
 	public static void main(String[] args) { 
+//		convertActivities();
+		
+		global("states/state-global.db", "logs/main.csv");
+	}
+	
+	public static void global(String inputDb, String outputFile) { 
+		Map<String,List<Row>> globalMap = getRows(inputDb);
+		Map<String,String[]> streamMap = toStreams(globalMap);
+		writeCSV(streamMap, outputFile);
+	}
+	
+	
+	
+	public static void convertActivities() { 
 		String path = "states/";
 		
 		int min = 1;
@@ -31,90 +45,135 @@ public class ExportStreamFile {
 				String inputDB = statePath + "state-agent1.db";
 				String outputFile = "logs/" + base + "-" + cnt + ".csv";
 
-				StateDatabase db = new StateDatabase(inputDB, false);
-				Map<Integer,String> entityMap = new HashMap<Integer,String>();
-				Map<Integer,String> fluentMap = new HashMap<Integer,String>();
+				Map<String,List<Row>> localMap = getRows(inputDB);
+				Map<String,String[]> streamMap = toStreams(localMap);
+				writeCSV(streamMap, outputFile);
+			}				
+		}		
+	}
+	
+	/**
+	 * Extract all of the rows from the SQLite database.  These are a fluent
+	 * representation where each row corresponds to a value that is consistent
+	 * during some interval.
+	 * @param inputDb
+	 * @return
+	 */
+	public static Map<String,List<Row>> getRows(String inputDb) { 
+		StateDatabase db = new StateDatabase(inputDb, false);
+		Map<Integer,String> entityMap = new HashMap<Integer,String>();
+		Map<Integer,String> fluentMap = new HashMap<Integer,String>();
 
-				fillMap(db, "select rowid, name from lookup_fluent_table", fluentMap);
-				fillMap(db, "select rowid, name from entity_map_table", entityMap);
+		fillMap(db, "select rowid, name from lookup_fluent_table", fluentMap);
+		fillMap(db, "select rowid, name from entity_map_table", entityMap);
 
-				System.out.println("Fluents: " + fluentMap.size() + " Entities: " + entityMap.size());
+		System.out.println("Fluents: " + fluentMap.size() + " Entities: " + entityMap.size());
 
-				int maxTime = 0;  // this will contain the size of the stream to be created.
-				Map<String,List<Row>> rowMap = new HashMap<String,List<Row>>();
-				for (String fluent : fluentMap.values()) { 
-					String tableName = "fluent_" + fluent;
+		Map<String,List<Row>> rowMap = new HashMap<String,List<Row>>();
+		for (String fluent : fluentMap.values()) { 
+			String tableName = "fluent_" + fluent;
 
-					List<Row> rows = new ArrayList<Row>();
-					try { 
-						Statement s = db.getStatement();
-						ResultSet rs = s.executeQuery("select * from " + tableName);
-						while (rs.next()) { 
-							Row r = new Row();
-							r.fluent = fluent;
-							r.entities = entityMap.get(rs.getInt("entities_id")).replaceAll("[,]", "");
-							r.value = rs.getString("value");
-							r.start = rs.getInt("start_time");
-							r.end = rs.getInt("end_time");
-							rows.add(r);
+			try { 
+				Statement s = db.getStatement();
+				ResultSet rs = s.executeQuery("select * from " + tableName);
+				while (rs.next()) { 
+					Row r = new Row();
+					r.fluent = fluent;
+					r.entities = entityMap.get(rs.getInt("entities_id")).replaceAll("[,]", "");
+					r.value = rs.getString("value");
+					r.start = rs.getInt("start_time");
+					r.end = rs.getInt("end_time");
 
-							maxTime = Math.max(r.end, maxTime);
-						}
-						rs.close();
-					} catch (Exception e) { 
-						e.printStackTrace();
+					// we are going to try and keep track of the exact set of 
+					// bounded fluents.
+					String key = "\"" + fluent + "(" + r.entities + ")\"";
+					List<Row> rows = rowMap.get(key);
+					if (rows == null) { 
+						rows = new ArrayList<Row>();
+						rowMap.put(key, rows);
 					}
-					rowMap.put(fluent, rows);
+					rows.add(r);
+				}
+				rs.close();
+			} catch (Exception e) { 
+				e.printStackTrace();
+			}
+		}
+		
+		return rowMap;
+	}
+	
+	/**
+	 * Covert the fluent representation into a stream representation since that
+	 * is what the CSV will be expecting.
+	 * @param rowMap
+	 * @return
+	 */
+	public static Map<String,String[]> toStreams(Map<String,List<Row>> rowMap) { 
+		// First we have to determine the max time that the fluents last....
+		int maxTime = 0;  // this will contain the size of the stream to be created.
+		for (List<Row> rows : rowMap.values()) { 
+			for (Row r : rows) 
+				maxTime = Math.max(r.end, maxTime);
+		}
+
+		// now we need to convert each fluent/entities pair into a stream
+		Map<String,String[]> streamMap = new TreeMap<String,String[]>();
+		for (String key : rowMap.keySet()) { 
+			for (Row r : rowMap.get(key)) { 
+				// first check to see if we already created a stream for this entity.  If not add it.
+				String[] stream = streamMap.get(key);
+				if (stream == null) { 
+					stream = new String[maxTime];
+					streamMap.put(key, stream);
 				}
 
-
-				// now we need to convert each fluent/entities pair into a stream
-				Map<String,String[]> streamMap = new TreeMap<String,String[]>();
-				for (String fluent : fluentMap.values()) { 
-					for (Row r : rowMap.get(fluent)) { 
-						// first check to see if we already created a stream for this entity.  If not add it.
-						String key = "\"" + fluent + "(" + r.entities + ")\"";
-						String[] stream = streamMap.get(key);
-						if (stream == null) { 
-							stream = new String[maxTime];
-							streamMap.put(key, stream);
-						}
-
-						for (int i = r.start; i < r.end; ++i) { 
-							// if you want numerical values instead of "true" and "false" and "unknown"
-							// then uncomment out this line.  Otherwise, leave it be.
-							//					updateNumeric(stream, r.value, i);
-							stream[i] = r.value;
-						}
-					}
-				}
-
-				// now we can write the mofo out.
-				try { 
-					BufferedWriter out = new BufferedWriter(new FileWriter(outputFile));
-					StringBuffer header = new StringBuffer();
-					for (String name : streamMap.keySet()) { 
-						header.append(name + ",");
-					}	
-					header.deleteCharAt(header.length()-1);
-					out.write(header + "\n");
-
-					// time starts at 1 so we should too.
-					for (int i = 1; i < maxTime; ++i) { 
-						StringBuffer row = new StringBuffer();
-						for (Map.Entry<String,String[]> entry : streamMap.entrySet()) { 
-							String value = entry.getValue()[i];
-							row.append(value + ",");
-						}
-						row.deleteCharAt(row.length()-1);
-						out.write(row + "\n");
-					}
-					out.close();
-				} catch (Exception e) { 
-					e.printStackTrace();
+				for (int i = r.start; i < r.end; ++i) { 
+					// if you want numerical values instead of "true" and "false" and "unknown"
+					// then uncomment out this line.  Otherwise, leave it be.
+					//					updateNumeric(stream, r.value, i);
+					stream[i] = r.value;
 				}
 			}
-		}		
+		}
+		return streamMap;
+	}
+	
+	/**
+	 * Write the CSV file from the streams given.
+	 * @param streamMap
+	 * @param outputFile
+	 */
+	public static void writeCSV(Map<String,String[]> streamMap, String outputFile) { 
+		// now we can write the mofo out.
+		try { 
+			BufferedWriter out = new BufferedWriter(new FileWriter(outputFile));
+			StringBuffer header = new StringBuffer();
+			
+			// write out the header
+			int maxTime = 0;
+			for (String name : streamMap.keySet()) { 
+				header.append(name + ",");
+				maxTime = Math.max(maxTime, streamMap.get(name).length);
+			}	
+			header.deleteCharAt(header.length()-1);
+			out.write(header + "\n");
+
+			// time starts at 1 so we should too.
+			for (int i = 1; i < maxTime; ++i) { 
+				StringBuffer row = new StringBuffer();
+				for (Map.Entry<String,String[]> entry : streamMap.entrySet()) { 
+					String value = entry.getValue()[i];
+					row.append(value + ",");
+				}
+				row.deleteCharAt(row.length()-1);
+				out.write(row + "\n");
+			}
+			out.close();
+		} catch (Exception e) { 
+			e.printStackTrace();
+		}
+
 	}
 	
 	/**

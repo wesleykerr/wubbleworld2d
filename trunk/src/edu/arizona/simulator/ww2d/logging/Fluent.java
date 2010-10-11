@@ -16,6 +16,7 @@ public class Fluent {
     protected StateDatabase _db;
 	
     private boolean _nonChanging;
+    private Object  _defaultValue;
     
 	protected String _name;
 	protected int    _nameId;
@@ -33,8 +34,13 @@ public class Fluent {
 	}
 
 	public Fluent(StateDatabase db, String name, String entities, boolean nonChanging, Object value) { 
+		this(db, name, entities, nonChanging, value, "unknown");
+	}
+	
+	public Fluent(StateDatabase db, String name, String entities, boolean nonChanging, Object value, Object defaultValue) { 
 		_db = db;
 		_nonChanging = nonChanging;
+		_defaultValue = defaultValue;
 		
 		_name = name;
 		_entityKey = entities;
@@ -47,7 +53,7 @@ public class Fluent {
 		
 		// we were unknown until this point
 		if (_lastUpdate > 1) { 
-			_value = "unknown";
+			_value = _defaultValue;
 			open(0);
 			close();
 		}
@@ -74,9 +80,9 @@ public class Fluent {
 	public void postUpdate() {
 		Space systemSpace = Blackboard.inst().getSpace("system");
 		long time = systemSpace.get(Variable.logicalTime).get(Long.class);
-		if (!_nonChanging && _lastUpdate < time && !"unknown".equals(_value)) {
+		if (!_nonChanging && _lastUpdate < time && !_defaultValue.equals(_value)) {
 			close();
-			_value = "unknown";
+			_value = _defaultValue;
 			open();
 		}
 	}

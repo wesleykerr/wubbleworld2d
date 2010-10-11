@@ -8,6 +8,7 @@ import org.jbox2d.dynamics.contacts.ContactResult;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.CollisionEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
+import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.utils.Event;
@@ -38,67 +39,77 @@ public class CollisionUpdater {
 		public void onEvent(Event e) {
 			ContactResult cr = (ContactResult) e.getValue("contact-result");
 
-			PhysicsObject obj1 = (PhysicsObject) cr.shape1.getUserData();
-			PhysicsObject obj2 = (PhysicsObject) cr.shape2.getUserData();
-
-//			logger.debug("ContactResult::onEvent: " + obj1.getName() + " " + obj2.getName());
-			if (Blackboard.inst().spaceExists(obj1.getName())) {
-				AgentSpace space1 = Blackboard.inst().getSpace(AgentSpace.class, obj1.getName());
-				CollisionEntry entry = space1.getCollisionEntry(obj2, cr.id.features.toString());
-				entry.update(cr);
-			}
-
-			if (Blackboard.inst().spaceExists(obj2.getName())) {
-				AgentSpace space2 = Blackboard.inst().getSpace(AgentSpace.class, obj2.getName());
-				CollisionEntry entry = space2.getCollisionEntry(obj1, cr.id.features.toString());
-				entry.update(cr);
-			}			
+			// update the generic collision information.
+			String key = CollisionEntry.key(cr);
+			ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+			CollisionEntry entry = objectSpace.getCollision(key);
+			entry.update(cr);
 		} 
 	}
 	
 	class CollisionListener implements EventListener {
 		@Override
 		public void onEvent(Event e) {
-			// these will be CollisionEvents and they
-			// just need to be written to the correct 
-			// places on the blackboard.
+			// these will be CollisionEvents and they just need to be written to the correct 
+			// places on the blackboard.  We will be using shared references in order
+			// to speed things up.  On persist, you only need to update the
+			// the ObjectSpace collision entry.
 			ContactPoint cp = (ContactPoint) e.getValue("contact-point");
 			String type = (String) e.getValue("type");
 			
+			if ("add".equals(type))  
+				add(cp);
+			else if ("persist".equals(type)) 
+				persist(cp);
+			else if ("remove".equals(type))
+				remove(cp);
+		}
+			
+		private void add(ContactPoint cp) { 
+			ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+			
+			CollisionEntry entry = new CollisionEntry(cp);
 			PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
 			PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
 
-//			logger.debug("CollisionListener::onEvent: " + obj1.getName() + " " + obj2.getName());
-			CollisionEntry entry = null;
-			if ("add".equals(type)) { 
-				entry = new CollisionEntry(cp);
-			}
-
-//			if (!"persist".equals(type)) 
-//				logger.debug("Collision: " + type + " " + obj1.getName() + " " + obj2.getName());
-
-//			if ("agent4".equals(obj1.getName()) || "agent4".equals(obj2.getName())) { 
-//				print(obj1, obj2, type, cp);
-//			}
-			
+			objectSpace.addCollision(entry);
 			if (Blackboard.inst().spaceExists(obj1.getName())) {
 				AgentSpace space1 = Blackboard.inst().getSpace(AgentSpace.class, obj1.getName());
-				if ("add".equals(type)) 
-					space1.add(entry);
-				else if ("persist".equals(type))
-					space1.persist(cp);
-				else if ("remove".equals(type))
-					space1.remove(cp);
+				space1.add(entry);
 			}
-
+			
 			if (Blackboard.inst().spaceExists(obj2.getName())) {
 				AgentSpace space2 = Blackboard.inst().getSpace(AgentSpace.class, obj2.getName());
-				if ("add".equals(type)) 
-					space2.add(entry);
-				else if ("persist".equals(type))
-					space2.persist(cp);
-				else if ("remove".equals(type))
-					space2.remove(cp);
+				space2.add(entry);
+			}
+		}
+		
+		/**
+		 * Only need to up the object space contact point since the others are
+		 * shared references.
+		 * @param cp
+		 */
+		private void persist(ContactPoint cp) { 
+			ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+			CollisionEntry entry = objectSpace.getCollision(CollisionEntry.key(cp));
+			entry.update(cp);
+		}
+		
+		private void remove(ContactPoint cp) { 
+			ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+			String key = CollisionEntry.key(cp);
+			objectSpace.removeCollision(key);
+			
+			PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
+			PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
+			if (Blackboard.inst().spaceExists(obj1.getName())) {
+				AgentSpace space1 = Blackboard.inst().getSpace(AgentSpace.class, obj1.getName());
+				space1.remove(cp);
+			}
+			
+			if (Blackboard.inst().spaceExists(obj2.getName())) {
+				AgentSpace space2 = Blackboard.inst().getSpace(AgentSpace.class, obj2.getName());
+				space2.remove(cp);
 			}
 		}
 	}

@@ -148,26 +148,6 @@ public class ReplayKnowledgeSource implements KnowledgeSource {
 					_fluentStore.record("sonar_" + reading.getName(), obj.getName(), reading.getDistance()*scale);
 				}
 			}
-			
-			// Now record distances
-			for (int j = i+1; j < physics.size(); ++j) { 
-				PhysicsObject other = physics.get(j);
-				DistanceEntry de = objectSpace.findOrAddDistance(obj, other);
-				_fluentStore.record("distance", obj.getName() + " " + other.getName(), de.getDistance());
-			}
-		}
-		
-		
-		
-		for (GameObject obj : objectSpace.getAll()) { 
-			Vec2 pos = obj.getPosition();
-			
-			_fluentStore.record("x", obj.getName(), pos.x);
-			_fluentStore.record("y", obj.getName(), pos.y);
-			_fluentStore.record("heading", obj.getName(), obj.getHeading());
-			
-			
-			
 		}
 		_fluentStore.update();
 	}

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import edu.arizona.simulator.ww2d.blackboard.entry.CollisionEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.DistanceEntry;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
@@ -30,7 +31,11 @@ public class ObjectSpace extends Space {
 	
 	private List<GameObject> _renderObjects;
 	
+	// buffered distance memory
 	private LinkedList<Map<String,Map<String,DistanceEntry>>> _distanceMemory;
+
+	// collisions aren't necessarily buffered yet....
+	private Map<String,CollisionEntry> _collisions;
 	
 	public ObjectSpace() { 
 		_renderObjects = new LinkedList<GameObject>();
@@ -41,6 +46,7 @@ public class ObjectSpace extends Space {
 		_cognitiveAgents = new ArrayList<PhysicsObject>();
 		
 		_distanceMemory = new LinkedList<Map<String,Map<String,DistanceEntry>>>();
+		_collisions = new HashMap<String,CollisionEntry>();
 		
 		EventManager.inst().registerForAll(EventType.UPDATE_START, new EventListener() {
 			@Override
@@ -192,6 +198,26 @@ public class ObjectSpace extends Space {
 		if (entry == null)
 			throw new RuntimeException("Distance doesn't exist for " + obj1.getName() + " " + obj2.getName() + " " + index);
 		return entry;
+	}
+	
+	public void addCollision(CollisionEntry entry) { 
+		_collisions.put(entry.key(), entry);
+	}
+	
+	/**
+	 * Get all of the currently active collisions
+	 * @return
+	 */
+	public Collection<CollisionEntry> getCollisions() { 
+		return _collisions.values();
+	}
+	
+	public CollisionEntry getCollision(String key) {
+		return _collisions.get(key);
+	}
+	
+	public void removeCollision(String key) { 
+		_collisions.remove(key);
 	}
 }
 
