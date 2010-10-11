@@ -6,6 +6,7 @@ import java.util.Map;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.EventListener;
+import edu.arizona.simulator.ww2d.utils.MathUtils;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
 
 /**
@@ -19,11 +20,13 @@ public class FluentStore {
 	private StateDatabase                  _db;
 	private Map<String,Map<String,Fluent>> _fluentMap;
 	private long                           _lastCommit;
+	private long                           _deltaValue;
 
 	public FluentStore(String dbName) { 
 		_db = new StateDatabase(dbName);
 		_fluentMap = new HashMap<String,Map<String,Fluent>>();
 		_lastCommit = System.currentTimeMillis();
+		_deltaValue = 1000 + MathUtils.random.nextInt(500);
 		
 		EventManager.inst().registerForAll(EventType.FINISH, new EventListener() {
 			@Override
@@ -61,7 +64,7 @@ public class FluentStore {
 		}
 		
 		long time = System.currentTimeMillis();
-		if (time - 1000 > _lastCommit) { 
+		if (time - _deltaValue > _lastCommit) { 
 			_db.commit();
 			_lastCommit = time;
 		}
@@ -85,6 +88,30 @@ public class FluentStore {
 	 * @param value
 	 */
 	public void record(String fluentName, String entitiesName, boolean nonChanging, Object value) { 
+		recordw(fluentName, entitiesName, nonChanging, value, "unknown");
+	}
+	
+	/**
+	 * Record the latest value for the give fluent and entities.  Provide a default
+	 * value if you want something specific other than "unknown";
+	 * @param fluentName
+	 * @param entitiesName
+	 * @param value
+	 * @param defaultValue
+	 */
+	public void recordw(String fluentName, String entitiesName, Object value, Object defaultValue) { 
+		recordw(fluentName, entitiesName, false, value, defaultValue);
+	}
+	
+	/**
+	 * This record will default to a given value when nothing is recorded.  Useful
+	 * for the global recording of events.
+	 * @param fluentName
+	 * @param entitiesName
+	 * @param value
+	 * @param defaultValue
+	 */
+	public void recordw(String fluentName, String entitiesName, boolean nonChanging, Object value, Object defaultValue) { 
 		Map<String,Fluent> map = _fluentMap.get(fluentName);
 		if (map == null) { 
 			map = new HashMap<String,Fluent>();
@@ -96,10 +123,12 @@ public class FluentStore {
 		// register multiple times.  The default value will
 		// be unknown.
 		if (fluent == null) { 
-			fluent = new Fluent(_db, fluentName, entitiesName, nonChanging, value);
+			fluent = new Fluent(_db, fluentName, entitiesName, nonChanging, value, defaultValue);
 			map.put(entitiesName, fluent);
 		} else { 
 			fluent.update(value);
 		}
 	}
+	
+	
 }
