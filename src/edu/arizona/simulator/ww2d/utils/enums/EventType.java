@@ -123,4 +123,19 @@ public enum EventType {
 	 * 		new-object - the new object that the camera will be centered on
 	 */
 	CHANGE_CAMERA_FOLLOWING,
+	
+	/**
+	 * SET_WAYPOINTS
+	 *   Payload:
+	 *     list of waypoints.
+	 */
+	SET_WAYPOINTS,
+	
+	/**
+	 * SET_WAYPOINTS_AND_TIMES
+	 *   Payload:
+	 *     list of waypoints.
+	 *     list of the amount of time to spend at each waypiont
+	 */
+	SET_WAYPOINTS_AND_TIMES,
 }

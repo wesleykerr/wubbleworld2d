@@ -1,26 +1,20 @@
 package edu.arizona.simulator.ww2d.states;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
-
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.Widget;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 import de.matthiasmann.twl.theme.ThemeManager;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
-import edu.arizona.simulator.ww2d.gui.MessageConsole;
 import edu.arizona.simulator.ww2d.gui.TWLInputAdapter;
+import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.system.FoodSubsystem;
 import edu.arizona.simulator.ww2d.system.GameSystem;
 import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
 import edu.arizona.simulator.ww2d.utils.Event;
@@ -32,6 +26,7 @@ public class GameplayState extends BHGameState {
 	
 	private String _levelFile;
 	private String _agentsFile;
+	private Scenario _scenario;
 	
 	private GameSystem _gameSystem;
 
@@ -41,11 +36,15 @@ public class GameplayState extends BHGameState {
     private Widget root;
     private TWLInputAdapter twlInputAdapter;
     
-    public GameplayState(FengWrapper feng, String levelFile, String agentsFile) {
+    private long _enterTime;
+    private boolean _update;
+    
+    public GameplayState(FengWrapper feng, String levelFile, String agentsFile, Scenario scenario) {
 		super(feng);
 		
 		_levelFile = levelFile;
 		_agentsFile = agentsFile;
+		_scenario = scenario;
 	}
 
     @Override
@@ -57,7 +56,7 @@ public class GameplayState extends BHGameState {
 	public void init(GameContainer container, StateBasedGame game) throws SlickException {
 		_gameSystem = new GameSystem(container.getWidth(), container.getHeight());
 		_gameSystem.addSubsystem(GameSystem.Systems.PhysicsSubystem, new PhysicsSubsystem());
-		_gameSystem.loadLevel(_levelFile, _agentsFile);
+		_gameSystem.loadLevel(_levelFile, _agentsFile, _scenario);
 		
 //        root = new Widget();
 //        root.setTheme("");
@@ -90,6 +89,8 @@ public class GameplayState extends BHGameState {
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException { 
 		super.enter(container, game);
 //		layout(_feng.getDisplay());
+		
+		_enterTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -119,7 +120,8 @@ public class GameplayState extends BHGameState {
 
 	@Override
 	public void update(GameContainer container, StateBasedGame game, int millis) throws SlickException {
-		_gameSystem.update(millis);
+		if (_enterTime + 5000 < System.currentTimeMillis())
+			_gameSystem.update(millis);
 //		twlInputAdapter.update();
 	}
 

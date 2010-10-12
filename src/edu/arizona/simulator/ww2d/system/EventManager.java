@@ -71,7 +71,7 @@ public class EventManager {
 		if (listeners == null) { 
 			listeners = new ArrayList<EventListener>();
 			_unique.get(event).put(obj.getName(), listeners);
-//			logger.debug("Registering: " + obj.getName() + " " + event);
+			logger.debug("Registering: " + obj.getName() + " " + event);
 		}
 		listeners.add(callback);
 	}

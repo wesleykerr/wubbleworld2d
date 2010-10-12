@@ -8,6 +8,10 @@ import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
+import edu.arizona.simulator.ww2d.scenario.PathScenario1;
+import edu.arizona.simulator.ww2d.scenario.PathScenario2;
+import edu.arizona.simulator.ww2d.scenario.PathScenario3;
+import edu.arizona.simulator.ww2d.scenario.PathScenario4;
 import edu.arizona.simulator.ww2d.states.AWTReplayState;
 import edu.arizona.simulator.ww2d.states.BHGameState;
 import edu.arizona.simulator.ww2d.states.RecordingGameplayState;
@@ -21,7 +25,7 @@ public class Record extends StateBasedGame {
 
 	private FengWrapper _fengWrapper;
 	
-	public static final int MILLIS = 30000;
+	public static final int MILLIS = 15000;
 	public static final int REPEAT = 20;
 	
 	public Record() {
@@ -33,13 +37,22 @@ public class Record extends StateBasedGame {
 	public void initStatesList(GameContainer container) throws SlickException {
 		_fengWrapper = new FengWrapper(container);
 
+		RecordingState recState = new RecordingState(_fengWrapper);
+		
+		recState.addParams("pass", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario1());
+		recState.addParams("talk-a", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario2());
+		recState.addParams("talk-b", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario3());
+		recState.addParams("collide", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario4());
+		
+
 		addState(new SplashState(_fengWrapper, States.RecordingState.ordinal()));
-		addState(new RecordingState(_fengWrapper));
+		addState(recState);
+		addState(new RecordingGameplayState(_fengWrapper));
 //		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Empty.xml", "data/levels/Agents-Chase.xml"));
 //		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Empty.xml", "data/levels/Agents-Flee.xml"));
 //		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Empty.xml", "data/levels/Agents-Fight.xml"));
 //		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Empty.xml", "data/levels/Agents-Wander.xml"));
-		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Balls.xml", "data/levels/Agents-Kick.xml"));
+//		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Balls.xml", "data/levels/Agents-Kick.xml", null));
 //		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Columns.xml", "data/levels/Agents-Kick.xml"));
 //		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Food.xml", "data/levels/Agents-Eat.xml"));
 		addState(new AWTReplayState(_fengWrapper));
