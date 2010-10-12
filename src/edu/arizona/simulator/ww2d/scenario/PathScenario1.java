@@ -46,9 +46,15 @@ public class PathScenario1 implements Scenario {
 		if (MathUtils.random.nextDouble() < 0.5) { 
 			waypoints1.add(offset2);
 			waypoints2.add(obj1.getPPosition());
+
+			obj2.getBody().setXForm(obj2.getPPosition(), radians);
+			obj1.getBody().setXForm(offset1, radians + PI);
 		} else { 
 			waypoints1.add(obj2.getPPosition());
 			waypoints2.add(offset1);
+
+			obj2.getBody().setXForm(offset2, radians);
+			obj1.getBody().setXForm(obj1.getPPosition(), radians + PI);
 		}
 		
 		// Set positions and orientations
