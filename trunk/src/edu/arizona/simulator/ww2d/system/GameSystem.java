@@ -24,6 +24,7 @@ import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 import edu.arizona.simulator.ww2d.factory.ObjectFactory;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
+import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
@@ -106,7 +107,7 @@ public class GameSystem {
 		_systems.put(id, s);
 	}
 	
-	public void loadLevel(String levelName, String agentsFile) { 
+	public void loadLevel(String levelName, String agentsFile, Scenario scenario) { 
 		logger.debug("Loading level: " + levelName);
 		
 		Space systemSpace = Blackboard.inst().getSpace("system");
@@ -170,6 +171,17 @@ public class GameSystem {
 		// TODO: here we need to decide what we want to do when we are done loading.
 		// Maybe we place a boolean value into the space that a knowledge source watches
 		// for.
+		if (scenario != null)
+			scenario.setup();
+	}
+
+	/**
+	 * Set up a simply activity scenario that will add some FSMs to the
+	 * agents and will make sure that they follow a path towards each other.
+	 * Probably should not be here, but for now no other good place to put
+	 * it.
+	 */
+	public void setPathScenario1() { 
 	}
 	
 	public void update(int elapsed) {

@@ -20,8 +20,8 @@ import org.newdawn.slick.state.StateBasedGame;
 
 import edu.arizona.simulator.ww2d.Record;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
+import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.system.FoodSubsystem;
 import edu.arizona.simulator.ww2d.system.GameSystem;
 import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
 import edu.arizona.simulator.ww2d.utils.Event;
@@ -34,17 +34,21 @@ public class RecordingGameplayState extends BHGameState {
 	
 	private GameSystem _gameSystem;
 
-	private String _levelFile;
-	private String _agentsFile;
+	private String   _levelFile;
+	private String   _agentsFile;
+	private Scenario _scenario;
 	
 	private long _enteredTime;
 
-    public RecordingGameplayState(FengWrapper feng, String levelFile, String agentsFile) {
+    public RecordingGameplayState(FengWrapper feng) {
 		super(feng);
-		
+	}
+    
+    public void setParams(String levelFile, String agentsFile, Scenario scenario) { 
 		_levelFile = levelFile;
 		_agentsFile = agentsFile;
-	}
+		_scenario = scenario;
+    }
 
     @Override
 	public int getID() {
@@ -60,7 +64,7 @@ public class RecordingGameplayState extends BHGameState {
 		super.enter(container, game);
 		_gameSystem = new GameSystem(container.getWidth(), container.getHeight());
 		_gameSystem.addSubsystem(GameSystem.Systems.PhysicsSubystem, new PhysicsSubsystem());
-		_gameSystem.loadLevel(_levelFile, _agentsFile);
+		_gameSystem.loadLevel(_levelFile, _agentsFile, _scenario);
 		
 		_enteredTime = System.currentTimeMillis();
 	}
@@ -91,6 +95,9 @@ public class RecordingGameplayState extends BHGameState {
 
 	@Override
 	public void update(GameContainer container, StateBasedGame game, int millis) throws SlickException {
+		if (_enteredTime + 2000 >= System.currentTimeMillis())
+			return;
+
 		long time = System.currentTimeMillis();
 		
 		// 300000 - 5 minutes

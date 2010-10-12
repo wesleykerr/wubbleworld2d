@@ -8,6 +8,8 @@ import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
+import edu.arizona.simulator.ww2d.scenario.PathScenario1;
+import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.states.BHGameState;
 import edu.arizona.simulator.ww2d.states.GameplayState;
 import edu.arizona.simulator.ww2d.states.MainMenuState;
@@ -17,6 +19,10 @@ import edu.arizona.simulator.ww2d.utils.enums.States;
 
 public class Main extends StateBasedGame {
     private static Logger logger = Logger.getLogger( Main.class );
+    
+    private String _levelFile = "data/levels/Room-Empty.xml";
+    private String _agentsFile = "data/levels/Agents-Path.xml";
+    private Scenario _scenario = new PathScenario1();
 
 	private FengWrapper _fengWrapper;
 	
@@ -31,7 +37,7 @@ public class Main extends StateBasedGame {
 
 		addState(new SplashState(_fengWrapper, States.MainMenuState.ordinal()));
 		addState(new MainMenuState(_fengWrapper));
-		addState(new GameplayState(_fengWrapper, "data/levels/Room-Columns.xml", "data/levels/Agents-Default.xml"));
+		addState(new GameplayState(_fengWrapper, _levelFile, _agentsFile, _scenario));
 
 		enterState(States.SplashState.ordinal());
 	}
