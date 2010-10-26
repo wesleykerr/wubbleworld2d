@@ -10,7 +10,7 @@ import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.EventListener;
-import edu.arizona.simulator.ww2d.utils.GameGlobals;
+import edu.arizona.simulator.ww2d.utils.SlickGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
 
 public class FoodComponent extends Component {
@@ -69,7 +69,7 @@ public class FoodComponent extends Component {
 	@Override 
 	public void render(Graphics g) { 
 		int store = (int) _parent.getUserData("store", Float.class).floatValue();
-		GameGlobals.textFont.drawString(_parent.getPosition().x-5, _parent.getPosition().y-5, store+"", Color.black);
+		SlickGlobals.textFont.drawString(_parent.getPosition().x-5, _parent.getPosition().y-5, store+"", Color.black);
 	}
 	
 	@Override

@@ -6,7 +6,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
 import edu.arizona.simulator.ww2d.object.GameObject;
-import edu.arizona.simulator.ww2d.utils.GameGlobals;
+import edu.arizona.simulator.ww2d.utils.SlickGlobals;
 
 public class TextVisual extends Component {
 
@@ -36,7 +36,7 @@ public class TextVisual extends Component {
 		Object value = _parent.getUserData(_varName);
 		if (value != null) {
 			Vec2 offset = _parent.getPosition().add(_offset);
-			GameGlobals.textFont.drawString(offset.x, offset.y, value.toString(), Color.black);
+			SlickGlobals.textFont.drawString(offset.x, offset.y, value.toString(), Color.black);
 		}
 	}
 	
