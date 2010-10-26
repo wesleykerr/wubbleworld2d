@@ -28,6 +28,7 @@ import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
+import edu.arizona.simulator.ww2d.utils.SlickGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -242,11 +243,11 @@ public class GameSystem {
 		g.setColor(blackAlpha);
 		g.fillRect(490, 0, 220, 60);
 
-		GameGlobals.textFont.drawString(500, 0, "Name: " + pobj.getName());
-		GameGlobals.textFont.drawString(500, 10, "Valence: " + GameGlobals.nf.format(valence.getValue()) + 
+		SlickGlobals.textFont.drawString(500, 0, "Name: " + pobj.getName());
+		SlickGlobals.textFont.drawString(500, 10, "Valence: " + GameGlobals.nf.format(valence.getValue()) + 
 				     " Arousal: " + GameGlobals.nf.format(arousal.getValue()));
-		GameGlobals.textFont.drawString(500, 20, "Energy: " + GameGlobals.nf.format(energy.getValue()));
-		GameGlobals.textFont.drawString(500, 30, "Target: " + target);
+		SlickGlobals.textFont.drawString(500, 20, "Energy: " + GameGlobals.nf.format(energy.getValue()));
+		SlickGlobals.textFont.drawString(500, 30, "Target: " + target);
 	}
 	
 	public void finish() { 

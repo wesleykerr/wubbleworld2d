@@ -29,7 +29,7 @@ import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Wander;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.EventListener;
-import edu.arizona.simulator.ww2d.utils.GameGlobals;
+import edu.arizona.simulator.ww2d.utils.SlickGlobals;
 import edu.arizona.simulator.ww2d.utils.SteeringOutput;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
@@ -152,7 +152,7 @@ public class BehaviorControl extends Component {
 			g.setColor(blackAlpha);
 			g.fillRect(pos.x-100, pos.y-200, 200, count*25);
 			
-			GameGlobals.textFont.drawString(pos.x-98, pos.y-198, buf.toString(), Color.white);
+			SlickGlobals.textFont.drawString(pos.x-98, pos.y-198, buf.toString(), Color.white);
 		}
 	}
 

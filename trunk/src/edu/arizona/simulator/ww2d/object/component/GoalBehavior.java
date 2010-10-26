@@ -24,7 +24,7 @@ import edu.arizona.simulator.ww2d.object.component.goals.IdleGoal;
 import edu.arizona.simulator.ww2d.object.component.goals.KickBallGoal;
 import edu.arizona.simulator.ww2d.object.component.goals.PursueGoal;
 import edu.arizona.simulator.ww2d.object.component.goals.WanderGoal;
-import edu.arizona.simulator.ww2d.utils.GameGlobals;
+import edu.arizona.simulator.ww2d.utils.SlickGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.GoalEnum;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -161,7 +161,7 @@ public class GoalBehavior extends Component {
 			buf.append(agentSpace.get(Variable.state).get(String.class) + "\n");
 			buf.append("Move : " + agentSpace.get(Variable.moveModifier).get(Float.class) + " ");
 			buf.append("Turn : " + agentSpace.get(Variable.turnModifier).get(Float.class) + "\n");
-			GameGlobals.textFont.drawString(pos.x+102, pos.y-198, buf.toString(), Color.white);
+			SlickGlobals.textFont.drawString(pos.x+102, pos.y-198, buf.toString(), Color.white);
 		}
 	}
 }
