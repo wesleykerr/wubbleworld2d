@@ -34,5 +34,6 @@
 	<classpathentry kind="lib" path="lib/xpp3_min-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3_xpath-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3-1.1.4c.jar"/>
+	<classpathentry kind="lib" path="lib/oomdp.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
