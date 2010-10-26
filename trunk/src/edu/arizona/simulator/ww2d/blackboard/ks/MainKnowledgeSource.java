@@ -280,9 +280,9 @@ public class MainKnowledgeSource implements KnowledgeSource {
 				// Math.PI is directly from the front
 				
 				float angle = MathUtils.angleBetween(v1, v2);
-				logger.debug("@@@@@@@ - Collision : " + ce.getPosition() + " Obj Position: " + obj.getPPosition());
-				logger.debug("@@@@@@@ - v1: " + v1 + " v2: " + v2);
-				logger.debug("@@@@@@@ - angle: " + angle);
+//				logger.debug("@@@@@@@ - Collision : " + ce.getPosition() + " Obj Position: " + obj.getPPosition());
+//				logger.debug("@@@@@@@ - v1: " + v1 + " v2: " + v2);
+//				logger.debug("@@@@@@@ - angle: " + angle);
 				if (angle <= MathUtils.PI4) {  // front collision
 					energyDelta -= 4*ce.getNormalImpulse();
 					aModifier = 0.2f;
@@ -303,7 +303,7 @@ public class MainKnowledgeSource implements KnowledgeSource {
 					vModifier = -0.3f;
 				}
 				
-				logger.debug("@@@@@@@ - " + ce.getNormalImpulse() + " energy: " + energyDelta + " arousal: " +  aModifier + " valence: " + vModifier);
+//				logger.debug("@@@@@@@ - " + ce.getNormalImpulse() + " energy: " + energyDelta + " arousal: " +  aModifier + " valence: " + vModifier);
 				break;
 			}
 			

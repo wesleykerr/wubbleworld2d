@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<level>
+	<physicsScale value="12" />
+	<physics>
+		<aabb>
+			<min x="-2" y="-2" />
+			<max x="102" y="102" />
+		</aabb>
+		<gravity x="0" y="0" />
+		<doSleep value="true" />		
+	</physics>
+
+	<!-- Do not add a food system to this room -->	
+	<foodSubsystem value="false" />
+	
+	<objects />
+</level>

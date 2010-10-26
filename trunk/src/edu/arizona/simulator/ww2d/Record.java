@@ -39,9 +39,9 @@ public class Record extends StateBasedGame {
 
 		RecordingState recState = new RecordingState(_fengWrapper);
 		
-		recState.addParams("pass", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario1());
-		recState.addParams("talk-a", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario2());
-		recState.addParams("talk-b", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario3());
+//		recState.addParams("pass", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario1());
+//		recState.addParams("talk-a", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario2());
+//		recState.addParams("talk-b", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario3());
 		recState.addParams("collide", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario4());
 		
 
