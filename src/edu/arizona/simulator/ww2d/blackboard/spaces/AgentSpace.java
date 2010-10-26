@@ -27,6 +27,7 @@ import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.EventListener;
+import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -64,11 +65,21 @@ public class AgentSpace extends Space {
 		_approaching = new HashSet<String>();
 		_novelSet = new HashMap<String,Long>();
 		
-		_fluentStore = new FluentStore(_name);
+		if (GameGlobals.record) {  
+			_fluentStore = new FluentStore(_name);
 		
-		// set up some of the default parameters that we want
-		// to keep an eye on possibly.
-		AgentHelper.recordSystem(this);
+			// set up some of the default parameters that we want
+			// to keep an eye on possibly.
+			AgentHelper.recordSystem(this);
+
+			// Recording takes place in the postUpdate method.
+			EventManager.inst().registerForAll(EventType.UPDATE_END, new EventListener() { 
+				@Override
+				public void onEvent(Event e) { 
+					postUpdate();
+				}
+			});
+		}
 		
 		EventManager.inst().registerForAll(EventType.UPDATE_START, new EventListener() {
 			@Override
@@ -76,13 +87,6 @@ public class AgentSpace extends Space {
 				preUpdate();
 			} 
 		});		
-		
-		EventManager.inst().registerForAll(EventType.UPDATE_END, new EventListener() { 
-			@Override
-			public void onEvent(Event e) { 
-				postUpdate();
-			}
-		});
 	}
 	
 	public FluentStore getFluentStore() { 

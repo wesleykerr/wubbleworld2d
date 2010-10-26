@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -36,6 +38,7 @@ public class ObjectSpace extends Space {
 
 	// collisions aren't necessarily buffered yet....
 	private Map<String,CollisionEntry> _collisions;
+	private Set<String> _collisionSet;
 	
 	public ObjectSpace() { 
 		_renderObjects = new LinkedList<GameObject>();
@@ -46,7 +49,9 @@ public class ObjectSpace extends Space {
 		_cognitiveAgents = new ArrayList<PhysicsObject>();
 		
 		_distanceMemory = new LinkedList<Map<String,Map<String,DistanceEntry>>>();
+		
 		_collisions = new HashMap<String,CollisionEntry>();
+		_collisionSet = new HashSet<String>();
 		
 		EventManager.inst().registerForAll(EventType.UPDATE_START, new EventListener() {
 			@Override
@@ -150,6 +155,7 @@ public class ObjectSpace extends Space {
 	 * everything from the distance map, since it is a cache map anyways.
 	 */
 	public void preUpdate() { 
+		// Print out the previous distances....
 		Map<String,Map<String,DistanceEntry>> distances = new HashMap<String,Map<String,DistanceEntry>>();
 		for (PhysicsObject obj : _physicsObjects.values()) { 
 			distances.put(obj.getName(), new HashMap<String,DistanceEntry>());
@@ -192,16 +198,33 @@ public class ObjectSpace extends Space {
 	}
 	
 	public DistanceEntry getDistance(PhysicsObject obj1, PhysicsObject obj2, int index) { 
+		if (index >= _distanceMemory.size())
+			return null;
+		
 		Map<String,Map<String,DistanceEntry>> distances = _distanceMemory.get(index);
 		Map<String,DistanceEntry> map = distances.get(obj1.getName());
+
 		DistanceEntry entry = map.get(obj2.getName());
-		if (entry == null)
+		if (entry == null) 
 			throw new RuntimeException("Distance doesn't exist for " + obj1.getName() + " " + obj2.getName() + " " + index);
 		return entry;
 	}
 	
+	/**
+	 * Test to see if there is a collision between obj1 and obj2
+	 * @param obj1
+	 * @param obj2
+	 * @return
+	 */
+	public boolean isCollision(PhysicsObject obj1, PhysicsObject obj2) { 
+		return _collisionSet.contains(obj1.getName() + " " + obj2.getName());
+	}
+	
 	public void addCollision(CollisionEntry entry) { 
 		_collisions.put(entry.key(), entry);
+
+		_collisionSet.add(entry.getObject1().getName() + " " + entry.getObject2().getName());
+		_collisionSet.add(entry.getObject2().getName() + " " + entry.getObject1().getName());
 	}
 	
 	/**
@@ -216,8 +239,11 @@ public class ObjectSpace extends Space {
 		return _collisions.get(key);
 	}
 	
-	public void removeCollision(String key) { 
+	public void removeCollision(String key, PhysicsObject obj1, PhysicsObject obj2) { 
 		_collisions.remove(key);
+		
+		_collisionSet.remove(obj1.getName() + " " + obj2.getName());
+		_collisionSet.remove(obj2.getName() + " " + obj1.getName());
 	}
 }
 

@@ -114,7 +114,7 @@ public class PerceptionComponent extends Component {
 			if (obj == _obj)
 				continue;
 			
-			// It's a dynamic object... therefore we can hear it.
+			// TODO: Actually add other dynamic objects... only if they are moving.
 			if (obj.getType() == ObjectType.reactiveAgent || obj.getType() == ObjectType.cognitiveAgent)
 				auditory.add(obj);
 			

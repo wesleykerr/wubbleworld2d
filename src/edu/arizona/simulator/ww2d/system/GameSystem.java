@@ -150,38 +150,31 @@ public class GameSystem {
 			e.printStackTrace();
 		}
 		
-		try {
-			URL url = this.getClass().getClassLoader().getResource(agentsFile);
-			Document doc = reader.read(url);
-			Element root = doc.getRootElement();
-		
-			List physicsObjs = root.elements("physicsObject");
-			for (int i = 0; i < physicsObjs.size(); ++i) { 
-				Element obj = (Element) physicsObjs.get(i);
-				
-				Event event = new Event(EventType.CREATE_PHYSICS_OBJECT);
-				event.addParameter("element", obj);
-				EventManager.inst().dispatchImmediate(event);
-			}
+		if (agentsFile != null) {
+			try {
+				URL url = this.getClass().getClassLoader().getResource(agentsFile);
+				Document doc = reader.read(url);
+				Element root = doc.getRootElement();
 
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		}		
+				List physicsObjs = root.elements("physicsObject");
+				for (int i = 0; i < physicsObjs.size(); ++i) { 
+					Element obj = (Element) physicsObjs.get(i);
+
+					Event event = new Event(EventType.CREATE_PHYSICS_OBJECT);
+					event.addParameter("element", obj);
+					EventManager.inst().dispatchImmediate(event);
+				}
+
+			} catch (DocumentException e) {
+				e.printStackTrace();
+			}		
+		}
 
 		// TODO: here we need to decide what we want to do when we are done loading.
 		// Maybe we place a boolean value into the space that a knowledge source watches
 		// for.
 		if (scenario != null)
 			scenario.setup();
-	}
-
-	/**
-	 * Set up a simply activity scenario that will add some FSMs to the
-	 * agents and will make sure that they follow a path towards each other.
-	 * Probably should not be here, but for now no other good place to put
-	 * it.
-	 */
-	public void setPathScenario1() { 
 	}
 	
 	public void update(int elapsed) {

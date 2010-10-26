@@ -3,6 +3,7 @@ package edu.arizona.simulator.ww2d.blackboard.control;
 import edu.arizona.simulator.ww2d.blackboard.ks.GlobalKS;
 import edu.arizona.simulator.ww2d.blackboard.ks.MainKnowledgeSource;
 import edu.arizona.simulator.ww2d.blackboard.ks.ReplayKnowledgeSource;
+import edu.arizona.simulator.ww2d.utils.GameGlobals;
 
 public class ConsoleControl {
 
@@ -12,13 +13,20 @@ public class ConsoleControl {
 	
 	public ConsoleControl() { 
 		_ap = new MainKnowledgeSource();
-		_replay = new ReplayKnowledgeSource();
-		_global = new GlobalKS();
+		
+		if (GameGlobals.record) { 
+			_replay = new ReplayKnowledgeSource();
+			_global = new GlobalKS();
+		}
 	}
 	
 	public void update(int elapsed) { 
 		_ap.update();
-		_replay.update();
-		_global.update();
+
+		if (_replay != null) 
+			_replay.update();
+		
+		if (_global != null) 
+			_global.update();
 	}
 }

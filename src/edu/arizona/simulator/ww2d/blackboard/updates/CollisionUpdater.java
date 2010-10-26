@@ -98,10 +98,12 @@ public class CollisionUpdater {
 		private void remove(ContactPoint cp) { 
 			ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 			String key = CollisionEntry.key(cp);
-			objectSpace.removeCollision(key);
 			
 			PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
 			PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
+
+			objectSpace.removeCollision(key, obj1, obj2);
+			
 			if (Blackboard.inst().spaceExists(obj1.getName())) {
 				AgentSpace space1 = Blackboard.inst().getSpace(AgentSpace.class, obj1.getName());
 				space1.remove(cp);

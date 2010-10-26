@@ -36,6 +36,9 @@ public class TopDownControl extends Component {
 		
 		_body = ((PhysicsObject) obj).getBody();
 		_commands = new boolean[6];
+	}
+	
+	private void init(boolean individual) { 
 		EventListener keyPressed = new EventListener() { 
 			public void onEvent(Event e) { 
 				int key = (Integer) e.getValue("key");
@@ -63,9 +66,14 @@ public class TopDownControl extends Component {
 				}
 			}
 		};
-				
-		EventManager.inst().registerForAll(EventType.KEY_PRESSED_EVENT, keyPressed);
-		EventManager.inst().registerForAll(EventType.KEY_RELEASED_EVENT, keyReleased);
+		
+		if (individual) {
+			EventManager.inst().register(EventType.KEY_PRESSED_EVENT, _parent, keyPressed);
+			EventManager.inst().register(EventType.KEY_RELEASED_EVENT, _parent, keyReleased);
+		} else { 
+			EventManager.inst().registerForAll(EventType.KEY_PRESSED_EVENT, keyPressed);
+			EventManager.inst().registerForAll(EventType.KEY_RELEASED_EVENT, keyReleased);
+		}
 	}
 	
 	/**
@@ -185,7 +193,6 @@ public class TopDownControl extends Component {
 
 	@Override
 	public void fromXML(Element e) {
-		// TODO Auto-generated method stub
-		
+		init(Boolean.parseBoolean(e.attributeValue("individual")));
 	}
 }

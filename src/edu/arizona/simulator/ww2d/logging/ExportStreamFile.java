@@ -1,6 +1,7 @@
 package edu.arizona.simulator.ww2d.logging;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -20,7 +21,25 @@ public class ExportStreamFile {
 	public static void main(String[] args) { 
 //		convertActivities();
 		
-		global("states/state-global.db", "logs/main.csv");
+//		global("states/state-global.db", "logs/main.csv");
+		simpleExample();
+	}
+	
+	public static void simpleExample() { 
+		String[] classes = new String[] { "collide", "pass", "talk-a", "talk-b" };
+		for (String className : classes) { 
+			File f = new File("logs/" + className + "/");
+			if (!f.exists()) 
+				f.mkdir();
+
+			for (int i = 1; i <= 20; ++i) { 
+				String inputFile = "states/" + className + "/" + className + "-" + i + "/state-global.db";
+				
+				
+				String outputFile = "logs/" + className + "/" + className + "-" + i + ".csv";
+				global(inputFile, outputFile);
+			}
+		}
 	}
 	
 	public static void global(String inputDb, String outputFile) { 

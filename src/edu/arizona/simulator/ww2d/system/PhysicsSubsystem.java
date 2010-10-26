@@ -37,9 +37,6 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
     private Map<String,ContactPoint>  _contactMap;
     
     public PhysicsSubsystem() { 
-    	_contactMap = new HashMap<String,ContactPoint>();
-    	_joints = new HashMap<String,Joint>();
-    	
     	addListeners();
     }
     
@@ -49,7 +46,6 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 	}
 	
 	private void addListeners() { 
-    	
 	}
 	
 	/**
@@ -66,6 +62,9 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 	 * @param e
 	 */
 	public void fromXML(Element e) { 
+    	_contactMap = new HashMap<String,ContactPoint>();
+    	_joints = new HashMap<String,Joint>();
+    	
 		Element tmp = e.element("aabb");
 		float x1 = Float.parseFloat(tmp.element("min").attributeValue("x"));
 		float y1 = Float.parseFloat(tmp.element("min").attributeValue("y"));
