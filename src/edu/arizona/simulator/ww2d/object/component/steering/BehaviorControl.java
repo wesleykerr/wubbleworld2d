@@ -143,16 +143,18 @@ public class BehaviorControl extends Component {
 		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 		
 		int index = systemSpace.get(Variable.controlledObject).get(Integer.class);
-		PhysicsObject us = (PhysicsObject) _parent;
-		PhysicsObject con = objectSpace.getCognitiveAgents().get(index);
-		if (us == con) { 
-			Vec2 pos = us.getPosition();
-			Color blackAlpha = new Color(Color.black);
-			blackAlpha.a = 0.5f;
-			g.setColor(blackAlpha);
-			g.fillRect(pos.x-100, pos.y-200, 200, count*25);
-			
-			SlickGlobals.textFont.drawString(pos.x-98, pos.y-198, buf.toString(), Color.white);
+		if (index >= 0) {
+			PhysicsObject us = (PhysicsObject) _parent;
+			PhysicsObject con = objectSpace.getCognitiveAgents().get(index);
+			if (us == con) { 
+				Vec2 pos = us.getPosition();
+				Color blackAlpha = new Color(Color.black);
+				blackAlpha.a = 0.5f;
+				g.setColor(blackAlpha);
+				g.fillRect(pos.x-100, pos.y-200, 200, count*25);
+				
+				SlickGlobals.textFont.drawString(pos.x-98, pos.y-198, buf.toString(), Color.white);
+			}
 		}
 	}
 

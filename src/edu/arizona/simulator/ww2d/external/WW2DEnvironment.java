@@ -29,27 +29,39 @@ import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
 
 public class WW2DEnvironment implements Environment {
-	
+
+	private VerbGameContainer _container;
 	private GameSystem _gameSystem;
 	
 	private List<OOMDPObjectState> _state;
 	
 	private NumberFormat _format;
 
-	public WW2DEnvironment() { 
+	public WW2DEnvironment(boolean visualize) { 
 		_format = NumberFormat.getInstance();
 		_format.setMinimumFractionDigits(3);
 		_format.setMaximumFractionDigits(3);
-		
+
+		if (visualize) {
+			try { 
+				_container = new VerbGameContainer(800, 800);
+				_container.start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		// Initializes the GameSystem so that we can run
 		// different initializations.
 		GameGlobals.record = false;
-		_gameSystem = new GameSystem(800,800);		
+		
+		_gameSystem = new GameSystem(800, 800, true);		
 		_gameSystem.addSubsystem(GameSystem.Systems.PhysicsSubystem, new PhysicsSubsystem());
 	}
 	
 	public void cleanup() { 
 		_gameSystem.finish();
+		_container.exit();
 	}
 	
 	// MDPObjectState -- This corresponds to the objects and thier attributes
@@ -127,7 +139,7 @@ public class WW2DEnvironment implements Environment {
 		_state = new ArrayList<OOMDPObjectState>(state);
 		
 		_gameSystem.finish();
-		_gameSystem = new GameSystem(800,800);		
+		_gameSystem = new GameSystem(800, 800, true);		
 		_gameSystem.addSubsystem(GameSystem.Systems.PhysicsSubystem, new PhysicsSubsystem());
 		_gameSystem.loadLevel("data/levels/Room-External.xml", null, null);
 
@@ -142,6 +154,9 @@ public class WW2DEnvironment implements Environment {
 
 		// Do an initial update to get the world turning....
 		_gameSystem.update(0);
+		
+		if (_container != null)
+			_container.render(_gameSystem);
 		
 		// TODO: build up the OOMDPState by adding the relations to
 		// the current state of the world.
@@ -326,8 +341,12 @@ public class WW2DEnvironment implements Environment {
 		
 		for (int i = 0; i < 10; ++i) { 
 			_gameSystem.update(100);
+			if (_container != null)
+				_container.render(_gameSystem);
 			computeAllRelations();
 		}
+		if (_container != null)
+			_container.render(_gameSystem);
 	}
 	
 	/**
@@ -357,6 +376,24 @@ enum ClassType {
 	        OOMDPObjectShape.valueOf(obj.getValue("shape-type")).convert(element, obj);
 	        
 	        Element components = element.addElement("components");
+	        
+	        Element sv = components.addElement("component")
+	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.ShapeVisual")
+	        	.addAttribute("fromPhysics", "true");
+	        sv.addElement("renderPriority").addAttribute("value", "99");
+	        sv.addElement("color")
+	        	.addAttribute("r", "1.0")
+	        	.addAttribute("g", "0.0")
+	        	.addAttribute("b", "0.0")
+	        	.addAttribute("a", "1.0");
+
+	        Element sp = components.addElement("component")
+        		.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.SpriteVisual");
+	        sp.addElement("renderPriority").addAttribute("value", "100");
+	        sp.addElement("image")
+        		.addAttribute("name", "data/images/half-circle.png")
+        		.addAttribute("scale", "0.0165");
+	        
 	        components.addElement("component")
 	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.steering.BehaviorControl");
 	        components.addElement("component")
@@ -364,8 +401,8 @@ enum ClassType {
 	        components.addElement("component")
         		.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.TopDownControl")
         		.addAttribute("individual", "true");
-	        components.addElement("component")
-	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.InternalComponent");
+//	        components.addElement("component")
+//	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.InternalComponent");
 
 	        return element;
 		}
@@ -384,24 +421,24 @@ enum ClassType {
 	        body(element, obj);
 	        OOMDPObjectShape.valueOf(obj.getValue("shape-type")).convert(element, obj);
 	        
-	        Element components = element.addElement("components");
-	        components.addElement("component")
-	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.steering.BehaviorControl");
-	        components.addElement("component")
-	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.PerceptionComponent");
-	        components.addElement("component")
-        		.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.TopDownControl");
-	        components.addElement("component")
-	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.InternalComponent");
-
+	        element.addElement("components");
 	        return element;
 		}
 	},
 	obstacle {
 		@Override
 		public Element convert(OOMDPObjectState obj) {
-			// TODO Auto-generated method stub
-			return null;
+			Document document = DocumentHelper.createDocument();
+	        Element element = document.addElement( "physicsObject" )
+	        	.addAttribute("name", obj.getName())
+	        	.addAttribute("renderPriority", "100")
+	        	.addAttribute("type", "obstacle");
+
+	        body(element, obj);
+	        OOMDPObjectShape.valueOf(obj.getValue("shape-type")).convert(element, obj);
+	        
+	        element.addElement("components");
+	        return element;
 		}
 		
 	};

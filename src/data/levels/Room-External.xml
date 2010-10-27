@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <level>
-	<physicsScale value="12" />
+	<physicsScale value="32" />
 	<physics>
 		<aabb>
-			<min x="-2" y="-2" />
-			<max x="102" y="102" />
+			<min x="0" y="0" />
+			<max x="25" y="25" />
 		</aabb>
 		<gravity x="0" y="0" />
 		<doSleep value="true" />		
@@ -13,5 +13,19 @@
 	<!-- Do not add a food system to this room -->	
 	<foodSubsystem value="false" />
 	
-	<objects />
+	<objects>
+		<gameObject name="background" renderPriority="0" type="visual" >
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" scale="true">
+					<shapeDef type="polygon">
+						<vertex x="0" y="0" />
+						<vertex x="0" y="100" />
+						<vertex x="100" y="100" />
+						<vertex x="100" y="0" />
+					</shapeDef>
+					<color r="0.0" g="1.0" b="0.0" a="1.0" />
+				</component>
+			</components>			
+		</gameObject>
+	</objects>
 </level>
