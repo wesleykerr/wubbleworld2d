@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.FilterData;
@@ -53,6 +55,23 @@ public class ObjectFactory {
 			} 
     	});
     	
+    	EventManager.inst().registerForAll(EventType.CREATE_WALL, new EventListener() { 
+			@Override
+			public void onEvent(Event e) {
+				String name = (String) e.getValue("name");
+				Vec2 position = (Vec2) e.getValue("position");
+				Vec2 dimensions = (Vec2) e.getValue("dimensions");
+				makeWall(name, position.x, position.y, dimensions.x, dimensions.y);
+			} 
+    	});
+    	
+    	EventManager.inst().registerForAll(EventType.FINISH, new EventListener() {
+			@Override
+			public void onEvent(Event e) {
+				finish();
+			} 
+    		
+    	});
     }
     
     public static ObjectFactory inst() { 
@@ -83,7 +102,7 @@ public class ObjectFactory {
 		
 		objectSpace.add(obj);
     }
-    
+  
     /**
      * Construct a physics object from the parameters specified within
      * the XML element given.
@@ -156,6 +175,54 @@ public class ObjectFactory {
 		objectSpace.add(obj);
 	}
 
+	/**
+	 * Make a wall object from the parameters given.
+	 * @param name
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 */
+	public void makeWall(String name, float x, float y, float width, float height) { 
+		Document document = DocumentHelper.createDocument();
+        Element element = document.addElement( "physicsObject" )
+        	.addAttribute("name", name)
+        	.addAttribute("renderPriority", "100")
+        	.addAttribute("type", "wall");
+
+        element.addElement("bodyDef")
+			.addAttribute("x", x+"")
+			.addAttribute("y", y+"");
+
+        Element shape = element.addElement("shapeDef")
+			.addAttribute("type", "polygon");
+
+        shape.addElement("vertex")
+    		.addAttribute("x", -(width/2) + "")
+    		.addAttribute("y", -(height/2) + "");
+        shape.addElement("vertex")
+        	.addAttribute("x", (width/2) + "")
+        	.addAttribute("y", -(height/2) + "");
+        shape.addElement("vertex")
+			.addAttribute("x", (width/2) + "")
+			.addAttribute("y", (height/2) + "");
+        shape.addElement("vertex")
+			.addAttribute("x", -(width/2) + "")
+			.addAttribute("y", (height/2) + "");
+
+        Element components = element.addElement("components");
+        Element sv = components.addElement("component")
+    		.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.ShapeVisual")
+    		.addAttribute("fromPhysics", "true");
+        sv.addElement("renderPriority").addAttribute("value", "99");
+        sv.addElement("color")
+    		.addAttribute("r", "1.0")
+    		.addAttribute("g", "1.0")
+    		.addAttribute("b", "1.0")
+    		.addAttribute("a", "1.0");
+        
+        makePhysicsObject(element);
+	}
 	
 	private BodyDef parseBodyDefinition(Element e, AABB aabb) { 
 		BodyDef b = new BodyDef();

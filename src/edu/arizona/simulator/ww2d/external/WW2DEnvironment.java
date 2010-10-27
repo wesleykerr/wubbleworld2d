@@ -10,10 +10,6 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.newdawn.slick.Input;
 
-import edu.arizona.environment.Environment;
-import edu.arizona.planning.mdp.OOMDPObjectState;
-import edu.arizona.planning.mdp.OOMDPState;
-import edu.arizona.planning.mdp.Relation;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.AuditoryEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.DistanceEntry;
@@ -27,6 +23,11 @@ import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
 import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
+import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
+import edu.arizona.verbs.environment.Environment;
+import edu.arizona.verbs.mdp.OOMDPObjectState;
+import edu.arizona.verbs.mdp.OOMDPState;
+import edu.arizona.verbs.mdp.Relation;
 
 public class WW2DEnvironment implements Environment {
 
@@ -204,6 +205,9 @@ public class WW2DEnvironment implements Environment {
 		// First add all of the propositions that involve a single object.
 		for (int i = 0; i < objects.size(); ++i) { 
 			PhysicsObject obj = objects.get(i);
+			if (obj.getType() == ObjectType.wall)
+				continue;
+			
 			String[] objArray = new String[] { obj.getName() };
 			
 			boolean moving = false;
@@ -229,6 +233,9 @@ public class WW2DEnvironment implements Environment {
 			// Compute all of the pairwise relations.
 			for (int j = i+1; j < objects.size(); ++j) { 
 				PhysicsObject obj2 = objects.get(j);
+				if (obj.getType() == ObjectType.wall)
+					continue;				
+				
 				String[] relArray = new String[] { obj.getName(), obj2.getName() };
 				String[] symArray = new String[] { obj2.getName(), obj.getName() };
 

@@ -3,8 +3,8 @@ package edu.arizona.simulator.ww2d.external;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.arizona.planning.mdp.OOMDPObjectState;
-import edu.arizona.planning.mdp.OOMDPState;
+import edu.arizona.verbs.mdp.OOMDPObjectState;
+import edu.arizona.verbs.mdp.OOMDPState;
 
 public class TestHarness {
 	
@@ -72,11 +72,11 @@ public class TestHarness {
 		System.out.println(env.performAction("agent1 1000;agent2 1000"));
 		System.out.println(env.performAction("agent1 1000;agent2 1000"));
 		
-		env.cleanup();
+//		env.cleanup();
 	}
 	
 	public static void main(String[] args) { 
-		test1Agent();
+//		test1Agent();
 		test2Agent();
 	}
 }
