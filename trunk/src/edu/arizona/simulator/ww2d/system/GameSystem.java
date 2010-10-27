@@ -42,7 +42,7 @@ public class GameSystem {
 	private Map<Systems,Subsystem> _systems;
 
 
-	public GameSystem(int width, int height) { 
+	public GameSystem(int width, int height, boolean global) { 
 		logger.debug("New GameSystem");
 		_systems = new TreeMap<Systems,Subsystem>();
 		
@@ -63,7 +63,11 @@ public class GameSystem {
 		systemSpace.put(Variable.maxRotation, new ValueEntry(2.0f));
 		
 		systemSpace.put(Variable.logicalTime, new ValueEntry(1L));
-		systemSpace.put(Variable.controlledObject, new ValueEntry(new Integer(0)));
+
+		if (global) 
+			systemSpace.put(Variable.controlledObject, new ValueEntry(new Integer(-1)));
+		else 
+			systemSpace.put(Variable.controlledObject, new ValueEntry(new Integer(0)));
 		
 		Blackboard.inst().addSpace("system", systemSpace);
 		Blackboard.inst().addSpace("object", objectSpace);
@@ -210,44 +214,53 @@ public class GameSystem {
 	}
 	
 	public void render(Graphics g) { 
+		if (g == null)
+			return;
+		
 		Space systemSpace = Blackboard.inst().getSpace("system");
 		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 		
-		int centerX = systemSpace.get(Variable.centerX).get(Integer.class);
-		int centerY = systemSpace.get(Variable.centerY).get(Integer.class);
-
 		int index = systemSpace.get(Variable.controlledObject).get(Integer.class);
-		PhysicsObject pobj = objectSpace.getCognitiveAgents().get(index);
-		g.pushTransform();
-		g.resetTransform();
-		g.translate(-pobj.getPosition().x+centerX, -pobj.getPosition().y+centerY);
+		PhysicsObject pobj = null; 
+		if (index >= 0) {
+			pobj = objectSpace.getCognitiveAgents().get(index);
+			float centerX = systemSpace.get(Variable.centerX).get(Integer.class);
+			float centerY = systemSpace.get(Variable.centerY).get(Integer.class);
+
+			g.pushTransform();
+			g.resetTransform();
+			g.translate(-pobj.getPosition().x+centerX, -pobj.getPosition().y+centerY);
+		}
+		
 
 		for (GameObject obj : objectSpace.getRenderObjects()) { 
 			obj.render(g);
 		}
 		
-		g.popTransform();
+		if (index >= 0) {
+			g.popTransform();
 
-		// now I would like to render some information about the currently controlled
-		// agent....
-		AgentSpace space = Blackboard.inst().getSpace(AgentSpace.class, pobj.getName());
-		BoundedEntry energy = space.getBounded(Variable.energy);
+			// now I would like to render some information about the currently controlled
+			// agent....
+			AgentSpace space = Blackboard.inst().getSpace(AgentSpace.class, pobj.getName());
+			BoundedEntry energy = space.getBounded(Variable.energy);
 
-		BoundedEntry valence = space.getBounded(Variable.valence);
-		BoundedEntry arousal = space.getBounded(Variable.arousal);
+			BoundedEntry valence = space.getBounded(Variable.valence);
+			BoundedEntry arousal = space.getBounded(Variable.arousal);
 
-		String target = space.get(Variable.target).get(String.class);
+			String target = space.get(Variable.target).get(String.class);
 
-		Color blackAlpha = new Color(Color.black);
-		blackAlpha.a = 0.5f;
-		g.setColor(blackAlpha);
-		g.fillRect(490, 0, 220, 60);
+			Color blackAlpha = new Color(Color.black);
+			blackAlpha.a = 0.5f;
+			g.setColor(blackAlpha);
+			g.fillRect(490, 0, 220, 60);
 
-		SlickGlobals.textFont.drawString(500, 0, "Name: " + pobj.getName());
-		SlickGlobals.textFont.drawString(500, 10, "Valence: " + GameGlobals.nf.format(valence.getValue()) + 
-				     " Arousal: " + GameGlobals.nf.format(arousal.getValue()));
-		SlickGlobals.textFont.drawString(500, 20, "Energy: " + GameGlobals.nf.format(energy.getValue()));
-		SlickGlobals.textFont.drawString(500, 30, "Target: " + target);
+			SlickGlobals.textFont.drawString(500, 0, "Name: " + pobj.getName());
+			SlickGlobals.textFont.drawString(500, 10, "Valence: " + GameGlobals.nf.format(valence.getValue()) + 
+					" Arousal: " + GameGlobals.nf.format(arousal.getValue()));
+			SlickGlobals.textFont.drawString(500, 20, "Energy: " + GameGlobals.nf.format(energy.getValue()));
+			SlickGlobals.textFont.drawString(500, 30, "Target: " + target);
+		}
 	}
 	
 	public void finish() { 

@@ -62,7 +62,7 @@ public class RecordingGameplayState extends BHGameState {
 	@Override 
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException { 
 		super.enter(container, game);
-		_gameSystem = new GameSystem(container.getWidth(), container.getHeight());
+		_gameSystem = new GameSystem(container.getWidth(), container.getHeight(), false);
 		_gameSystem.addSubsystem(GameSystem.Systems.PhysicsSubystem, new PhysicsSubsystem());
 		_gameSystem.loadLevel(_levelFile, _agentsFile, _scenario);
 		

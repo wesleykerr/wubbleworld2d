@@ -58,7 +58,7 @@ public class KinematicDemo extends BHGameState {
 
 	@Override
 	public void init(GameContainer container, StateBasedGame game) throws SlickException {
-		_gameSystem = new GameSystem(container.getWidth(), container.getHeight());
+		_gameSystem = new GameSystem(container.getWidth(), container.getHeight(), false);
 		
 		_character = new GameObject("character", ObjectType.visual, 100);
 		ShapeVisual v1 = new ShapeVisual(_character);

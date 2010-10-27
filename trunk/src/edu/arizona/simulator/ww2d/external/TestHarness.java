@@ -20,7 +20,7 @@ public class TestHarness {
 		List<OOMDPObjectState> objects = new ArrayList<OOMDPObjectState>();
 		objects.add(obj1);
 		
-		WW2DEnvironment env = new WW2DEnvironment();
+		WW2DEnvironment env = new WW2DEnvironment(true);
 		OOMDPState state = env.initializeEnvironment(objects);
 
 		System.out.println("Initialization complete...");
@@ -56,7 +56,7 @@ public class TestHarness {
 		objects.add(obj1);
 		objects.add(obj2);
 		
-		WW2DEnvironment env = new WW2DEnvironment();
+		WW2DEnvironment env = new WW2DEnvironment(true);
 		OOMDPState state = env.initializeEnvironment(objects);
 
 		System.out.println("Initialization complete...");
@@ -72,6 +72,7 @@ public class TestHarness {
 		System.out.println(env.performAction("agent1 1000;agent2 1000"));
 		System.out.println(env.performAction("agent1 1000;agent2 1000"));
 		
+		env.cleanup();
 	}
 	
 	public static void main(String[] args) { 
