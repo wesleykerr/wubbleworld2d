@@ -107,6 +107,15 @@ public enum EventType {
 	 *     element - the XML element that contains the initialization information
 	 */
 	CREATE_PHYSICS_OBJECT,
+	
+	/**
+	 * CREATE_WALL
+	 *   Payload:
+	 *      name - the name of the wall
+	 *      position - the x,y location of the wall
+	 *      dimensions - the width and height of the wall
+	 */
+	CREATE_WALL,
 
 	/**
 	 * CONSOLE_MESSAGE

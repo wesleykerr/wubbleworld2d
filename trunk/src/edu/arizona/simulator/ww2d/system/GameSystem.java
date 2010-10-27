@@ -11,6 +11,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.jbox2d.collision.AABB;
+import org.jbox2d.common.Vec2;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -130,6 +132,10 @@ public class GameSystem {
 			physics.fromXML(root.element("physics"));
 
 			Element objects = root.element("objects");
+			if (objects.attribute("walls") != null && Boolean.parseBoolean(objects.attributeValue("walls"))) 
+				makeWalls(physics);
+
+			
 			List physicsObjs = objects.elements("physicsObject");
 			for (int i = 0; i < physicsObjs.size(); ++i) { 
 				Element obj = (Element) physicsObjs.get(i);
@@ -180,6 +186,41 @@ public class GameSystem {
 		// for.
 		if (scenario != null)
 			scenario.setup();
+	}
+	
+	/**
+	 * Construct walls that are on the boundaries of the physics world.
+	 */
+	private void makeWalls(PhysicsSubsystem physics) { 
+		// walls are always 0.5 units wide and as long as the world - 2 (+1 buffer on each side)
+		AABB aabb = physics.getWorldAABB();
+		float width = (aabb.upperBound.x - aabb.lowerBound.x);
+		float height = (aabb.upperBound.y - aabb.lowerBound.y);
+		
+		float w = 0.125f;
+		float w2 = 2.0f*w;
+		
+		
+		sendWallEvent("wall1", new Vec2(w, height/2), new Vec2(w2,  height));
+		sendWallEvent("wall3", new Vec2(width-w, height/2), new Vec2(w2, height));
+
+		sendWallEvent("wall2", new Vec2(width/2, w), new Vec2(width, w2));
+		sendWallEvent("wall4", new Vec2(width/2, height-w), new Vec2(width, w2));
+		
+	}
+	
+	/**
+	 * Send the actual Wall event out to whoever is listening.
+	 * @param name
+	 * @param position
+	 * @param dimensions
+	 */
+	private void sendWallEvent(String name, Vec2 position, Vec2 dimensions) { 
+		Event event = new Event(EventType.CREATE_WALL);
+		event.addParameter("name", "wall1");
+		event.addParameter("position", position);
+		event.addParameter("dimensions", dimensions);
+		EventManager.inst().dispatchImmediate(event);
 	}
 	
 	public void update(int elapsed) {
@@ -269,6 +310,5 @@ public class GameSystem {
 		
 		EventManager.inst().finish();
 		Blackboard.inst().finish();
-		ObjectFactory.inst().finish();
 	}
 }
