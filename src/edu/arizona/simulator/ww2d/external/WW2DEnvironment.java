@@ -61,7 +61,7 @@ public class WW2DEnvironment implements Environment {
 	
 	public void cleanup() { 
 		_gameSystem.finish();
-		_container.exit();
+		_container.destroy();
 	}
 	
 	// MDPObjectState -- This corresponds to the objects and thier attributes
@@ -98,6 +98,13 @@ public class WW2DEnvironment implements Environment {
 					buf.insert(0, '0');
 				int w = buf.length();
 				
+				// Cannot go forward and backward at the same time.
+				if (buf.charAt(0) == '1' && buf.charAt(3) == '1')
+					continue;
+				
+				if (buf.charAt(1) == '1' && buf.charAt(2) == '1')
+					continue; 
+				
 				tmp.add(obj.getName() + " " + buf.substring(w-4).toString());
 			}
 			actionsByAgent.add(tmp);
@@ -119,7 +126,7 @@ public class WW2DEnvironment implements Environment {
 			boolean keepGoing = true;
 			while (keepGoing && last >= 0) { 
 				counters[last] += 1;
-				if (counters[last] < 16) {
+				if (counters[last] < 9) {
 					keepGoing = false;
 				} else { 
 					counters[last] = 0;

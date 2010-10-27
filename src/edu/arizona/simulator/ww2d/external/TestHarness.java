@@ -76,6 +76,7 @@ public class TestHarness {
 	}
 	
 	public static void main(String[] args) { 
+		test1Agent();
 		test2Agent();
 	}
 }
