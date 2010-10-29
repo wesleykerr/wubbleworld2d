@@ -1,13 +1,14 @@
 package edu.arizona.simulator.ww2d.object.component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.newdawn.slick.Input;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
-import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
@@ -29,51 +30,37 @@ public class TopDownControl extends Component {
     private static Logger logger = Logger.getLogger( TopDownControl.class );
 
     private Body          _body;
-    private boolean[]     _commands;
+    
+    private EventType[] _events;
+    private Map<EventType,Boolean> _commands;
       
 	public TopDownControl(GameObject obj) { 
 		super(obj);
 		
 		_body = ((PhysicsObject) obj).getBody();
-		_commands = new boolean[6];
+
+		_events = new EventType[] { 
+				EventType.FORWARD_EVENT, EventType.BACKWARD_EVENT,
+				EventType.LEFT_EVENT, EventType.RIGHT_EVENT,
+				EventType.STRAFE_LEFT_EVENT, EventType.STRAFE_RIGHT_EVENT
+		};
+		_commands = new HashMap<EventType,Boolean>();
+		for (EventType event : _events) 
+			_commands.put(event, false);
 	}
 	
 	private void init(boolean individual) { 
-		EventListener keyPressed = new EventListener() { 
-			public void onEvent(Event e) { 
-				int key = (Integer) e.getValue("key");
-				switch (key) { 
-				case Input.KEY_W: _commands[0] = true; break;
-				case Input.KEY_S: _commands[1] = true; break;
-				case Input.KEY_A: _commands[2] = true; break;
-				case Input.KEY_D: _commands[3] = true; break;
-				case Input.KEY_Q: _commands[4] = true; break;
-				case Input.KEY_E: _commands[5] = true; break;
-				}
-			}
+		EventListener listener = new EventListener() {
+			@Override
+			public void onEvent(Event e) {
+				boolean state = (Boolean) e.getValue("state");
+				_commands.remove(e.getId());
+				_commands.put(e.getId(), state);
+			} 
 		};
 		
-		EventListener keyReleased = new EventListener() { 
-			public void onEvent(Event e) { 
-				int key = (Integer) e.getValue("key");
-				switch (key) { 
-				case Input.KEY_W: _commands[0] = false; break;
-				case Input.KEY_S: _commands[1] = false; break;
-				case Input.KEY_A: _commands[2] = false; break;
-				case Input.KEY_D: _commands[3] = false; break;
-				case Input.KEY_Q: _commands[4] = false; break;
-				case Input.KEY_E: _commands[5] = false; break;
-				}
-			}
-		};
-		
-		if (individual) {
-			EventManager.inst().register(EventType.KEY_PRESSED_EVENT, _parent, keyPressed);
-			EventManager.inst().register(EventType.KEY_RELEASED_EVENT, _parent, keyReleased);
-		} else { 
-			EventManager.inst().registerForAll(EventType.KEY_PRESSED_EVENT, keyPressed);
-			EventManager.inst().registerForAll(EventType.KEY_RELEASED_EVENT, keyReleased);
-		}
+		for (EventType event : _events) 
+			EventManager.inst().register(event, _parent, listener);
 	}
 	
 	/**
@@ -96,22 +83,25 @@ public class TopDownControl extends Component {
 	 * @param elapsed
 	 */
 	private void updateFB(float elapsed) { 
-		if (_commands[0] && _commands[1])
+		boolean forward = _commands.get(EventType.FORWARD_EVENT);
+		boolean backward = _commands.get(EventType.BACKWARD_EVENT);
+		
+		if (forward && backward)
 			return;
 
 		//TODO: may want to actually handle this specially.  We could
 		// slow the agent down.
-		if (!_commands[0] && !_commands[1]) {
+		if (!forward && !backward) {
 			return;
 		}
 		
 		float x = 0;	
-		if (_commands[0]) {
+		if (forward) {
 			// TODO: handle powerups 
 			x = Constants.MAX_ACCELERATION;  //*ae.getMoveModifier();
 		}
 		
-		if (_commands[1]) {
+		if (backward) {
 			// TODO: handle powerups
 			x = -Constants.MAX_ACCELERATION; //*ae.getMoveModifier();
 		} 		
@@ -129,10 +119,12 @@ public class TopDownControl extends Component {
 	 * @param elapsed
 	 */
 	private void updateLR(float elapsed) { 
-		if (_commands[2] && _commands[3])
+		boolean left = _commands.get(EventType.LEFT_EVENT);
+		boolean right = _commands.get(EventType.RIGHT_EVENT);
+		if (left && right)
 			return;
 		
-		if (!_commands[2] && !_commands[3]) {
+		if (!left && !right) {
 			// Slow down the angular velocity of the PhysicsObject
 			float old = _body.getAngularVelocity();
 			_body.setAngularVelocity(0.5f * old);
@@ -142,7 +134,7 @@ public class TopDownControl extends Component {
 		// TODO: be able to handle power ups
 		Space systemSpace = Blackboard.inst().getSpace("system");
 		float x = systemSpace.get(Variable.maxAngularAcceleration).get(Float.class);
-		if (_commands[2]) 
+		if (left) 
 			x *= -1;  //Constants.MAX_ANGULAR_ACCELERATION; //*ae.getTurnModifier();
 
 		_body.applyTorque(_body.getMass()*x);
@@ -163,24 +155,27 @@ public class TopDownControl extends Component {
 	 * @param elapsed
 	 */
 	private void updateStrafe(float elapsed) { 
+		boolean sLeft = _commands.get(EventType.STRAFE_LEFT_EVENT);
+		boolean sRight = _commands.get(EventType.STRAFE_RIGHT_EVENT);
+		
 		// If we are trying strafe both left and right
 		// then the net force is the big goose egg.
-		if (_commands[4] && _commands[5])
+		if (sLeft && sRight)
 			return;
 
 		// If neither strafing command is active then
 		// we turn off strafing and continue about our business.
-		if (!_commands[4] && !_commands[5]) {
+		if (!sLeft && !sRight) {
 			return;
 		}
 		
 		float x = 0;	
-		if (_commands[4]) {
+		if (sLeft) {
 			// TODO: handle powerups
 			x = -Constants.MAX_ACCELERATION; //*_entity.getMoveModifier();
 		}
 		
-		if (_commands[5]) {
+		if (sRight) {
 			x = Constants.MAX_ACCELERATION; //*_entity.getMoveModifier();
 		} 
 

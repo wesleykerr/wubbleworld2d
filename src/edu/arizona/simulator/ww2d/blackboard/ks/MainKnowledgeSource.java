@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.contacts.ContactPoint;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.AuditoryEntry;
@@ -24,6 +23,7 @@ import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.utils.Event;
+import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
@@ -34,6 +34,33 @@ public class MainKnowledgeSource implements KnowledgeSource {
     
 	private Space       _systemSpace;
 	private ObjectSpace _objectSpace;
+	
+	public MainKnowledgeSource() { 
+		
+		EventManager.inst().registerForAll(EventType.CHANGE_CONTROL_EVENT, new EventListener() {
+			@Override
+			public void onEvent(Event e) {
+				Space systemSpace = Blackboard.inst().getSpace("system");
+				ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+
+				int size = objectSpace.getCognitiveAgents().size();
+				ValueEntry entry = systemSpace.get(Variable.controlledObject);
+				int current = entry.get(Integer.class);
+
+				PhysicsObject previousObj = objectSpace.getCognitiveAgents().get(current);
+
+				current = (current + 1) % size;
+				entry.setValue(current);
+
+				PhysicsObject newObj = objectSpace.getCognitiveAgents().get(current);
+
+				Event controlledEvent = new Event(EventType.CHANGE_CAMERA_FOLLOWING);
+				controlledEvent.addParameter("previous-object", previousObj);
+				controlledEvent.addParameter("new-object", newObj);
+				EventManager.inst().dispatch(controlledEvent);
+			} 
+		});
+	}
 	
 	@Override
 	public void update() { 

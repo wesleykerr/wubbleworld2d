@@ -184,10 +184,6 @@ public class KinematicDemo extends BHGameState {
 
 	@Override
 	public void keyPressed(int key, char c) {
-		Event keyPressed = new Event(EventType.KEY_PRESSED_EVENT);
-		keyPressed.addParameter("key", key);
-		EventManager.inst().dispatch(keyPressed);
-		
 		switch (key) { 
 		case Input.KEY_S: 
 			_behavior = KinematicsComponent.Behavior.seek;
@@ -210,9 +206,6 @@ public class KinematicDemo extends BHGameState {
 	
 	@Override
 	public void keyReleased(int key, char c) { 
-		Event keyReleased = new Event(EventType.KEY_RELEASED_EVENT);
-		keyReleased.addParameter("key", key);
-		EventManager.inst().dispatch(keyReleased);	
 	}
 	
 	

@@ -15,7 +15,6 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Input;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.BoundedEntry;
@@ -28,7 +27,6 @@ import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.SlickGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
@@ -77,32 +75,6 @@ public class GameSystem {
 		// initialize the ObjectFactory in order to ensure that it is 
 		// listening for important events.
 		ObjectFactory.inst();
-
-		EventManager.inst().registerForAll(EventType.KEY_PRESSED_EVENT, new EventListener() {
-			@Override
-			public void onEvent(Event e) {
-				int key = (Integer) e.getValue("key");
-				if (key == Input.KEY_F1) { 
-					ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
-
-					int size = objectSpace.getCognitiveAgents().size();
-					ValueEntry entry = systemSpace.get(Variable.controlledObject);
-					int current = entry.get(Integer.class);
-
-					PhysicsObject previousObj = objectSpace.getCognitiveAgents().get(current);
-					
-					current = (current + 1) % size;
-					entry.setValue(current);
-					
-					PhysicsObject newObj = objectSpace.getCognitiveAgents().get(current);
-
-					Event controlledEvent = new Event(EventType.CHANGE_CAMERA_FOLLOWING);
-					controlledEvent.addParameter("previous-object", previousObj);
-					controlledEvent.addParameter("new-object", newObj);
-					EventManager.inst().dispatch(controlledEvent);
-				}
-			} 
-		});		
 	}
 
 	/**
