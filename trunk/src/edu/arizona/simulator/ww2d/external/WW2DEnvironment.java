@@ -301,6 +301,8 @@ public class WW2DEnvironment implements Environment {
 			state.setAttribute("vy", _format.format(obj.getBody().getLinearVelocity().y));
 			
 			state.setAttribute("vtheta", _format.format(obj.getBody().getAngularVelocity()));
+			
+			attrs.add(state);
 		}
 		
 		List<Relation> relations = computeAllRelations();
