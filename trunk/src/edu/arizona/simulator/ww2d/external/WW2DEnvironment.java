@@ -8,7 +8,8 @@ import java.util.Map;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.newdawn.slick.Input;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.AuditoryEntry;
@@ -34,8 +35,6 @@ public class WW2DEnvironment implements Environment {
 	private VerbGameContainer _container;
 	private GameSystem _gameSystem;
 	
-	private List<OOMDPObjectState> _state;
-	
 	private NumberFormat _format;
 
 	public WW2DEnvironment(boolean visualize) { 
@@ -55,9 +54,6 @@ public class WW2DEnvironment implements Environment {
 		// Initializes the GameSystem so that we can run
 		// different initializations.
 		GameGlobals.record = false;
-		
-		_gameSystem = new GameSystem(800, 800, true);		
-		_gameSystem.addSubsystem(GameSystem.Systems.PhysicsSubystem, new PhysicsSubsystem());
 	}
 	
 	public void cleanup() { 
@@ -144,9 +140,6 @@ public class WW2DEnvironment implements Environment {
 
 	@Override
 	public OOMDPState initializeEnvironment(List<OOMDPObjectState> state) {
-		_state = new ArrayList<OOMDPObjectState>(state);
-		
-		_gameSystem.finish();
 		_gameSystem = new GameSystem(800, 800, true);		
 		_gameSystem.addSubsystem(GameSystem.Systems.PhysicsSubystem, new PhysicsSubsystem());
 		_gameSystem.loadLevel("data/levels/Room-External.xml", null, null);
@@ -166,29 +159,152 @@ public class WW2DEnvironment implements Environment {
 		if (_container != null)
 			_container.render(_gameSystem);
 		
-		// TODO: build up the OOMDPState by adding the relations to
-		// the current state of the world.
-		updateState();
-		List<Relation> relations = computeAllRelations();
-		return new OOMDPState(_state, relations);
+		return getState();
 	}
 
 	@Override
 	public OOMDPState performAction(String action) {
 		go(action);
-
-		updateState();
-		List<Relation> relations = computeAllRelations();
-		return new OOMDPState(_state, relations);
+		return getState();
 	}
 
-	@Override
+	/**
+	 * simulateAction first saves off the current state and thn performs
+	 * the action, records the next state and resets the state to
+	 * the original.
+	 */
 	public OOMDPState simulateAction(OOMDPState state, String action) {
+		// Save off the currentState....
+		OOMDPState current = getState();
+		
+		// Set the current state to be state
+		setState(state);
+		_gameSystem.update(0);
+
 		go(action);
 
-		updateState();
+		OOMDPState next = getState();
+		setState(current);
+		_gameSystem.update(0);
+		
+		return next;
+	}
+	
+	/**
+	 * Walk the simulation forward for some period of time.
+	 * We have four possible actions for now.
+	 *   Forward Left Right Back
+	 * To make things easier to parse, we just have a string
+	 * of four binary values for if the control is true or false.
+	 *   0000 -- all off
+	 *   1000 -- only forward
+	 *   ...
+	 *   1111 -- all on
+	 */
+	private void go(String action) {
+		parseAction(action);
+		
+		for (int i = 0; i < 10; ++i) { 
+			_gameSystem.update(100);
+			if (_container != null)
+				_container.render(_gameSystem);
+			computeAllRelations();
+		}
+		if (_container != null)
+			_container.render(_gameSystem);
+	}
+	
+	/**
+	 * Parse the action that will send messages so that
+	 * stuff will move when the external environment asks.
+	 */
+	private void parseAction(String action) {
+		EventType[] types = new EventType[] { 
+				EventType.FORWARD_EVENT, EventType.LEFT_EVENT, 
+				EventType.RIGHT_EVENT, EventType.BACKWARD_EVENT 
+		};
+
+		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+
+		String[] objectActions = action.split("[;]");
+		for (String subAction : objectActions) { 
+			String[] tokens = subAction.split("[ ]");
+			String name = tokens[0];
+			String code = tokens[1];
+			
+			PhysicsObject obj = objectSpace.getPhysicsObject(name);
+			for (int i = 0; i < code.length(); ++i) { 
+				Event event = new Event(types[i]);
+				event.addRecipient(obj);
+				event.addParameter("state", code.charAt(i) == '1');
+				EventManager.inst().dispatch(event);
+				
+			}
+		}
+	}
+	
+	/**
+	 * Set the world to match the given state
+	 * @param state
+	 */
+	private void setState(OOMDPState state) { 
+		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+		
+		for (OOMDPObjectState objState : state.getObjectStates()) { 
+			PhysicsObject obj = objectSpace.getPhysicsObject(objState.getName());
+			Body body = obj.getBody();
+			
+			float x = Float.parseFloat(objState.getValue("x"));
+			float y = Float.parseFloat(objState.getValue("y"));
+			
+			float heading = Float.parseFloat(objState.getValue("heading"));
+			
+			body.setXForm(new Vec2(x,y), heading);
+			
+			float vx = Float.parseFloat(objState.getValue("vx"));
+			float vy = Float.parseFloat(objState.getValue("vy"));
+			
+			float vtheta = Float.parseFloat(objState.getValue("vtheta"));
+			
+			body.setLinearVelocity(new Vec2(vx,vy));
+			body.setAngularVelocity(vtheta);
+		}
+	}
+
+	/**
+	 * Iterate over the objects in the world generating the new state and determine
+	 * all of the Relations that exist.
+	 * @return
+	 */
+	private OOMDPState getState() { 
+		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+		
+		// First generate all of the attribute values.
+		List<OOMDPObjectState> attrs = new ArrayList<OOMDPObjectState>();
+		for (PhysicsObject obj : objectSpace.getPhysicsObjects()) { 
+			if (obj.getType() == ObjectType.wall)
+				continue;
+			
+			// TODO: Stupid mapping problem.  
+			String className = obj.getType().toString();
+			if (obj.getType() == ObjectType.cognitiveAgent)
+				className = "agent";
+
+			OOMDPObjectState state = new OOMDPObjectState(obj.getName(), className);
+
+			state.setAttribute("x", _format.format(obj.getPPosition().x));
+			state.setAttribute("y", _format.format(obj.getPPosition().y));
+			
+			state.setAttribute("heading", _format.format(obj.getHeading()));
+			
+			state.setAttribute("vx", _format.format(obj.getBody().getLinearVelocity().x));
+			state.setAttribute("vy", _format.format(obj.getBody().getLinearVelocity().y));
+			
+			state.setAttribute("vtheta", _format.format(obj.getBody().getAngularVelocity()));
+		}
+		
 		List<Relation> relations = computeAllRelations();
-		return new OOMDPState(_state, relations);
+		return new OOMDPState(attrs, relations);
 	}
 
 	/**
@@ -293,74 +409,6 @@ public class WW2DEnvironment implements Environment {
 //			System.out.println(r.toString() + " -- " + r.value);
 //		}
 		return list;
-	}
-	
-	/**
-	 * Iterate over all the stored original state and put
-	 * in the new values for x,y and the other real-valued
-	 * information that has changed.
-	 */
-	private void updateState() { 
-		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
-		
-		for (OOMDPObjectState obj : _state) { 
-			PhysicsObject pObject = objectSpace.getPhysicsObject(obj.getName());
-			
-			obj.setAttribute("x", _format.format(pObject.getPPosition().x));
-			obj.setAttribute("y", _format.format(pObject.getPPosition().y));
-			
-			obj.setAttribute("heading", _format.format(pObject.getHeading()));
-			
-			obj.setAttribute("vx", _format.format(pObject.getBody().getLinearVelocity().x));
-			obj.setAttribute("vy", _format.format(pObject.getBody().getLinearVelocity().y));
-		}
-	}
-	
-	/**
-	 * Walk the simulation forward for some period of time.
-	 * We have four possible actions for now.
-	 *   Forward Left Right Back
-	 * To make things easier to parse, we just have a string
-	 * of four binary values for if the control is true or false.
-	 *   0000 -- all off
-	 *   1000 -- only forward
-	 *   ...
-	 *   1111 -- all on
-	 */
-	private void go(String action) {
-		int[] keys = new int[] { Input.KEY_W, Input.KEY_A, Input.KEY_D, Input.KEY_S };
-
-		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
-
-		String[] objectActions = action.split("[;]");
-		for (String subAction : objectActions) { 
-			String[] tokens = subAction.split("[ ]");
-			String name = tokens[0];
-			String code = tokens[1];
-			
-			PhysicsObject obj = objectSpace.getPhysicsObject(name);
-			for (int i = 0; i < code.length(); ++i) { 
-				Event event = null;
-				if (code.charAt(i) == '1')
-					event = new Event(EventType.KEY_PRESSED_EVENT);
-				else
-					event = new Event(EventType.KEY_RELEASED_EVENT);
-				
-				event.addParameter("key", keys[i]);
-				event.addRecipient(obj);
-				EventManager.inst().dispatch(event);
-				
-			}
-		}
-		
-		for (int i = 0; i < 10; ++i) { 
-			_gameSystem.update(100);
-			if (_container != null)
-				_container.render(_gameSystem);
-			computeAllRelations();
-		}
-		if (_container != null)
-			_container.render(_gameSystem);
 	}
 	
 	/**
@@ -469,7 +517,7 @@ enum ClassType {
         element.addElement("bodyDef")
     		.addAttribute("x", obj.getValue("x"))
     		.addAttribute("y", obj.getValue("y"))
-    		.addAttribute("angle", obj.getValue("angle"));
+    		.addAttribute("angle", obj.getValue("heading"));
 	}
 }
 

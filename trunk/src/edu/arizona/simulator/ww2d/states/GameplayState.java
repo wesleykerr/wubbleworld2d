@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -11,8 +12,13 @@ import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.Widget;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 import de.matthiasmann.twl.theme.ThemeManager;
+import edu.arizona.simulator.ww2d.blackboard.Blackboard;
+import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
+import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
+import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.gui.TWLInputAdapter;
+import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.system.GameSystem;
@@ -20,6 +26,7 @@ import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
 import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.States;
+import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 public class GameplayState extends BHGameState {
 	private static Logger logger = Logger.getLogger( GameplayState.class );
@@ -127,15 +134,63 @@ public class GameplayState extends BHGameState {
 
 	@Override
 	public void keyPressed(int key, char c) {
-		Event keyPressed = new Event(EventType.KEY_PRESSED_EVENT);
-		keyPressed.addParameter("key", key);
-		EventManager.inst().dispatch(keyPressed);
+		if (key == Input.KEY_F1) {
+			Event event = new Event(EventType.CHANGE_CONTROL_EVENT);
+			EventManager.inst().dispatch(event);
+		}
+		
+		handleKey(key, true);
 	}
 	
 	@Override
 	public void keyReleased(int key, char c) { 
-		Event keyReleased = new Event(EventType.KEY_RELEASED_EVENT);
-		keyReleased.addParameter("key", key);
-		EventManager.inst().dispatch(keyReleased);
+		handleKey(key, false);
+	}
+	
+	private void handleKey(int key, boolean state) { 
+		Space systemSpace = Blackboard.inst().getSpace("system");
+		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+		ValueEntry entry = systemSpace.get(Variable.controlledObject);
+		PhysicsObject obj = objectSpace.getCognitiveAgents().get(entry.get(Integer.class));
+		
+		Event event = null;
+		switch (key) { 
+		case Input.KEY_W:
+			event = new Event(EventType.FORWARD_EVENT);
+			event.addRecipient(obj);
+			event.addParameter("state", state);
+			EventManager.inst().dispatch(event);
+			break;
+		case Input.KEY_S:
+			event = new Event(EventType.BACKWARD_EVENT);
+			event.addRecipient(obj);
+			event.addParameter("state", state);
+			EventManager.inst().dispatch(event);
+			break;
+		case Input.KEY_A:
+			event = new Event(EventType.LEFT_EVENT);
+			event.addRecipient(obj);
+			event.addParameter("state", state);
+			EventManager.inst().dispatch(event);
+			break;
+		case Input.KEY_D:
+			event = new Event(EventType.RIGHT_EVENT);
+			event.addRecipient(obj);
+			event.addParameter("state", state);
+			EventManager.inst().dispatch(event);
+			break;
+		case Input.KEY_Q:
+			event = new Event(EventType.STRAFE_LEFT_EVENT);
+			event.addRecipient(obj);
+			event.addParameter("state", state);
+			EventManager.inst().dispatch(event);
+			break;
+		case Input.KEY_E:
+			event = new Event(EventType.STRAFE_RIGHT_EVENT);
+			event.addRecipient(obj);
+			event.addParameter("state", state);
+			EventManager.inst().dispatch(event);
+			break;
+		}
 	}
 }

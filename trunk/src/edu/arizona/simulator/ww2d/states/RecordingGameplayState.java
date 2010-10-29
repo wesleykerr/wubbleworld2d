@@ -21,11 +21,8 @@ import org.newdawn.slick.state.StateBasedGame;
 import edu.arizona.simulator.ww2d.Record;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
-import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.system.GameSystem;
 import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.States;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -111,16 +108,12 @@ public class RecordingGameplayState extends BHGameState {
 
 	@Override
 	public void keyPressed(int key, char c) {
-		Event keyPressed = new Event(EventType.KEY_PRESSED_EVENT);
-		keyPressed.addParameter("key", key);
-		EventManager.inst().dispatch(keyPressed);
+		// TODO: do I need to do anything with these?
 	}
 	
 	@Override
 	public void keyReleased(int key, char c) { 
-		Event keyReleased = new Event(EventType.KEY_RELEASED_EVENT);
-		keyReleased.addParameter("key", key);
-		EventManager.inst().dispatch(keyReleased);
+		// TODO: do I need to do anything with these?
 	}
 	
 	/**

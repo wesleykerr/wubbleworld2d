@@ -39,18 +39,52 @@ public enum EventType {
 	KINEMATIC_EVENT,
 	
 	/**
-	 * KEY_PRESSED_EVENT
+	 * FORWARD_EVENT
 	 *   Payload:
-	 *      key - the key that was pressed
+	 *     state - start or end event
 	 */
-	KEY_PRESSED_EVENT,
+	FORWARD_EVENT,
+
+	/**
+	 * BACKWARD_EVENT
+	 *   Payload:
+	 *     state - start or end event
+	 */
+	BACKWARD_EVENT,
 	
 	/**
-	 * KEY_RELEASED_EVENT
+	 * LEFT_EVENT
 	 *   Payload:
-	 *      key - the key that was released
+	 *     state - start or end event
 	 */
-	KEY_RELEASED_EVENT,
+	LEFT_EVENT,
+	
+	/**
+	 * RIGHT_EVENT
+	 *   Payload:
+	 *     state - start or end event
+	 */
+	RIGHT_EVENT,
+	
+	/**
+	 * STRAFE_LEFT_EVENT
+	 *   Payload:
+	 *     state - start or end event
+	 */
+	STRAFE_LEFT_EVENT,
+	
+	/**
+	 * STRAFE_RIGHT_EVENT
+	 *   Payload:
+	 *     state - start or end event
+	 */
+	STRAFE_RIGHT_EVENT,
+	
+	/**
+	 * CHANGE_CONTROL_EVENT
+	 *   Payload: 
+	 */
+	CHANGE_CONTROL_EVENT,
 	
 	/**
 	 * BEHAVIOR_EVENT
