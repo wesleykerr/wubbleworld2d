@@ -25,10 +25,10 @@ import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
-import edu.arizona.verbs.environment.Environment;
-import edu.arizona.verbs.mdp.OOMDPObjectState;
-import edu.arizona.verbs.mdp.OOMDPState;
-import edu.arizona.verbs.mdp.Relation;
+import edu.arizona.verbs.shared.Environment;
+import edu.arizona.verbs.shared.OOMDPObjectState;
+import edu.arizona.verbs.shared.OOMDPState;
+import edu.arizona.verbs.shared.Relation;
 
 public class WW2DEnvironment implements Environment {
 

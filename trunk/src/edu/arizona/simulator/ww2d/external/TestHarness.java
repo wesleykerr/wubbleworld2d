@@ -3,9 +3,9 @@ package edu.arizona.simulator.ww2d.external;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.arizona.verbs.mdp.OOMDPObjectState;
-import edu.arizona.verbs.mdp.OOMDPState;
-import edu.arizona.verbs.mdp.Relation;
+import edu.arizona.verbs.shared.OOMDPObjectState;
+import edu.arizona.verbs.shared.OOMDPState;
+import edu.arizona.verbs.shared.Relation;
 
 public class TestHarness {
 	
