@@ -6,7 +6,7 @@ public class GameGlobals {
 	
 	public static NumberFormat nf;
 	
-	public static boolean record = false;
+	public static boolean record = true;
 
     static { 
 		nf = NumberFormat.getInstance();
