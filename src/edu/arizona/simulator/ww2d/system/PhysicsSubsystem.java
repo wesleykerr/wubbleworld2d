@@ -296,6 +296,20 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 		// probably need to do some clean up here.
 		
 	}
+	
+	/**
+	 * Test to see if the point lies within the physics world.
+	 * @param point
+	 * @return
+	 */
+	public static boolean within(Vec2 point) { 
+		Space systemSpace = Blackboard.inst().getSpace("system");
+		Vec2 min = systemSpace.get(Variable.physicsMin).get(Vec2.class);
+		Vec2 max = systemSpace.get(Variable.physicsMax).get(Vec2.class);
+		
+		logger.debug("Min: " + min + " Max: " + max);
+		return point.x > min.x && point.x < max.x && point.y > min.y && point.y < max.y;
+	}
 }
 
 class GameContactFilter extends DefaultContactFilter {

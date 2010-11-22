@@ -90,7 +90,7 @@ public class GameSystem {
 		logger.debug("Loading level: " + levelName);
 		
 		Space systemSpace = Blackboard.inst().getSpace("system");
-		
+
 		SAXReader reader = new SAXReader(false);
 		try {
 			URL url = this.getClass().getClassLoader().getResource(levelName);
