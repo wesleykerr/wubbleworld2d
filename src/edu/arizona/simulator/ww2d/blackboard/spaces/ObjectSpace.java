@@ -101,6 +101,13 @@ public class ObjectSpace extends Space {
 				_physicsObjects.put(obj.getName(), pobj);
 			}
 			
+			// if there already exists a Distance memory then we are probably
+			// already running.
+			if (!_distanceMemory.isEmpty()) { 
+				Map<String,Map<String,DistanceEntry>> map = _distanceMemory.getFirst();
+				map.put(pobj.getName(), new HashMap<String,DistanceEntry>());
+			}
+			
 			// if it's mass is greater than 0 then it
 			// is a Dynamic body
 			if (pobj.getBody().getMass() > 0) { 
