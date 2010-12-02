@@ -13,6 +13,14 @@ import java.util.TreeMap;
 
 public class ExportStreamFile {
 	
+	public static String[] classes = new String[] { 
+		"eat", "chase", "fight", "flee", "kick-ball", "kick-column"
+//		"collide", "pass", "talk-a", "talk-b"
+	};
+	
+	public static String prefix = "ww2d-states/";
+	public static int numEpisodes = 100;
+	
 	/**
 	 * Change this function when you want to change which
 	 * file is output and where it is output to.
@@ -26,14 +34,13 @@ public class ExportStreamFile {
 	}
 	
 	public static void simpleExample() { 
-		String[] classes = new String[] { "collide", "pass", "talk-a", "talk-b" };
 		for (String className : classes) { 
 			File f = new File("logs/" + className + "/");
 			if (!f.exists()) 
 				f.mkdir();
 
-			for (int i = 1; i <= 20; ++i) { 
-				String inputFile = "states/" + className + "/" + className + "-" + i + "/state-global.db";
+			for (int i = 1; i <= 100; ++i) { 
+				String inputFile = prefix + "/" + className + "-" + i + "/state-global.db";
 				
 				
 				String outputFile = "logs/" + className + "/" + className + "-" + i + ".csv";

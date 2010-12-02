@@ -97,37 +97,5 @@
 				</component>
 			</components>
 		</physicsObject>
-
-		<physicsObject name="ball2" renderPriority="100" type="dynamic" hasMass="true" >
-			<bodyDef random="true" radius="0.25" />
-			<shapeDef type="circle" density="0.2" friction="0.5" restitution="0.25" radius="0.25" />
-		
-			<components>
-				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
-					<renderPriority value="99" />
-					<color r="1.0" g="0.0" b="0.0" a="1.0" />
-				</component>
-				<component className="edu.arizona.simulator.ww2d.object.component.SpriteVisual">
-					<renderPriority value="100" />
-					<image name="data/images/ball.png" scale="0.03125" />
-				</component>
-			</components>
-		</physicsObject>
-		
-		<physicsObject name="ball3" renderPriority="100" type="dynamic" hasMass="true" >
-			<bodyDef random="true" radius="0.25" />
-			<shapeDef type="circle" density="0.2" friction="0.5" restitution="0.25" radius="0.25" />
-		
-			<components>
-				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
-					<renderPriority value="99" />
-					<color r="1.0" g="0.0" b="0.0" a="1.0" />
-				</component>
-				<component className="edu.arizona.simulator.ww2d.object.component.SpriteVisual">
-					<renderPriority value="100" />
-					<image name="data/images/ball.png" scale="0.03125" />
-				</component>
-			</components>
-		</physicsObject>						
 	</objects>
 </level>

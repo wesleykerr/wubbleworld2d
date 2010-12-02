@@ -44,8 +44,8 @@ public class Record extends StateBasedGame {
 		recState.addParams("chase", "data/levels/Room-Empty.xml", "data/levels/Agents-Chase.xml", new VisibleScenario("agent1", "agent2"));
 		recState.addParams("flee", "data/levels/Room-Empty.xml", "data/levels/Agents-Flee.xml", new VisibleScenario("agent2", "agent1"));
 		recState.addParams("fight", "data/levels/Room-Empty.xml", "data/levels/Agents-Fight.xml", new VisibleScenario("agent1", "agent2", true));
-		recState.addParams("kick-ball", "data/levels/Room-Balls.xml", "data/levels/Agents-Kick.xml", null);
-		recState.addParams("kick-column", "data/levels/Room-Columns.xml", "data/levels/Agents-Kick.xml", null);
+		recState.addParams("kick-ball", "data/levels/Room-Balls.xml", "data/levels/Agents-Kick.xml", new VisibleScenario("agent1", "ball1"));
+		recState.addParams("kick-column", "data/levels/Room-Columns.xml", "data/levels/Agents-Kick.xml", new VisibleScenario("agent1", "column1"));
 		recState.addParams("eat", "data/levels/Room-Food.xml", "data/levels/Agents-Eat.xml", null);
 
 		addState(new SplashState(_fengWrapper, States.RecordingState.ordinal()));
