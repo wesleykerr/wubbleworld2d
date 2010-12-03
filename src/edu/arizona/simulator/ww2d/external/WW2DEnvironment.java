@@ -39,8 +39,8 @@ public class WW2DEnvironment implements Environment {
 
 	public WW2DEnvironment(boolean visualize) { 
 		_format = NumberFormat.getInstance();
-		_format.setMinimumFractionDigits(3);
-		_format.setMaximumFractionDigits(3);
+		_format.setMinimumFractionDigits(2);
+		_format.setMaximumFractionDigits(2);
 
 		if (visualize) {
 			try { 
@@ -148,6 +148,8 @@ public class WW2DEnvironment implements Environment {
 			ClassType type = ClassType.valueOf(obj.getClassName());
 			Element e = type.convert(obj);
 
+			System.out.println("ELEMENT:\n" + e.asXML());
+			
 			Event event = new Event(EventType.CREATE_PHYSICS_OBJECT);
 			event.addParameter("element", e);
 			EventManager.inst().dispatchImmediate(event);
@@ -178,14 +180,27 @@ public class WW2DEnvironment implements Environment {
 		OOMDPState current = getState();
 		
 		// Set the current state to be state
+		System.out.println("ACTION: " + action + " SETTING TO: " + state);
 		setState(state);
 		_gameSystem.update(0);
+		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+		for (OOMDPObjectState objState : state.getObjectStates()) { 
+			PhysicsObject obj = objectSpace.getPhysicsObject(objState.getName());
+			Body body = obj.getBody();
+			System.out.println(obj.getName() + " " + obj.getHeading() + " " + obj.getPPosition() + " " + 
+					body.getLinearVelocity() + " " + body.getAngularVelocity());
+		}
+		computeAllRelations(); // Testing
 
-		go(action);
+		go(action); 
 
 		OOMDPState next = getState();
 		setState(current);
+		System.out.println("RESTORING: " + current);
 		_gameSystem.update(0);
+		
+					
+		//		computeAllRelations(); // Testing
 		
 		return next;
 	}
@@ -205,13 +220,28 @@ public class WW2DEnvironment implements Environment {
 		parseAction(action);
 		
 		for (int i = 0; i < 10; ++i) { 
-			_gameSystem.update(100);
+			_gameSystem.update(20);
 			if (_container != null)
 				_container.render(_gameSystem);
 			computeAllRelations();
 		}
 		if (_container != null)
 			_container.render(_gameSystem);
+		
+		EventType[] types = new EventType[] { 
+				EventType.FORWARD_EVENT, EventType.LEFT_EVENT, 
+				EventType.RIGHT_EVENT, EventType.BACKWARD_EVENT 
+		};
+
+		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+		for (PhysicsObject obj : objectSpace.getCognitiveAgents()) { 
+			for (EventType evt : types) { 
+				Event event = new Event(evt);
+				event.addRecipient(obj);
+				event.addParameter("state", false);
+				EventManager.inst().dispatchImmediate(event);
+			}
+		}
 	}
 	
 	/**
@@ -238,7 +268,6 @@ public class WW2DEnvironment implements Environment {
 				event.addRecipient(obj);
 				event.addParameter("state", code.charAt(i) == '1');
 				EventManager.inst().dispatch(event);
-				
 			}
 		}
 	}
@@ -258,9 +287,7 @@ public class WW2DEnvironment implements Environment {
 			float y = Float.parseFloat(objState.getValue("y"));
 			
 			float heading = Float.parseFloat(objState.getValue("heading"));
-			
-			body.setXForm(new Vec2(x,y), heading);
-			
+						
 			float vx = Float.parseFloat(objState.getValue("vx"));
 			float vy = Float.parseFloat(objState.getValue("vy"));
 			
@@ -268,6 +295,9 @@ public class WW2DEnvironment implements Environment {
 			
 			body.setLinearVelocity(new Vec2(vx,vy));
 			body.setAngularVelocity(vtheta);
+			body.setXForm(new Vec2(x,y), heading);
+			
+			System.out.println("V-THETA: " + vtheta + " BODY: " + body.getAngularVelocity());
 		}
 	}
 
@@ -478,14 +508,25 @@ enum ClassType {
 			Document document = DocumentHelper.createDocument();
 	        Element element = document.addElement( "physicsObject" )
 	        	.addAttribute("name", obj.getName())
-	        	.addAttribute("renderPriority", "100")
+	        	.addAttribute("renderPriority", "3")
 	        	.addAttribute("type", "dynamic")
 	        	.addAttribute("hasMass", "true");
 
 	        body(element, obj);
 	        OOMDPObjectShape.valueOf(obj.getValue("shape-type")).convert(element, obj);
+	   
+	        Element components = element.addElement("components");
 	        
-	        element.addElement("components");
+	        Element sv = components.addElement("component")
+        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.ShapeVisual")
+        	.addAttribute("fromPhysics", "true");
+	        sv.addElement("renderPriority").addAttribute("value", "99");
+	        sv.addElement("color")
+        	.addAttribute("r", "0.0")
+        	.addAttribute("g", "0.0")
+        	.addAttribute("b", "1.0")
+        	.addAttribute("a", "1.0");
+	        
 	        return element;
 		}
 	},
@@ -501,7 +542,17 @@ enum ClassType {
 	        body(element, obj);
 	        OOMDPObjectShape.valueOf(obj.getValue("shape-type")).convert(element, obj);
 	        
-	        element.addElement("components");
+        	Element components = element.addElement("components");
+	        
+	        Element sv = components.addElement("component")
+        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.ShapeVisual")
+        	.addAttribute("fromPhysics", "true");
+	        sv.addElement("renderPriority").addAttribute("value", "99");
+	        sv.addElement("color")
+        	.addAttribute("r", "0.0")
+        	.addAttribute("g", "1.0")
+        	.addAttribute("b", "1.0")
+        	.addAttribute("a", "1.0");
 	        return element;
 		}
 		

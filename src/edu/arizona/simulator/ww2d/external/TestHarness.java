@@ -46,12 +46,19 @@ public class TestHarness {
 		obj1.setAttribute("shape-type", "circle");
 		obj1.setAttribute("radius", "0.25");
 
-		OOMDPObjectState obj2 = new OOMDPObjectState("agent2", "agent");
+//		OOMDPObjectState obj2 = new OOMDPObjectState("agent2", "agent");
+//		obj2.setAttribute("x", "20");
+//		obj2.setAttribute("y", "10");
+//		obj2.setAttribute("heading", "3.14");
+//		obj2.setAttribute("shape-type", "circle");
+//		obj2.setAttribute("radius", "0.25");
+		
+		OOMDPObjectState obj2 = new OOMDPObjectState("target", "obstacle");
 		obj2.setAttribute("x", "20");
 		obj2.setAttribute("y", "10");
-		obj2.setAttribute("heading", "3.14");
 		obj2.setAttribute("shape-type", "circle");
-		obj2.setAttribute("radius", "0.25");
+		obj2.setAttribute("radius", "0.5");
+		obj2.setAttribute("heading", "3.14");
 		
 		List<OOMDPObjectState> objects = new ArrayList<OOMDPObjectState>();
 		objects.add(obj1);
@@ -68,10 +75,24 @@ public class TestHarness {
 		System.out.println(actions.size() + " actions...");
 		System.out.println(env.getActions());
 
-		System.out.println(env.performAction("agent1 1000;agent2 1000"));
-		System.out.println(env.performAction("agent1 1000;agent2 1000"));
-		System.out.println(env.performAction("agent1 1000;agent2 1000"));
-		System.out.println(env.performAction("agent1 1000;agent2 1000"));
+		System.out.println("BEGIN PERFORM");
+		
+		for (int i = 0; i < 17; i++) {
+			OOMDPState newState = env.performAction("agent1 1000"); //;agent2 0000");
+			System.out.println(newState);
+		}
+		
+		System.out.println("BEGIN SIMULATE");
+		
+		// Now for testing the simulation
+		OOMDPState simState = env.initializeEnvironment(objects);
+		for (int i = 0; i < 17; i++) {
+			System.out.println("================ LOOP " + i);
+			simState = env.simulateAction(simState, "agent1 1000"); //;agent2 0000");
+			System.out.println("TEST 1: " + simState);
+			env.simulateAction(simState, "agent1 0100");
+			System.out.println("TEST 2: " + simState);
+		}
 		
 		env.cleanup();
 	}
@@ -127,7 +148,7 @@ public class TestHarness {
 	
 	public static void main(String[] args) { 
 //		test1Agent();
-//		test2Agent();
-		test3Agent();
+		test2Agent();
+//		test3Agent();
 	}
 }
