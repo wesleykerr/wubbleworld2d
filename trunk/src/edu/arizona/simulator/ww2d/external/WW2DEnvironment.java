@@ -17,6 +17,7 @@ import edu.arizona.simulator.ww2d.blackboard.entry.DistanceEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.MemoryEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
+import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.system.GameSystem;
@@ -189,6 +190,8 @@ public class WW2DEnvironment implements Environment {
 			Body body = obj.getBody();
 			System.out.println(obj.getName() + " " + obj.getHeading() + " " + obj.getPPosition() + " " + 
 					body.getLinearVelocity() + " " + body.getAngularVelocity());
+			
+			System.out.println("******* " + body.m_force);
 		}
 		computeAllRelations(); // Testing
 
@@ -278,7 +281,7 @@ public class WW2DEnvironment implements Environment {
 	 */
 	private void setState(OOMDPState state) { 
 		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
-		
+
 		for (OOMDPObjectState objState : state.getObjectStates()) { 
 			PhysicsObject obj = objectSpace.getPhysicsObject(objState.getName());
 			Body body = obj.getBody();
@@ -296,6 +299,8 @@ public class WW2DEnvironment implements Environment {
 			body.setLinearVelocity(new Vec2(vx,vy));
 			body.setAngularVelocity(vtheta);
 			body.setXForm(new Vec2(x,y), heading);
+			body.m_force.setZero();
+			body.m_torque = 0;
 			
 			System.out.println("V-THETA: " + vtheta + " BODY: " + body.getAngularVelocity());
 		}
