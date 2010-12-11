@@ -38,11 +38,14 @@ public class TestHarness {
 		env.cleanup();
 	}
 
-	public static void test2Agent() { 
+	public static void testAgentObstacle() { 
 		OOMDPObjectState obj1 = new OOMDPObjectState("agent1", "agent");
-		obj1.setAttribute("x", "10");
-		obj1.setAttribute("y", "10");
-		obj1.setAttribute("heading", "0.00");
+		obj1.setAttribute("x", "50");
+		obj1.setAttribute("y", "50");
+		obj1.setAttribute("heading", "0");
+		obj1.setAttribute("vx", "0");
+		obj1.setAttribute("vy", "0");
+		obj1.setAttribute("vtheta", "0");
 		obj1.setAttribute("shape-type", "circle");
 		obj1.setAttribute("radius", "0.25");
 
@@ -54,11 +57,14 @@ public class TestHarness {
 //		obj2.setAttribute("radius", "0.25");
 		
 		OOMDPObjectState obj2 = new OOMDPObjectState("target", "obstacle");
-		obj2.setAttribute("x", "20");
-		obj2.setAttribute("y", "10");
+		obj2.setAttribute("x", "75");
+		obj2.setAttribute("y", "50");
+		obj2.setAttribute("heading", "0");
+		obj2.setAttribute("vx", "0");
+		obj2.setAttribute("vy", "0");
+		obj2.setAttribute("vtheta", "0");
 		obj2.setAttribute("shape-type", "circle");
 		obj2.setAttribute("radius", "0.5");
-		obj2.setAttribute("heading", "3.14");
 		
 		List<OOMDPObjectState> objects = new ArrayList<OOMDPObjectState>();
 		objects.add(obj1);
@@ -67,31 +73,32 @@ public class TestHarness {
 		WW2DEnvironment env = new WW2DEnvironment(true);
 		OOMDPState state = env.initializeEnvironment(objects);
 
-		System.out.println("Initialization complete...");
-		System.out.println(state.toString());
-		
-		System.out.println("Printing actions...");
-		List<String> actions = env.getActions();
-		System.out.println(actions.size() + " actions...");
-		System.out.println(env.getActions());
+//		System.out.println("Initialization complete...");
+//		System.out.println(state.toString());
+//		
+//		System.out.println("Printing actions...");
+//		List<String> actions = env.getActions();
+//		System.out.println(actions.size() + " actions...");
+//		System.out.println(env.getActions());
 
 		System.out.println("BEGIN PERFORM");
-		
-		for (int i = 0; i < 17; i++) {
+		System.out.println(state);
+		for (int i = 0; i < 9; i++) {
 			OOMDPState newState = env.performAction("agent1 1000"); //;agent2 0000");
 			System.out.println(newState);
 		}
 		
 		System.out.println("BEGIN SIMULATE");
-		
-		// Now for testing the simulation
 		OOMDPState simState = env.initializeEnvironment(objects);
-		for (int i = 0; i < 17; i++) {
-			System.out.println("================ LOOP " + i);
-			simState = env.simulateAction(simState, "agent1 1000"); //;agent2 0000");
-			System.out.println("TEST 1: " + simState);
-			env.simulateAction(simState, "agent1 0100");
-			System.out.println("TEST 2: " + simState);
+		System.out.println(simState);
+		for (int i = 0; i < 10; i++) {
+//			System.out.println("================ LOOP " + i);
+//			simState = env.simulateAction(simState, "agent1 1000");
+			simState = env.simulateAction("agent1 1000");
+//			System.out.println("TEST 1: " + simState);
+//			env.simulateAction(simState, "agent1 0100");
+//			System.out.println("TEST 2: " + simState);
+			System.out.println(simState);
 		}
 		
 		env.cleanup();
@@ -148,7 +155,7 @@ public class TestHarness {
 	
 	public static void main(String[] args) { 
 //		test1Agent();
-		test2Agent();
+		testAgentObstacle();
 //		test3Agent();
 	}
 }
