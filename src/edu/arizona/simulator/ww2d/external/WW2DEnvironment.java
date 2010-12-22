@@ -62,7 +62,7 @@ public class WW2DEnvironment implements Environment {
 		_container.destroy();
 	}
 	
-	// MDPObjectState -- This corresponds to the objects and thier attributes
+	// MDPObjectState -- This corresponds to the objects and their attributes
 	//    -- Class Name: cognitiveAgent, dynamic, obstacle, wall, food
 	//    -- Attributes: x, y, shape, width, height
 	//       -- shapes : circle, rectangle  (squares are subsets)
@@ -179,7 +179,7 @@ public class WW2DEnvironment implements Environment {
 		
 		List<State> lastWorldState = worldState;
 		
-		List<Relation> specialRelations = go(action);
+		List<Relation> specialRelations = go(action, true);
 		
 		worldState = getGroundState();
 		
@@ -198,7 +198,7 @@ public class WW2DEnvironment implements Environment {
 
 		List<State> prev = getGroundState();
 		
-		List<Relation> specialRelations = go(action); 
+		List<Relation> specialRelations = go(action, false); 
 
 		OOMDPState next = makeMdpState(getGroundState(), prev, specialRelations); 
 		
@@ -213,7 +213,7 @@ public class WW2DEnvironment implements Environment {
 	 * It is a sort of hybrid between simulate and perform.
 	 */
 	public OOMDPState simulateAction(String action) {
-		List<Relation> specialRelations = go(action);
+		List<Relation> specialRelations = go(action, false);
 		
 		OOMDPState next = makeMdpState(getGroundState(), worldState, specialRelations);
 		
@@ -241,18 +241,18 @@ public class WW2DEnvironment implements Environment {
 	 *   ...
 	 *   1111 -- all on
 	 */
-	private List<Relation> go(String action) { 
+	private List<Relation> go(String action, boolean render) { 
 		parseAction(action);
 		
 		List<Relation> specialRelations = new ArrayList<Relation>();
 		
 		for (int i = 0; i < 10; ++i) { 
-			_gameSystem.update(20);
-			if (_container != null)
+			_gameSystem.update(15);
+			if (render && _container != null)
 				_container.render(_gameSystem);
 			resolveRelations(specialRelations, computeSpecialRelations());
 		}
-		if (_container != null)
+		if (render && _container != null)
 			_container.render(_gameSystem);
 		
 		EventType[] types = new EventType[] { 
@@ -461,23 +461,36 @@ public class WW2DEnvironment implements Environment {
 //				}
 //			}
 //		}
-		
-		if (previousStates == null) {
-			return list; // TODO: Probably should be a bit more discriminating here
-		}
-		
+
 		HashMap<String, State> currentMap = makeStateMap(currentStates);
-		HashMap<String, State> prevMap = makeStateMap(previousStates);
 		
-		for (String name : currentMap.keySet()) {
-			// Compute the predicates
-			list.addAll(computePredicates(currentMap.get(name), prevMap.get(name)));
+		if (previousStates == null) { // Only compute instantaneous relations
+			for (String name : currentMap.keySet()) {
+				// There are no inst. predicates right now
+				
+				// Compute the binary relations
+				for (State other : currentStates) {
+					if (!name.equals(other.name)) { // No need to compare with self
+						list.addAll(computeInstBinaryRelations(currentMap.get(name), currentMap.get(other.name))); 
+					}
+				}
+			}
+
+		} else { // Compute both inst. and differential predicates
 			
-			// Compute the binary relations
-			for (State other : currentStates) {
-				if (!name.equals(other.name)) { // No need to compare with self
-					list.addAll(computeBinaryRelations(currentMap.get(name), prevMap.get(name), 
-													   currentMap.get(other.name), prevMap.get(other.name))); 
+			HashMap<String, State> prevMap = makeStateMap(previousStates);
+			
+			for (String name : currentMap.keySet()) {
+				// Compute the predicates
+				list.addAll(computeDiffPredicates(currentMap.get(name), prevMap.get(name)));
+				
+				// Compute the binary relations
+				for (State other : currentStates) {
+					if (!name.equals(other.name)) { // No need to compare with self
+						list.addAll(computeInstBinaryRelations(currentMap.get(name), currentMap.get(other.name)));
+						list.addAll(computeDiffBinaryRelations(currentMap.get(name), prevMap.get(name), 
+														   currentMap.get(other.name), prevMap.get(other.name))); 
+					}
 				}
 			}
 		}
@@ -495,13 +508,14 @@ public class WW2DEnvironment implements Environment {
 		return map;
 	}
 	
-	private List<Relation> computePredicates(State current, State previous) {
+	private List<Relation> computeDiffPredicates(State current, State previous) {
 		List<Relation> list = new ArrayList<Relation>();
 		
 		String[] names = new String[] { current.name };
 		list.add(new Relation("Moved", names, (!(current.x == previous.x) ||
 											   !(current.y == previous.y))));
 		
+		// TODO: Can we put these back?
 //		float deltaX = current.x - previous.x;
 //		float deltaY = current.y - previous.y;
 //		
@@ -510,7 +524,7 @@ public class WW2DEnvironment implements Environment {
 //		
 //		double deltaAngle = State.deltaAngle(direction, current.heading);
 //		
-//		double deadZone = 0.1;
+//		double deadZone = 0.05;
 //		
 //		if (Math.abs(magnitude) < deadZone) {
 //			list.add(new Relation("MovedForward", names, false));
@@ -527,36 +541,22 @@ public class WW2DEnvironment implements Environment {
 		return list;
 	}
 	
-	private List<Relation> computeBinaryRelations(State currentSelf, State formerSelf, State currentOther, State formerOther) {
+	private List<Relation> computeInstBinaryRelations(State self, State other) {
 		List<Relation> list = new ArrayList<Relation>();
 		
-		String[] names = new String[] { currentSelf.name, currentOther.name };
-		String[] symNames = new String[] { currentOther.name, currentSelf.name };
- 		
-		float dist = currentSelf.computeDistanceTo(currentOther);
-		float lastDist = formerSelf.computeDistanceTo(formerOther);
+		String[] names = new String[] { self.name, other.name };
+		String[] symNames = new String[] { other.name, self.name };
 		
-		boolean dd = (dist < lastDist);
-		boolean di = (dist > lastDist);
-		boolean dc = (dist == lastDist);
-		
-		list.add(new Relation("DistanceDecreased", names, dd));
-		list.add(new Relation("DistanceDecreased", symNames, dd));
-		
-		list.add(new Relation("DistanceIncreased", names, di));
-		list.add(new Relation("DistanceIncreased", symNames, di));
-		
-		list.add(new Relation("DistanceConstant", names, dc));
-		list.add(new Relation("DistanceConstant", symNames, dc));
+		float dist = self.computeDistanceTo(other);
 		
 		list.add(new Relation("Near", names, (dist < 2.0)));
 		list.add(new Relation("Near", symNames, (dist < 2.0)));
 		
-		if (currentSelf.className.equals("agent")) {
+		if (self.className.equals("agent")) {
 			String rels[] = new String[] { "RightOf", "LeftOf", "InFrontOf", "Behind" };
 			int true_index = -1;
 
-			float relAngle = currentSelf.computeRelativeAngle(currentOther);
+			float relAngle = self.computeRelativeAngle(other);
 
 			
 			true_index = 0;
@@ -577,6 +577,31 @@ public class WW2DEnvironment implements Environment {
 				list.add(new Relation(rels[i], names, (true_index == i)));
 			}
 		}
+		
+		return list;
+	}
+	
+	private List<Relation> computeDiffBinaryRelations(State currentSelf, State formerSelf, State currentOther, State formerOther) {
+		List<Relation> list = new ArrayList<Relation>();
+		
+		String[] names = new String[] { currentSelf.name, currentOther.name };
+		String[] symNames = new String[] { currentOther.name, currentSelf.name };
+ 		
+		float dist = currentSelf.computeDistanceTo(currentOther);
+		float lastDist = formerSelf.computeDistanceTo(formerOther);
+		
+		boolean dd = (dist < lastDist);
+		boolean di = (dist > lastDist);
+		boolean dc = (dist == lastDist);
+		
+		list.add(new Relation("DistanceDecreased", names, dd));
+		list.add(new Relation("DistanceDecreased", symNames, dd));
+		
+		list.add(new Relation("DistanceIncreased", names, di));
+		list.add(new Relation("DistanceIncreased", symNames, di));
+		
+		list.add(new Relation("DistanceConstant", names, dc));
+		list.add(new Relation("DistanceConstant", symNames, dc));
 		
 		return list;
 	}
@@ -687,15 +712,6 @@ public class WW2DEnvironment implements Environment {
 		return list;
 	}
 	
-	/**
-	 * For the time being ignored.
-	 * TODO: remove if not necessary.
-	 * @param objectStates
-	 * @return
-	 */
-	public OOMDPState computeRelations(List<OOMDPObjectState> objectStates) {
-		return null;
-	}
 }
 
 enum ClassType { 
