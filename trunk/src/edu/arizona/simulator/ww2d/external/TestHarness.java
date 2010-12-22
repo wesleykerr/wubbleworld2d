@@ -2,6 +2,7 @@ package edu.arizona.simulator.ww2d.external;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import edu.arizona.verbs.shared.OOMDPObjectState;
 import edu.arizona.verbs.shared.OOMDPState;
@@ -57,7 +58,7 @@ public class TestHarness {
 //		obj2.setAttribute("radius", "0.25");
 		
 		OOMDPObjectState obj2 = new OOMDPObjectState("target", "obstacle");
-		obj2.setAttribute("x", "75");
+		obj2.setAttribute("x", "25");
 		obj2.setAttribute("y", "50");
 		obj2.setAttribute("heading", "0");
 		obj2.setAttribute("vx", "0");
@@ -81,25 +82,54 @@ public class TestHarness {
 //		System.out.println(actions.size() + " actions...");
 //		System.out.println(env.getActions());
 
+		List<String> actions = env.getActions();
+		Random r = new Random();
+		
+		
 		System.out.println("BEGIN PERFORM");
 		System.out.println(state);
-		for (int i = 0; i < 9; i++) {
-			OOMDPState newState = env.performAction("agent1 1000"); //;agent2 0000");
-			System.out.println(newState);
-		}
+//		for (int i = 0; i < 12; i++) {
+			 //;agent2 0000");
+//			OOMDPState newState = env.performAction(actions.get(r.nextInt(actions.size())));
+//			System.out.println(newState);
+//		}
+		// Forward Left Right Back
+		OOMDPState newState = env.performAction("agent1 0100");
+		newState = env.performAction("agent1 0100");
+		newState = env.performAction("agent1 0100");
+		newState = env.performAction("agent1 0100");
+		newState = env.performAction("agent1 0100");
 		
-		System.out.println("BEGIN SIMULATE");
-		OOMDPState simState = env.initializeEnvironment(objects);
-		System.out.println(simState);
-		for (int i = 0; i < 10; i++) {
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 0100");
+		
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 1000");
+		newState = env.performAction("agent1 1000");
+
+		System.out.println(newState);
+		
+		
+//		System.out.println("BEGIN SIMULATE");
+//		OOMDPState simState = env.initializeEnvironment(objects);
+//		System.out.println(simState);
+//		for (int i = 0; i < 12; i++) {
 //			System.out.println("================ LOOP " + i);
 //			simState = env.simulateAction(simState, "agent1 1000");
-			simState = env.simulateAction("agent1 1000");
+//			simState = env.simulateAction("agent1 1000");
 //			System.out.println("TEST 1: " + simState);
 //			env.simulateAction(simState, "agent1 0100");
 //			System.out.println("TEST 2: " + simState);
-			System.out.println(simState);
-		}
+//			System.out.println(simState);
+//		}
 		
 		env.cleanup();
 	}
