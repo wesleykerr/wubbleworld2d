@@ -220,32 +220,47 @@ public class WW2DEnvironment implements Environment {
 	}
 	
 	/**
-	 * Experimental: This version of simulate simulates from the current ground state. 
+	 * This version of simulate simulates from the current ground state. 
 	 * It is a sort of hybrid between simulate and perform.
 	 */
+	private List<State> lastRealState = null;
+
 	public OOMDPState simulateAction(String action) {
 		if (!needsReset) { // i.e., the first time
 			backupEnemyCounter = enemyCounter;
 			backupEnemyState = enemyState;
+			lastRealState = worldState;
 		}
 		
+		// Save the old state for computing relations later
+		List<State> lastWorldState = worldState;
+		
+		// Perform the action
 		List<Relation> specialRelations = go(action, false);
 		
-		OOMDPState next = makeMdpState(getGroundState(), worldState, specialRelations);
+		// Get the new state
+		worldState = getGroundState();
 		
+		// Compute relations, make the OOMDP state
+		OOMDPState next = makeMdpState(worldState, lastWorldState, specialRelations);
+		
+		// Indicate that we have diverged from reality
 		needsReset = true;
 		
 		return next;
 	}
 	
 	public void reset() {
+//		System.out.println("RESET CALLED");
 		if (needsReset) {
-			setState(worldState);
-			
+//			System.out.println("ACTUALLY RESETTING");
+			// Restore the last true state
+			worldState = lastRealState;
+			setState(lastRealState);
 			// Reset the enemy
 			enemyState = backupEnemyState;
 			enemyCounter = backupEnemyCounter;
-			
+
 			needsReset = false;
 		}
 	}
@@ -603,12 +618,15 @@ public class WW2DEnvironment implements Environment {
 				areColliding = true;
 			}
 		}
-		
-		if (areColliding) { 
+		if (areColliding) {  
 			dd = false;
 			di = false;
-			dc = true; // Not really but oh well
+			dc = true; 
 		}
+		
+//		if (dd && currentSelf.name.equals("person") && currentOther.name.equals("waypoint")) {
+//			System.out.println("WTF?!");
+//		}
 		
 		list.add(new Relation("DistanceDecreased", names, dd));
 		list.add(new Relation("DistanceDecreased", symNames, dd));
@@ -880,8 +898,8 @@ enum OOMDPObjectShape {
 		element.addAttribute("density", "0.2");
 		element.addAttribute("friction", "0.5");
 		element.addAttribute("restitution", "0.0"); // Testing
-//		if (obj.getClassName().equals("obstacle")) {
-//			element.addAttribute("isSensor", "true"); // Testing
-//		}
+		if (obj.getClassName().equals("obstacle")) {
+			element.addAttribute("isSensor", "true"); // Testing
+		}
 	}
 }
