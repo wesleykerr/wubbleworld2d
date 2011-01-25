@@ -10,7 +10,7 @@ import edu.arizona.verbs.shared.Relation;
 
 public class TestHarness {
 	
-	public static void test1Agent() { 
+	public static void test1Agent() throws SimulatorFailureException { 
 		// Create simple initial environment. Single agent as a circle.
 		OOMDPObjectState obj1 = new OOMDPObjectState("agent1", "agent");
 		obj1.setAttribute("x", "10");
@@ -39,8 +39,65 @@ public class TestHarness {
 		env.cleanup();
 	}
 
-	public static void testAgentObstacle() { 
-		OOMDPObjectState obj1 = new OOMDPObjectState("agent1", "agent");
+	public static void testAgentEnemy() throws SimulatorFailureException {
+		OOMDPObjectState person = new OOMDPObjectState("person", "agent");
+		person.setAttribute("x", "60");
+		person.setAttribute("y", "55");
+		person.setAttribute("heading", "-3");
+		person.setAttribute("vx", "0");
+		person.setAttribute("vy", "0");
+		person.setAttribute("vtheta", "0");
+		person.setAttribute("shape-type", "circle");
+		person.setAttribute("radius", "0.25");
+		
+		OOMDPObjectState enemy = new OOMDPObjectState("enemy", "agent");
+		enemy.setAttribute("x", "40");
+		enemy.setAttribute("y", "50");
+		enemy.setAttribute("heading", "0");
+		enemy.setAttribute("vx", "0");
+		enemy.setAttribute("vy", "0");
+		enemy.setAttribute("vtheta", "0");
+		enemy.setAttribute("shape-type", "circle");
+		enemy.setAttribute("radius", "0.25");
+		
+		OOMDPObjectState place = new OOMDPObjectState("place", "obstacle");
+		place.setAttribute("x", "70");
+		place.setAttribute("y", "50");
+		place.setAttribute("heading", "0");
+		place.setAttribute("vx", "0");
+		place.setAttribute("vy", "0");
+		place.setAttribute("vtheta", "0");
+		place.setAttribute("shape-type", "circle");
+		place.setAttribute("radius", "0.5");
+		
+		List<OOMDPObjectState> objects = new ArrayList<OOMDPObjectState>();
+		objects.add(person);
+		objects.add(enemy);
+		objects.add(place);
+		
+		WW2DEnvironment env = new WW2DEnvironment(true);
+		OOMDPState state = env.initializeEnvironment(objects);
+
+		System.out.println("Initialization complete...");
+		System.out.println(state.toString());
+		
+		System.out.println("Printing actions...");
+		List<String> actions = env.getActions();
+		System.out.println(actions.size() + " actions...");
+		System.out.println(env.getActions());
+
+		for (int i = 0; i < 50; i++) {
+			if (i < 2) {
+				state = env.performAction("person 1000");
+			} else {
+				state = env.performAction("person 0000");
+			}
+			System.out.println(state.getActiveRelations());
+		}
+	}
+	
+	public static void testAgentObstacle() throws SimulatorFailureException { 
+		OOMDPObjectState obj1 = new OOMDPObjectState("person", "agent");
 		obj1.setAttribute("x", "50");
 		obj1.setAttribute("y", "50");
 		obj1.setAttribute("heading", "0");
@@ -57,9 +114,9 @@ public class TestHarness {
 //		obj2.setAttribute("shape-type", "circle");
 //		obj2.setAttribute("radius", "0.25");
 		
-		OOMDPObjectState obj2 = new OOMDPObjectState("target", "obstacle");
-		obj2.setAttribute("x", "25");
-		obj2.setAttribute("y", "50");
+		OOMDPObjectState obj2 = new OOMDPObjectState("place", "obstacle");
+		obj2.setAttribute("x", "55");
+		obj2.setAttribute("y", "45");
 		obj2.setAttribute("heading", "0");
 		obj2.setAttribute("vx", "0");
 		obj2.setAttribute("vy", "0");
@@ -94,28 +151,21 @@ public class TestHarness {
 //			System.out.println(newState);
 //		}
 		// Forward Left Right Back
-		OOMDPState newState = env.performAction("agent1 0100");
-		newState = env.performAction("agent1 0100");
-		newState = env.performAction("agent1 0100");
-		newState = env.performAction("agent1 0100");
-		newState = env.performAction("agent1 0100");
+		OOMDPState newState = env.performAction("person 0100");
+		newState = env.performAction("person 0100");
+//		newState = env.performAction("person 0100");
+//		newState = env.performAction("person 0100");
+//		newState = env.performAction("person 0100");
+//		newState = env.performAction("person 0100");
 		
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 0100");
+		newState = env.performAction("person 1000");
+//		newState = env.performAction("person 0100");
+		newState = env.performAction("person 1000");
+		newState = env.performAction("person 1000");
+		newState = env.performAction("person 1000");
 		
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 1000");
-		newState = env.performAction("agent1 1000");
 
-		System.out.println(newState);
+		System.out.println("FINAL: " + newState);
 		
 		
 //		System.out.println("BEGIN SIMULATE");
@@ -134,7 +184,7 @@ public class TestHarness {
 		env.cleanup();
 	}
 	
-	public static void test3Agent() { 
+	public static void test3Agent() throws SimulatorFailureException { 
 		OOMDPObjectState obj1 = new OOMDPObjectState("agent1", "agent");
 		obj1.setAttribute("x", "10");
 		obj1.setAttribute("y", "10");
@@ -183,9 +233,10 @@ public class TestHarness {
 	}
 	
 	
-	public static void main(String[] args) { 
+	public static void main(String[] args) throws SimulatorFailureException { 
 //		test1Agent();
-		testAgentObstacle();
+//		testAgentObstacle();
+		testAgentEnemy();
 //		test3Agent();
 	}
 }
