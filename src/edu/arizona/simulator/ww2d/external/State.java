@@ -108,6 +108,26 @@ public class State {
 		return (float) Math.sqrt(Math.pow(other.x - this.x, 2) + Math.pow(other.y - this.y, 2));
 	}
 	
+//	public float computeDistanceTo(State other) {
+//		int deltaX = discretizeLoc(other.x) - discretizeLoc(this.x);
+//		int deltaY = discretizeLoc(other.y) - discretizeLoc(this.y);
+//		
+////		return Math.max(deltaX, deltaY); // This is the chess distance
+//		
+//		if (deltaX == 0 && deltaY == 0) {
+//			return 0.0f;
+//		
+//		} else {
+//			float distance = (float) Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+//			
+////			if (distance < 0.01) {
+////				return 0.0f;
+////			} else {
+//				return distance;
+////			}
+//		}
+//	}
+	
 	public float computeRelativeAngle(State other) {
 		double deltaX = other.x - this.x;
 		double deltaY = other.y - this.y;

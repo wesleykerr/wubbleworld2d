@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -13,10 +12,9 @@ import org.dom4j.Element;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
+import com.google.common.collect.Lists;
+
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
-import edu.arizona.simulator.ww2d.blackboard.entry.AuditoryEntry;
-import edu.arizona.simulator.ww2d.blackboard.entry.MemoryEntry;
-import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
@@ -87,8 +85,19 @@ public class WW2DEnvironment implements Environment {
 		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 		List<PhysicsObject> agents = objectSpace.getCognitiveAgents();
 
+		PhysicsObject enemy = null;
+		for (PhysicsObject agent : agents) {
+			if (agent.getName().equals("enemy")) {
+				enemy = agent;
+			}
+		}
+		if (enemy != null) {
+			agents.remove(enemy);
+		}
+		
 		List<List<String>> actionsByAgent = new ArrayList<List<String>>(agents.size());
-		for (PhysicsObject obj : objectSpace.getCognitiveAgents()) { 
+		for (PhysicsObject obj : agents) { 
+			
 			List<String> tmp = new ArrayList<String>();
 			for (int i = 0; i < 16; ++i) { 
 				StringBuffer buf = new StringBuffer(Integer.toBinaryString(i));
@@ -139,7 +148,6 @@ public class WW2DEnvironment implements Environment {
 		return actions;
 	}
 
-//	private OOMDPState trueState = null;
 	private List<State> worldState = null;
 	private boolean needsReset = false;
 	
@@ -160,6 +168,10 @@ public class WW2DEnvironment implements Environment {
 			EventManager.inst().dispatchImmediate(event);
 		}
 
+		// Reset the enemy
+		enemyState = EnemyState.Approaching;
+		enemyCounter = 0;
+		
 		// Do an initial update to get the world turning....
 		_gameSystem.update(0);
 		
@@ -174,7 +186,7 @@ public class WW2DEnvironment implements Environment {
 	}
 
 	@Override
-	public OOMDPState performAction(String action) {
+	public OOMDPState performAction(String action) throws SimulatorFailureException {
 		reset();
 		
 		List<State> lastWorldState = worldState;
@@ -191,10 +203,10 @@ public class WW2DEnvironment implements Environment {
 	 * the action, records the next state and resets the state to
 	 * the original.
 	 */
-	public OOMDPState simulateAction(OOMDPState state, String action) {
+	@Override
+	public OOMDPState simulateAction(OOMDPState state, String action) throws SimulatorFailureException {
 		// Set the current state to be state
 		setState(state);
-		_gameSystem.update(0);
 
 		List<State> prev = getGroundState();
 		
@@ -203,7 +215,6 @@ public class WW2DEnvironment implements Environment {
 		OOMDPState next = makeMdpState(getGroundState(), prev, specialRelations); 
 		
 		setState(worldState);
-		_gameSystem.update(0);
 		
 		return next;
 	}
@@ -213,6 +224,11 @@ public class WW2DEnvironment implements Environment {
 	 * It is a sort of hybrid between simulate and perform.
 	 */
 	public OOMDPState simulateAction(String action) {
+		if (!needsReset) { // i.e., the first time
+			backupEnemyCounter = enemyCounter;
+			backupEnemyState = enemyState;
+		}
+		
 		List<Relation> specialRelations = go(action, false);
 		
 		OOMDPState next = makeMdpState(getGroundState(), worldState, specialRelations);
@@ -225,7 +241,11 @@ public class WW2DEnvironment implements Environment {
 	public void reset() {
 		if (needsReset) {
 			setState(worldState);
-			_gameSystem.update(0);
+			
+			// Reset the enemy
+			enemyState = backupEnemyState;
+			enemyCounter = backupEnemyCounter;
+			
 			needsReset = false;
 		}
 	}
@@ -288,6 +308,13 @@ public class WW2DEnvironment implements Environment {
 	 * Parse the action that will send messages so that
 	 * stuff will move when the external environment asks.
 	 */
+	public enum EnemyState { Approaching, Intercepted, ReachedGoal };
+	EnemyState enemyState = EnemyState.Approaching;
+	public int enemyCounter = 0;
+	
+	EnemyState backupEnemyState = enemyState;
+	public int backupEnemyCounter = 0;
+	
 	private void parseAction(String action) {
 		EventType[] types = new EventType[] { 
 				EventType.FORWARD_EVENT, EventType.LEFT_EVENT, 
@@ -310,14 +337,40 @@ public class WW2DEnvironment implements Environment {
 				EventManager.inst().dispatch(event);
 			}
 		}
+		
+		// Now for the enemy
+		PhysicsObject enemy = objectSpace.getPhysicsObject("enemy");
+		if (enemy != null) {
+			if (enemyState.equals(EnemyState.Approaching)) {
+				if (enemyCounter % 4 == 0) {
+					Event event = new Event(EventType.FORWARD_EVENT);
+					event.addRecipient(enemy);
+					event.addParameter("state", true);
+					EventManager.inst().dispatch(event);
+				} else {
+					Event event = new Event(EventType.FORWARD_EVENT);
+					event.addRecipient(enemy);
+					event.addParameter("state", false);
+					EventManager.inst().dispatch(event);
+				}
+			} else {
+				Event event = new Event(EventType.FORWARD_EVENT);
+				event.addRecipient(enemy);
+				event.addParameter("state", false);
+				EventManager.inst().dispatch(event);
+			}
+		}
+		
+		enemyCounter++;
 	}
 	
 	/**
 	 * Set the world to match the given state
 	 * @param state
+	 * @throws SimulatorFailureException 
 	 */
 	// TODO: Maybe remove this and always go through State first, for clarity
-	private void setState(OOMDPState state) {
+	private void setState(OOMDPState state) throws SimulatorFailureException {
 		ArrayList<State> states = new ArrayList<State>();
 		
 		for (OOMDPObjectState objState : state.getObjectStates()) {
@@ -325,24 +378,10 @@ public class WW2DEnvironment implements Environment {
 		}
 		
 		setState(states);
-		
-//		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
-//
-//		for (OOMDPObjectState objState : state.getObjectStates()) { 
-//			PhysicsObject obj = objectSpace.getPhysicsObject(objState.getName());
-//			Body body = obj.getBody();
-//			
-//			State s = new State(objState);
-//			
-//			body.setLinearVelocity(new Vec2(s.vx, s.vy));
-//			body.setAngularVelocity(s.vtheta);
-//			body.setXForm(new Vec2(s.x, s.y), s.heading);
-//			body.m_force.setZero();
-//			body.m_torque = 0;
-//		}
 	}
 
-	private void setState(List<State> states) {
+	// NB: Moved the update(0) in here
+	private void setState(List<State> states) throws SimulatorFailureException {
 		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 
 		for (State s : states) { 
@@ -350,29 +389,23 @@ public class WW2DEnvironment implements Environment {
 			Body body = obj.getBody();
 			body.setLinearVelocity(new Vec2(s.vx, s.vy));
 			body.setAngularVelocity(s.vtheta);
-			body.setXForm(new Vec2(s.x, s.y), s.heading);
+			
+			if (!body.setXForm(new Vec2(s.x, s.y), s.heading)) {
+				throw new SimulatorFailureException();
+			}
+			
 			body.m_force.setZero();
 			body.m_torque = 0;
 		}
+		
+		_gameSystem.update(0);
 	}
 	
-	/**
-	 * Iterate over the objects in the world generating the new state and determine
-	 * all of the Relations that exist.
-	 * @return
-	 */
-//	private OOMDPState getState(List<OOMDPObjectState> objectState, List<Relation> specialRelations) {
-//		List<OOMDPObjectState> objectStates = getObjectStates(objectState);
-//		List<Relation> relations = computeRelations2(objectStates);
-//		relations.addAll(specialRelations);
-//		return new OOMDPState(objectStates, relations);
-//	}
-
 	private OOMDPState makeMdpState(List<State> groundStates, List<State> previousStates, List<Relation> specialRelations) {
 		List<OOMDPObjectState> objectStates = makeObjectStates(groundStates);
 		
-		List<Relation> relations = computeGroundRelations(groundStates, previousStates);
-		relations.addAll(specialRelations);
+		List<Relation> relations = computeGroundRelations(groundStates, previousStates, specialRelations);
+//		relations.addAll(specialRelations);
 		
 		return new OOMDPState(objectStates, relations);
 	}
@@ -402,98 +435,52 @@ public class WW2DEnvironment implements Environment {
 		return mdpStates;
 	}
 	
-//	private HashMap<String, OOMDPObjectState> makeStateMap(List<OOMDPObjectState> states) {
-//		HashMap<String, OOMDPObjectState> stateMap = new HashMap<String, OOMDPObjectState>();
-//
-//		if (states == null) {
-//			return stateMap;
-//		}
-//		
-//		for (OOMDPObjectState os : states) {
-//			stateMap.put(os.getName(), os);
-//		}
-//		
-//		return stateMap;
-//	}
-	
-//	private List<OOMDPObjectState> getObjectStates(List<OOMDPObjectState> previous) {
-//		HashMap<String,OOMDPObjectState> stateMap = makeStateMap(previous);
-//		
-//		// First generate all of the attribute values.
-//		List<OOMDPObjectState> objectStates = new ArrayList<OOMDPObjectState>();
-//		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
-//		for (PhysicsObject obj : objectSpace.getPhysicsObjects()) { 
-//			if (obj.getType() == ObjectType.wall)
-//				continue;
-//			
-//			State s = new State(obj);
-//			OOMDPObjectState state = s.discretize();
-//
-//			// Do we want this anymore?
-//			if (stateMap.containsKey(obj.getName())) {
-//				OOMDPObjectState prevState = stateMap.get(obj.getName());
-//				state.setAttribute("last_x", prevState.getValue("x"));
-//				state.setAttribute("last_y", prevState.getValue("y"));
-//				state.setAttribute("last_heading", prevState.getValue("heading"));
-//			} else {
-//				state.setAttribute("last_x", state.getValue("x"));
-//				state.setAttribute("last_y", state.getValue("y"));
-//				state.setAttribute("last_heading", state.getValue("heading"));
-//			}
-//			
-//			objectStates.add(state);
-//		}
-//		
-//		return objectStates;
-//	}
-	
-	private List<Relation> computeGroundRelations(List<State> currentStates, List<State> previousStates) {
+	private List<Relation> computeGroundRelations(List<State> currentStates, List<State> previousStates, List<Relation> specialRelations) {
 		List<Relation> list = new ArrayList<Relation>();
 		
-//		for (State state : currentStates) {
-//			// First compute the predicates for the object
-//			list.addAll(computePredicates(state));
-//			
-//			// Then compute all the binary relations
-//			for (State other : currentStates) {
-//				if (!state.name.equals(other.name)) { // No need to compare with self
-//					list.addAll(computeBinaryRelations(state, other));
-//				}
-//			}
-//		}
-
 		HashMap<String, State> currentMap = makeStateMap(currentStates);
 		
 		if (previousStates == null) { // Only compute instantaneous relations
-			for (String name : currentMap.keySet()) {
+			
+			ArrayList<String> nameList = new ArrayList<String>(currentMap.keySet());
+			for (int i = 0; i < nameList.size(); i++) {
+				String name = nameList.get(i);
+
 				// There are no inst. predicates right now
 				
 				// Compute the binary relations
-				for (State other : currentStates) {
-					if (!name.equals(other.name)) { // No need to compare with self
-						list.addAll(computeInstBinaryRelations(currentMap.get(name), currentMap.get(other.name))); 
+				for (int j = i+1; j < nameList.size(); j++) {
+					String other = nameList.get(j);
+					if (!name.equals(other)) { // No need to compare with self
+						list.addAll(computeInstBinaryRelations(currentMap.get(name), currentMap.get(other), specialRelations));
 					}
 				}
 			}
-
+			
 		} else { // Compute both inst. and differential predicates
 			
 			HashMap<String, State> prevMap = makeStateMap(previousStates);
 			
-			for (String name : currentMap.keySet()) {
+			ArrayList<String> nameList = new ArrayList<String>(currentMap.keySet());
+			for (int i = 0; i < nameList.size(); i++) {
+				String name = nameList.get(i);
+
 				// Compute the predicates
 				list.addAll(computeDiffPredicates(currentMap.get(name), prevMap.get(name)));
 				
 				// Compute the binary relations
-				for (State other : currentStates) {
-					if (!name.equals(other.name)) { // No need to compare with self
-						list.addAll(computeInstBinaryRelations(currentMap.get(name), currentMap.get(other.name)));
+				for (int j = i+1; j < nameList.size(); j++) {
+					String other = nameList.get(j);
+					if (!name.equals(other)) { // No need to compare with self
+						list.addAll(computeInstBinaryRelations(currentMap.get(name), currentMap.get(other), specialRelations));
 						list.addAll(computeDiffBinaryRelations(currentMap.get(name), prevMap.get(name), 
-														   currentMap.get(other.name), prevMap.get(other.name))); 
+														   	   currentMap.get(other), prevMap.get(other), specialRelations)); 
 					}
 				}
 			}
 		}
+		
+		list.addAll(specialRelations);
 		
 		return list;
 	}
@@ -511,10 +498,10 @@ public class WW2DEnvironment implements Environment {
 	private List<Relation> computeDiffPredicates(State current, State previous) {
 		List<Relation> list = new ArrayList<Relation>();
 		
-		String[] names = new String[] { current.name };
-		list.add(new Relation("Moved", names, (!(current.x == previous.x) ||
-											   !(current.y == previous.y))));
-		
+//		ArrayList<String> names = Lists.newArrayList(current.name);
+//		list.add(new Relation("Moved", names, (!(current.x == previous.x) ||
+//											   !(current.y == previous.y))));
+//		
 		// TODO: Can we put these back?
 //		float deltaX = current.x - previous.x;
 //		float deltaY = current.y - previous.y;
@@ -534,45 +521,60 @@ public class WW2DEnvironment implements Environment {
 //			list.add(new Relation("MovedBackward", names, (deltaAngle < -(Math.PI/2) || (Math.PI/2) < deltaAngle)));
 //		}
 		
-		list.add(new Relation("Rotated", names, (current.heading != previous.heading)));
-		list.add(new Relation("RotatedLeft", names, (current.vtheta < 0.0)));
-		list.add(new Relation("RotatedRight", names, (current.vtheta > 0.0)));
-		
+//		list.add(new Relation("Rotated", names, (current.heading != previous.heading)));
+//		list.add(new Relation("RotatedLeft", names, (current.vtheta < 0.0)));
+//		list.add(new Relation("RotatedRight", names, (current.vtheta > 0.0)));
+//		
 		return list;
 	}
 	
-	private List<Relation> computeInstBinaryRelations(State self, State other) {
+	private List<Relation> computeInstBinaryRelations(State self, State other, List<Relation> specialRelations) {
 		List<Relation> list = new ArrayList<Relation>();
 		
-		String[] names = new String[] { self.name, other.name };
-		String[] symNames = new String[] { other.name, self.name };
+		ArrayList<String> names = Lists.newArrayList(self.name, other.name);
+//		ArrayList<String> symNames = Lists.newArrayList(other.name, self.name);
 		
-		float dist = self.computeDistanceTo(other);
+//		float dist = self.computeDistanceTo(other);
 		
-		list.add(new Relation("Near", names, (dist < 2.0)));
-		list.add(new Relation("Near", symNames, (dist < 2.0)));
+		//list.add(new Relation("Near", names, (dist < 2.0)));
+		//list.add(new Relation("Near", symNames, (dist < 2.0)));
 		
 		if (self.className.equals("agent")) {
 			String rels[] = new String[] { "RightOf", "LeftOf", "InFrontOf", "Behind" };
 			int true_index = -1;
 
-			float relAngle = self.computeRelativeAngle(other);
-
+			// If they are in collision, relations don't make sense so forget them
+			boolean areColliding = false;
+			for (Relation r : specialRelations) {
+				if (r.relation.equals("Collision") && r.objectNames.equals(names) && r.value) {
+					areColliding = true;
+				}
+			}
 			
-			true_index = 0;
-			if (relAngle < 0) {
-				true_index = 1;
-				relAngle = Math.abs(relAngle);
+			if (areColliding && self.name.equals("enemy") && enemyState.equals(EnemyState.Approaching)) {
+				if (other.className.equals("agent")) {
+					enemyState = EnemyState.Intercepted;
+				} else {
+					enemyState = EnemyState.ReachedGoal;
+				}
 			}
-
-			if (relAngle < (Math.PI / 4) - 0.1) {
-				true_index = 2;
-			} else if (relAngle > (3 * Math.PI / 4) + 0.1) {
-				true_index = 3;
+			
+			if (!areColliding) {
+				float relAngle = self.computeRelativeAngle(other);
+				
+				true_index = 0;
+				if (relAngle < 0) {
+					true_index = 1;
+					relAngle = Math.abs(relAngle);
+				}
+	
+				if (relAngle < (Math.PI / 4) - 0.1) {
+					true_index = 2;
+				} else if (relAngle > (3 * Math.PI / 4) + 0.1) {
+					true_index = 3;
+				}
 			}
-
-//			System.out.println("REL ANGLE: " + relAngle + " " + rels[true_index]);
-
+			
 			for (int i = 0; i < 4; i++) {
 				list.add(new Relation(rels[i], names, (true_index == i)));
 			}
@@ -581,18 +583,32 @@ public class WW2DEnvironment implements Environment {
 		return list;
 	}
 	
-	private List<Relation> computeDiffBinaryRelations(State currentSelf, State formerSelf, State currentOther, State formerOther) {
+	private List<Relation> computeDiffBinaryRelations(State currentSelf, State formerSelf, State currentOther, State formerOther, List<Relation> specialRelations) {
 		List<Relation> list = new ArrayList<Relation>();
 		
-		String[] names = new String[] { currentSelf.name, currentOther.name };
-		String[] symNames = new String[] { currentOther.name, currentSelf.name };
- 		
+		ArrayList<String> names = Lists.newArrayList(currentSelf.name, currentOther.name);
+		ArrayList<String> symNames = Lists.newArrayList(currentOther.name, currentSelf.name);
+		
 		float dist = currentSelf.computeDistanceTo(currentOther);
 		float lastDist = formerSelf.computeDistanceTo(formerOther);
 		
 		boolean dd = (dist < lastDist);
 		boolean di = (dist > lastDist);
 		boolean dc = (dist == lastDist);
+		
+		// If they are in collision, relations don't make sense so forget them
+		boolean areColliding = false;
+		for (Relation r : specialRelations) {
+			if (r.relation.equals("Collision") && r.objectNames.equals(names) && r.value) {
+				areColliding = true;
+			}
+		}
+		
+		if (areColliding) { 
+			dd = false;
+			di = false;
+			dc = true; // Not really but oh well
+		}
 		
 		list.add(new Relation("DistanceDecreased", names, dd));
 		list.add(new Relation("DistanceDecreased", symNames, dd));
@@ -610,7 +626,6 @@ public class WW2DEnvironment implements Environment {
 	 * Iterate over all of the objects and build the set of 
 	 * relations that are important.  We want all true and
 	 * false relations.
-	 * @return
 	 */
 	private List<Relation> computeSpecialRelations() { 
 		List<Relation> list = new ArrayList<Relation>();
@@ -623,87 +638,46 @@ public class WW2DEnvironment implements Environment {
 			if (obj.getType() == ObjectType.wall)
 				continue;
 			
-//			String[] objArray = new String[] { obj.getName() };
-//			
-//			boolean moving = false;
-//			if (obj.getBody().getLinearVelocity().lengthSquared() > 0)  
-//				moving = true;
-//			list.add(new Relation("Moving", objArray, moving));
-			
-//			boolean turning = false;
-//			boolean turningLeft = false;
-//			boolean turningRight = false;
-//			float angVel = obj.getBody().getAngularVelocity();
-//			if (Float.compare(angVel, 0) != 0)
-//				turning = true;
-//			if (angVel < 0)
-//				turningLeft = true;
-//			if (angVel > 0)
-//				turningRight = true;
-//			
-//			list.add(new Relation("Rotating", objArray, turning));
-//			list.add(new Relation("RotatingLeft", objArray, turningLeft));
-//			list.add(new Relation("RotatingRight", objArray, turningRight));
-			
 			// Compute all of the pairwise relations.
 			for (int j = i+1; j < objects.size(); ++j) { 
 				PhysicsObject obj2 = objects.get(j);
-				if (obj.getType() == ObjectType.wall)
+				if (obj2.getType() == ObjectType.wall)
 					continue;				
 				
-				String[] relArray = new String[] { obj.getName(), obj2.getName() };
-				String[] symArray = new String[] { obj2.getName(), obj.getName() };
+				ArrayList<String> names = Lists.newArrayList(obj.getName(), obj2.getName());
+				ArrayList<String> symNames = Lists.newArrayList(obj2.getName(), obj.getName());
 
-//				DistanceEntry current = objectSpace.findOrAddDistance(obj, obj2);
-//				DistanceEntry previous = objectSpace.getDistance(obj, obj2, 1);
-
-//				boolean dd = false;
-//				boolean ds = false;
-//				boolean di = false;
-//				if (previous != null) { 
-//					int value = Float.compare(current.getDistance(), previous.getDistance());
-//					System.out.println("Dist between " + relArray[0] + " and " + relArray[1] 
-//                                      + " is " + current.getDistance() + " (was " + previous.getDistance() + ")");
-//					if (value < 0) dd = true;
-//					if (value > 0) di = true;
-//					if (value == 0) ds = true;
-//				}
-//				
-//				list.add(new Relation("DistanceDecreasing", relArray, dd));
-//				list.add(new Relation("DistanceDecreasing", symArray, dd));
-//				
-//				list.add(new Relation("DistanceIncreasing", relArray, di));
-//				list.add(new Relation("DistanceIncreasing", symArray, di));
-//				
-//				list.add(new Relation("DistanceStable", relArray, ds));
-//				list.add(new Relation("DistanceStable", symArray, ds));
-				
-				list.add(new Relation("Collision", relArray, objectSpace.isCollision(obj, obj2)));
-				list.add(new Relation("Collision", symArray, objectSpace.isCollision(obj, obj2)));
+				list.add(new Relation("Collision", names, objectSpace.isCollision(obj, obj2)));
+				list.add(new Relation("Collision", symNames, objectSpace.isCollision(obj, obj2)));
 			}
 		}
 
+		// TODO this was disabled for testing
+		
 		// Now we gather the perceptive system updates for each of the cognitive
 		// agents.
-		for (PhysicsObject obj : objectSpace.getCognitiveAgents()) { 
-			AgentSpace agentSpace = Blackboard.inst().getSpace(AgentSpace.class, obj.getName());
-			
-			Map<String,AuditoryEntry> auditoryMap = agentSpace.getAuditoryMemories().getFirst();
-			Map<String,MemoryEntry> visualMap = agentSpace.getVisualMemories().getFirst();
-			
-			for (PhysicsObject other : objects) { 
-				String[] relArray = new String[] { obj.getName(), other.getName() };
-
-				if (obj.getName().equals(other.getName()))
-					continue;
-				
-				boolean heard = auditoryMap.containsKey(other.getName());
-				list.add(new Relation("Heard", relArray, heard));
-				
-				boolean seen = visualMap.containsKey(other.getName());
-				list.add(new Relation("Seen", relArray, seen));
-			}
-		}
+//		for (PhysicsObject obj : objectSpace.getCognitiveAgents()) { 
+//			AgentSpace agentSpace = Blackboard.inst().getSpace(AgentSpace.class, obj.getName());
+//			
+//			Map<String,AuditoryEntry> auditoryMap = agentSpace.getAuditoryMemories().getFirst();
+//			Map<String,MemoryEntry> visualMap = agentSpace.getVisualMemories().getFirst();
+//			
+//			for (PhysicsObject other : objects) { 
+//				if (other.getType() == ObjectType.wall)
+//					continue;
+//				
+//				ArrayList<String> names = Lists.newArrayList(obj.getName(), other.getName());
+//				
+//				if (obj.getName().equals(other.getName()))
+//					continue;
+//				
+//				boolean heard = auditoryMap.containsKey(other.getName());
+//				list.add(new Relation("Heard", names, heard));
+//				
+//				boolean seen = visualMap.containsKey(other.getName());
+//				list.add(new Relation("Seen", names, seen));
+//			}
+//		}
 		
 //		System.out.println("Compute all relations: " + list);
 //		for (Relation r : list) { 
@@ -713,6 +687,10 @@ public class WW2DEnvironment implements Environment {
 	}
 	
 }
+
+
+
+
 
 enum ClassType { 
 	agent {
@@ -747,6 +725,14 @@ enum ClassType {
 	        sp.addElement("image")
         		.addAttribute("name", "data/images/half-circle.png")
         		.addAttribute("scale", "0.0165");
+
+//	        if (obj.getName().equals("enemy")) {
+//	        	Element gb = components.addElement("component")
+//	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.GoalBehavior");
+//	        	gb.addElement("goals")
+//	        	.addElement("goal")
+//	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.goals.WanderGoal");
+//	        }
 	        
 	        components.addElement("component")
 	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.steering.BehaviorControl");
@@ -758,6 +744,9 @@ enum ClassType {
 //	        components.addElement("component")
 //	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.InternalComponent");
 
+	        
+//	        System.out.println(element.asXML());
+	        
 	        return element;
 		}
 		
@@ -890,6 +879,9 @@ enum OOMDPObjectShape {
 	private static void addPhysicsProperties(Element element, OOMDPObjectState obj) { 
 		element.addAttribute("density", "0.2");
 		element.addAttribute("friction", "0.5");
-		element.addAttribute("restitution", "0.25");
+		element.addAttribute("restitution", "0.0"); // Testing
+//		if (obj.getClassName().equals("obstacle")) {
+//			element.addAttribute("isSensor", "true"); // Testing
+//		}
 	}
 }
