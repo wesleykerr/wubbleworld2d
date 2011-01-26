@@ -182,6 +182,8 @@ public class WW2DEnvironment implements Environment {
 		
 		worldState = getGroundState();
 		
+		needsReset = false;
+		
 		return makeMdpState(worldState, null, specialRelations);
 	}
 
