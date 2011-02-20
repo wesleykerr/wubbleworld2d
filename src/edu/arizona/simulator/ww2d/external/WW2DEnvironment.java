@@ -316,7 +316,7 @@ public class WW2DEnvironment implements Environment {
 			accumulator.addAll(current);
 		} else {
 			for (int i = 0; i < accumulator.size(); i++) {
-				accumulator.get(i).value = (accumulator.get(i).value || current.get(i).value);
+				accumulator.get(i).setValue(accumulator.get(i).getValue() || current.get(i).getValue());
 			}
 		}
 	}
@@ -563,7 +563,7 @@ public class WW2DEnvironment implements Environment {
 			// If they are in collision, relations don't make sense so forget them
 			boolean areColliding = false;
 			for (Relation r : specialRelations) {
-				if (r.relation.equals("Collision") && r.objectNames.equals(names) && r.value) {
+				if (r.getRelation().equals("Collision") && r.getArguments().equals(names) && r.getValue()) {
 					areColliding = true;
 				}
 			}
@@ -616,7 +616,7 @@ public class WW2DEnvironment implements Environment {
 		// If they are in collision, relations don't make sense so forget them
 		boolean areColliding = false;
 		for (Relation r : specialRelations) {
-			if (r.relation.equals("Collision") && r.objectNames.equals(names) && r.value) {
+			if (r.getRelation().equals("Collision") && r.getArguments().equals(names) && r.getValue()) {
 				areColliding = true;
 			}
 		}
