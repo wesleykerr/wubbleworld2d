@@ -35,13 +35,14 @@ public class WW2DEnvironment implements Environment {
 	private GameSystem _gameSystem;
 	
 	private NumberFormat _format;
+	public static boolean visualize = false;
 
 	public WW2DEnvironment(boolean visualize) { 
 		_format = NumberFormat.getInstance();
 		_format.setMinimumFractionDigits(2);
 		_format.setMaximumFractionDigits(2);
 
-		if (visualize) {
+		if (WW2DEnvironment.visualize) {
 			try { 
 				_container = new VerbGameContainer(800, 800);
 				_container.start();
@@ -470,6 +471,7 @@ public class WW2DEnvironment implements Environment {
 					String other = nameList.get(j);
 					if (!name.equals(other)) { // No need to compare with self
 						list.addAll(computeInstBinaryRelations(currentMap.get(name), currentMap.get(other), specialRelations));
+						list.addAll(computeFalseDiffBinaryRelations(currentMap.get(name), currentMap.get(other)));
 					}
 				}
 			}
@@ -596,6 +598,24 @@ public class WW2DEnvironment implements Environment {
 				list.add(new Relation(rels[i], names, (true_index == i)));
 			}
 		}
+		
+		return list;
+	}
+	
+	private List<Relation> computeFalseDiffBinaryRelations(State currentSelf, State currentOther) {
+		List<Relation> list = new ArrayList<Relation>();
+		
+		ArrayList<String> names = Lists.newArrayList(currentSelf.name, currentOther.name);
+		ArrayList<String> symNames = Lists.newArrayList(currentOther.name, currentSelf.name);
+		
+		list.add(new Relation("DistanceDecreased", names, false));
+		list.add(new Relation("DistanceDecreased", symNames, false));
+		
+		list.add(new Relation("DistanceIncreased", names, false));
+		list.add(new Relation("DistanceIncreased", symNames, false));
+		
+		list.add(new Relation("DistanceConstant", names, false));
+		list.add(new Relation("DistanceConstant", symNames, false));
 		
 		return list;
 	}
@@ -729,23 +749,25 @@ enum ClassType {
 	        
 	        Element components = element.addElement("components");
 	        
-	        Element sv = components.addElement("component")
-	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.ShapeVisual")
-	        	.addAttribute("fromPhysics", "true");
-	        sv.addElement("renderPriority").addAttribute("value", "99");
-	        sv.addElement("color")
-	        	.addAttribute("r", "1.0")
-	        	.addAttribute("g", "0.0")
-	        	.addAttribute("b", "0.0")
-	        	.addAttribute("a", "1.0");
-
-	        Element sp = components.addElement("component")
-        		.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.SpriteVisual");
-	        sp.addElement("renderPriority").addAttribute("value", "100");
-	        sp.addElement("image")
-        		.addAttribute("name", "data/images/half-circle.png")
-        		.addAttribute("scale", "0.0165");
-
+	        if (WW2DEnvironment.visualize) {
+		        Element sv = components.addElement("component")
+		        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.ShapeVisual")
+		        	.addAttribute("fromPhysics", "true");
+		        sv.addElement("renderPriority").addAttribute("value", "99");
+		        sv.addElement("color")
+		        	.addAttribute("r", "1.0")
+		        	.addAttribute("g", "0.0")
+		        	.addAttribute("b", "0.0")
+		        	.addAttribute("a", "1.0");
+	
+		        Element sp = components.addElement("component")
+	        		.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.SpriteVisual");
+		        sp.addElement("renderPriority").addAttribute("value", "100");
+		        sp.addElement("image")
+	        		.addAttribute("name", "data/images/half-circle.png")
+	        		.addAttribute("scale", "0.0165");
+	        }
+	        
 //	        if (obj.getName().equals("enemy")) {
 //	        	Element gb = components.addElement("component")
 //	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.GoalBehavior");
@@ -813,15 +835,17 @@ enum ClassType {
 	        
         	Element components = element.addElement("components");
 	        
-	        Element sv = components.addElement("component")
-        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.ShapeVisual")
-        	.addAttribute("fromPhysics", "true");
-	        sv.addElement("renderPriority").addAttribute("value", "99");
-	        sv.addElement("color")
-        	.addAttribute("r", "0.0")
-        	.addAttribute("g", "1.0")
-        	.addAttribute("b", "1.0")
-        	.addAttribute("a", "1.0");
+        	if (WW2DEnvironment.visualize) {
+		        Element sv = components.addElement("component")
+	        	.addAttribute("className", "edu.arizona.simulator.ww2d.object.component.ShapeVisual")
+	        	.addAttribute("fromPhysics", "true");
+		        sv.addElement("renderPriority").addAttribute("value", "99");
+		        sv.addElement("color")
+	        	.addAttribute("r", "0.0")
+	        	.addAttribute("g", "1.0")
+	        	.addAttribute("b", "1.0")
+	        	.addAttribute("a", "1.0");
+        	}
 	        return element;
 		}
 		
