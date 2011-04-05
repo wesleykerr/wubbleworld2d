@@ -90,6 +90,7 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 		systemSpace.put(Variable.physicsWorld, new ValueEntry(_world));
 		systemSpace.put(Variable.physicsMin, new ValueEntry(new Vec2(x1,y1)));
 		systemSpace.put(Variable.physicsMax, new ValueEntry(new Vec2(x2,y2)));
+		systemSpace.put(Variable.physicsGravity, new ValueEntry(new Vec2(x,y)));
 	}
     
     /**

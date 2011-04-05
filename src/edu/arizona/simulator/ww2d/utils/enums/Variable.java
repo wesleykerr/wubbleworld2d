@@ -25,6 +25,7 @@ public enum Variable {
 	physicsWorld,
 	physicsMin,
 	physicsMax,
+	physicsGravity,
 
 	isMoving,
 	attackable,
