@@ -12,13 +12,13 @@ import edu.arizona.simulator.ww2d.blackboard.entry.AuditoryEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.BoundedEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.MemoryEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
+import edu.arizona.simulator.ww2d.events.player.BehaviorWeightEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.ObstacleAvoidance;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Separation;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Wander;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.GoalEnum;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
@@ -41,49 +41,16 @@ public class AvoidOthersGoal implements Goal {
 		logger.debug(_parent.getName() + " activating run away...");
 
 		// turn on Separation
-		Event e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", Separation.class);
-		e.addParameter("status", true);
-
-		EventManager.inst().dispatch(e);
-
-		e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", Separation.class);		
-		e.addParameter("weight", 1.0f);
-
-		EventManager.inst().dispatch(e);
+		EventManager.inst().dispatch(new BehaviorEvent(Separation.class, true, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(Separation.class, 1.0f, _parent));
 
 		// turn on ObstacleAvoidance
-		e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", ObstacleAvoidance.class);
-		e.addParameter("status", true);
-		
-		EventManager.inst().dispatch(e);
+		EventManager.inst().dispatch(new BehaviorEvent(ObstacleAvoidance.class, true, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(ObstacleAvoidance.class, 2.0f));
 
-		e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", ObstacleAvoidance.class);		
-		e.addParameter("weight", 2.0f);
-
-		EventManager.inst().dispatch(e);
-		
-		e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", Wander.class);
-		e.addParameter("status", true);
-		
-		EventManager.inst().dispatch(e);
-
-		e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", Wander.class);		
-		e.addParameter("weight", 0.5f);
-
-		EventManager.inst().dispatch(e);
-		
+		// turn on Wander
+		EventManager.inst().dispatch(new BehaviorEvent(Wander.class, true, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(Wander.class, 0.5f));
 	}
 
 	@Override
@@ -134,49 +101,17 @@ public class AvoidOthersGoal implements Goal {
 	public void terminate() {
 		logger.debug(_parent.getName() + " deactivating run away...");
 
-		// turn on Separation
-		Event e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", Separation.class);
-		e.addParameter("status", false);
-		
-		EventManager.inst().dispatch(e);
-		
-		e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", Separation.class);		
-		e.addParameter("weight", 1.0f);
+		// turn off Separation
+		EventManager.inst().dispatch(new BehaviorEvent(Separation.class, false, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(Separation.class, 1.0f, _parent));
 
-		EventManager.inst().dispatch(e);
+		// turn off ObstacleAvoidance
+		EventManager.inst().dispatch(new BehaviorEvent(ObstacleAvoidance.class, false, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(ObstacleAvoidance.class, 1.0f));
 
-		// turn on ObstacleAvoidance
-		e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", ObstacleAvoidance.class);
-		e.addParameter("status", false);
-		
-		EventManager.inst().dispatch(e);
-		
-		e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", ObstacleAvoidance.class);		
-		e.addParameter("weight", 1.0f);
-
-		EventManager.inst().dispatch(e);		
-		
-		e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", Wander.class);
-		e.addParameter("status", false);
-		
-		EventManager.inst().dispatch(e);
-
-		e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", Wander.class);		
-		e.addParameter("weight", 1.0f);
-
-		EventManager.inst().dispatch(e);		
+		// turn off Wander
+		EventManager.inst().dispatch(new BehaviorEvent(Wander.class, false, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(Wander.class, 1.0f));
 	}
 
 	public float desireability() { 

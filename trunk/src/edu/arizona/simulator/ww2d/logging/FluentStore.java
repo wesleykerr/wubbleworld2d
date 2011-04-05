@@ -3,11 +3,11 @@ package edu.arizona.simulator.ww2d.logging;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.system.FinishEvent;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 
 /**
  * This class will maintain a list of references to fluents
@@ -28,7 +28,7 @@ public class FluentStore {
 		_lastCommit = System.currentTimeMillis();
 		_deltaValue = 1000 + MathUtils.random.nextInt(500);
 		
-		EventManager.inst().registerForAll(EventType.FINISH, new EventListener() {
+		EventManager.inst().registerForAll(FinishEvent.class, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
 				for (Map<String,Fluent> map : _fluentMap.values()) { 

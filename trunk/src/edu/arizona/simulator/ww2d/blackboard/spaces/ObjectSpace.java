@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
 
 import edu.arizona.simulator.ww2d.blackboard.entry.CollisionEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.DistanceEntry;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.system.UpdateStart;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 
 public class ObjectSpace extends Space {
@@ -53,7 +53,7 @@ public class ObjectSpace extends Space {
 		_collisions = new HashMap<String,CollisionEntry>();
 		_collisionSet = new HashSet<String>();
 		
-		EventManager.inst().registerForAll(EventType.UPDATE_START, new EventListener() {
+		EventManager.inst().registerForAll(UpdateStart.class, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
 				preUpdate();

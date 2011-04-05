@@ -6,8 +6,8 @@ import org.newdawn.slick.Graphics;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
-import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.SteeringOutput;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -35,13 +35,13 @@ public class Seek extends Behavior{
 	}
 	
 	@Override
-	public void onEvent(Event e) {
-		_isOn = (Boolean) e.getValue("status");
+	public void onEvent(BehaviorEvent e) {
+		_isOn = e.getState();
 		
 		if (!_isOn)
 			return;
 		
-		Object target = e.getValue("target");
+		Object target = e.getTarget();
 		if (target instanceof Vec2) { 
 			setTarget((Vec2) target);
 		} else { 

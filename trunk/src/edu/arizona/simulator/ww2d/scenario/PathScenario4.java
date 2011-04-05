@@ -7,11 +7,9 @@ import org.jbox2d.common.Vec2;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
+import edu.arizona.simulator.ww2d.events.player.SetWaypoints;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 
 public class PathScenario4 implements Scenario {
 
@@ -49,15 +47,7 @@ public class PathScenario4 implements Scenario {
 		obj1.getBody().setXForm(obj1.getPPosition(), radians + (float) Math.PI);
 		obj2.getBody().setXForm(obj2.getPPosition(), radians);
 
-		Event waypoint1 = new Event(EventType.SET_WAYPOINTS);
-		waypoint1.addRecipient(obj1);
-		waypoint1.addParameter("waypoints", waypoints1);
-		EventManager.inst().dispatch(waypoint1);
-		
-		Event waypoint2 = new Event(EventType.SET_WAYPOINTS);
-		waypoint2.addRecipient(obj2);
-		waypoint2.addParameter("waypoints", waypoints2);
-		EventManager.inst().dispatch(waypoint2);
+		EventManager.inst().dispatch(new SetWaypoints(waypoints1, obj1));
+		EventManager.inst().dispatch(new SetWaypoints(waypoints2, obj2));
 	}
-
 }

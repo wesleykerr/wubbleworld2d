@@ -13,6 +13,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
@@ -22,29 +23,32 @@ import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
-import edu.arizona.simulator.ww2d.factory.ObjectFactory;
+import edu.arizona.simulator.ww2d.events.spawn.CreateGameObject;
+import edu.arizona.simulator.ww2d.events.spawn.CreatePhysicsObject;
+import edu.arizona.simulator.ww2d.events.spawn.CreateWall;
+import edu.arizona.simulator.ww2d.events.system.FinishEvent;
+import edu.arizona.simulator.ww2d.events.system.UpdateEnd;
+import edu.arizona.simulator.ww2d.events.system.UpdateStart;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
-import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.SlickGlobals;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
+import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 public class GameSystem {
     private static Logger logger = Logger.getLogger( GameSystem.class );
 
-	public enum Systems { 
-		PhysicsSubystem, SpawnSubsystem, FoodSubsystem, LoggingSubsystem,
-	};
-	
-	private Map<Systems,Subsystem> _systems;
+	private Map<SubsystemType,Subsystem> _systems;
 
+	private boolean _cameraMode;
+	private Vec2 _cameraPos;
+	private float _scale;
 
 	public GameSystem(int width, int height, boolean global) { 
 		logger.debug("New GameSystem");
-		_systems = new TreeMap<Systems,Subsystem>();
+		_systems = new TreeMap<SubsystemType,Subsystem>();
 		
 		final Space systemSpace = new Space();
 		final ObjectSpace objectSpace = new ObjectSpace();
@@ -71,10 +75,13 @@ public class GameSystem {
 		
 		Blackboard.inst().addSpace("system", systemSpace);
 		Blackboard.inst().addSpace("object", objectSpace);
+
+		// Add the SpawnSubsystem into the gameplay system
+		// so that everything will work properly.
+		_systems.put(SubsystemType.SpawnSubsystem, new SpawnSubsystem());
 		
-		// initialize the ObjectFactory in order to ensure that it is 
-		// listening for important events.
-		ObjectFactory.inst();
+		_cameraPos = new Vec2(0,0);
+		_scale = 0.2f;
 	}
 
 	/**
@@ -82,9 +89,68 @@ public class GameSystem {
 	 * @param id
 	 * @param s
 	 */
-	public void addSubsystem(Systems id, Subsystem s) {
+	public void addSubsystem(SubsystemType id, Subsystem s) {
 		_systems.put(id, s);
 	}
+	
+	/**
+	 * Increment or decrement the scale value by delta
+	 * @param delta
+	 */
+	public void scale(float delta) { 
+		_scale += delta;
+		_scale = Math.max(0.01f, _scale);
+		_scale = Math.min(3, _scale);
+	}
+	
+	/**
+	 * Set the scale for rendering purposes.
+	 * @param scale
+	 */
+	public void setScale(float scale) { 
+		_scale = scale;
+	}
+	
+	/**
+	 * Switch between a free-moving camera and a 
+	 * camera that follows a specific agent.
+	 */
+	public void flipCameraMode() {
+		_cameraMode = !_cameraMode;
+	}
+	
+	/**
+	 * Set the camera mode to the desired setting.
+	 * @param cameraMode
+	 */
+	public void setCameraMode(boolean cameraMode) { 
+		_cameraMode = cameraMode;
+	}
+	
+	/**
+	 * Get the current camera mode.
+	 * @return
+	 */
+	public boolean getCameraMode() { 
+		return _cameraMode;
+	}
+	
+	/**
+	 * Move the camera by some delta value.
+	 * @param delta
+	 */
+	public void translate(Vec2 delta) { 
+		_cameraPos.addLocal(delta);
+	}
+	
+	/**
+	 * Set the camera position.
+	 * @param pos
+	 */
+	public void setCamera(Vec2 pos) { 
+		_cameraPos = pos;
+	}
+
 	
 	public void loadLevel(String levelName, String agentsFile, Scenario scenario) { 
 		logger.debug("Loading level: " + levelName);
@@ -100,34 +166,28 @@ public class GameSystem {
 			float physicsScale = Float.parseFloat(root.element("physicsScale").attributeValue("value"));
 			systemSpace.put(Variable.physicsScale, new ValueEntry(physicsScale));
 
-			PhysicsSubsystem physics = (PhysicsSubsystem) _systems.get(Systems.PhysicsSubystem);
+			PhysicsSubsystem physics = (PhysicsSubsystem) _systems.get(SubsystemType.PhysicsSubsystem);
 			physics.fromXML(root.element("physics"));
 
 			Element objects = root.element("objects");
 			if (objects.attribute("walls") != null && Boolean.parseBoolean(objects.attributeValue("walls"))) 
 				makeWalls(physics);
 
-			
+			World world = systemSpace.get(Variable.physicsWorld).get(World.class);
 			List physicsObjs = objects.elements("physicsObject");
 			for (int i = 0; i < physicsObjs.size(); ++i) { 
 				Element obj = (Element) physicsObjs.get(i);
-				
-				Event event = new Event(EventType.CREATE_PHYSICS_OBJECT);
-				event.addParameter("element", obj);
-				EventManager.inst().dispatchImmediate(event);
+				EventManager.inst().dispatchImmediate(new CreatePhysicsObject(world, obj));
 			}
 			List gameObjs = objects.elements("gameObject");
 			for (int i = 0; i < gameObjs.size(); ++i) { 
 				Element obj = (Element) gameObjs.get(i);
-
-				Event event = new Event(EventType.CREATE_GAME_OBJECT);
-				event.addParameter("element", obj);
-				EventManager.inst().dispatchImmediate(event);
+				EventManager.inst().dispatchImmediate(new CreateGameObject(obj));
 			}
 			
 			Element food = root.element("foodSubsystem");
 			if (food == null || Boolean.parseBoolean(food.attributeValue("value"))) {
-				addSubsystem(Systems.FoodSubsystem, new FoodSubsystem());
+				addSubsystem(SubsystemType.FoodSubsystem, new FoodSubsystem());
 			}
 		} catch (DocumentException e) {
 			e.printStackTrace();
@@ -139,13 +199,11 @@ public class GameSystem {
 				Document doc = reader.read(url);
 				Element root = doc.getRootElement();
 
+				World world = systemSpace.get(Variable.physicsWorld).get(World.class);
 				List physicsObjs = root.elements("physicsObject");
 				for (int i = 0; i < physicsObjs.size(); ++i) { 
 					Element obj = (Element) physicsObjs.get(i);
-
-					Event event = new Event(EventType.CREATE_PHYSICS_OBJECT);
-					event.addParameter("element", obj);
-					EventManager.inst().dispatchImmediate(event);
+					EventManager.inst().dispatchImmediate(new CreatePhysicsObject(world, obj));
 				}
 
 			} catch (DocumentException e) {
@@ -188,18 +246,13 @@ public class GameSystem {
 	 * @param dimensions
 	 */
 	private void sendWallEvent(String name, Vec2 position, Vec2 dimensions) { 
-		Event event = new Event(EventType.CREATE_WALL);
-		event.addParameter("name", "wall1");
-		event.addParameter("position", position);
-		event.addParameter("dimensions", dimensions);
-		EventManager.inst().dispatchImmediate(event);
+		EventManager.inst().dispatchImmediate(new CreateWall("wall1", position, dimensions));
 	}
 	
 	public void update(int elapsed) {
 		// Let those who are interested know that we are starting a brand new
 		// update.
-		Event updateStart = new Event(EventType.UPDATE_START);
-		EventManager.inst().dispatchImmediate(updateStart);
+		EventManager.inst().dispatchImmediate(new UpdateStart());
 		
 		for (Subsystem s : _systems.values()) { 
 			s.update(elapsed);
@@ -218,40 +271,79 @@ public class GameSystem {
 			obj.update(elapsed);
 		}
 		
-		Event updateEnd = new Event(EventType.UPDATE_END);
-		EventManager.inst().dispatchImmediate(updateEnd);
+		EventManager.inst().dispatchImmediate(new UpdateEnd());
 		
 		Space systemSpace = Blackboard.inst().getSpace("system");
 		long currentTime = systemSpace.get(Variable.logicalTime).get(Long.class);
 		systemSpace.get(Variable.logicalTime).setValue(currentTime+1);
 	}
 	
+	/**
+	 * Prepare the world for rendering.  Can be useful when we want to project
+	 * screen coordinates into world coordinates.
+	 * @param g
+	 */
+	private void startRender(Graphics g) { 
+		Space systemSpace = Blackboard.inst().getSpace("system");
+		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+
+		g.pushTransform();
+		g.resetTransform();
+		
+		float centerX = systemSpace.get(Variable.centerX).get(Integer.class);
+		float centerY = systemSpace.get(Variable.centerY).get(Integer.class);
+
+		
+		Vec2 pos = null;
+		if (_cameraMode) { 
+			pos = _cameraPos.mul(_scale);
+		} else { 
+			// Follow a specific agent determined by the current index.
+			PhysicsObject pobj = null; 
+			int index = systemSpace.get(Variable.controlledObject).get(Integer.class);
+			if (index >= 0) {
+				pobj = objectSpace.getCognitiveAgents().get(index);
+				pos = pobj.getPosition().mul(_scale);
+			}
+		}
+		g.translate(-pos.x+centerX, -pos.y+centerY);
+		g.scale(_scale, _scale);
+	}
+
+	/**
+	 * Undo the translations/rotations/scaling that was done to 
+	 * the graphics context.
+	 * @param g
+	 */
+	private void finishRender(Graphics g) { 
+		g.popTransform();
+	}
+	
 	public void render(Graphics g) { 
 		if (g == null)
 			return;
-		
+
+		startRender(g);
+
 		Space systemSpace = Blackboard.inst().getSpace("system");
 		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 		
-		int index = systemSpace.get(Variable.controlledObject).get(Integer.class);
-		PhysicsObject pobj = null; 
-		if (index >= 0) {
-			pobj = objectSpace.getCognitiveAgents().get(index);
-			float centerX = systemSpace.get(Variable.centerX).get(Integer.class);
-			float centerY = systemSpace.get(Variable.centerY).get(Integer.class);
-
-			g.pushTransform();
-			g.resetTransform();
-			g.translate(-pobj.getPosition().x+centerX, -pobj.getPosition().y+centerY);
-		}
-		
-
 		for (GameObject obj : objectSpace.getRenderObjects()) { 
 			obj.render(g);
 		}
 		
+		// Now render each of the subsystems
+		for (Subsystem sub : _systems.values()) { 
+			sub.render(g);
+		}
+		
+		// Go ahead and finish rendering now.  Anything following will
+		// be working in Screen coordinates.
+		finishRender(g);
+		
+		int index = systemSpace.get(Variable.controlledObject).get(Integer.class);
 		if (index >= 0) {
-			g.popTransform();
+			PhysicsObject pobj = objectSpace.getCognitiveAgents().get(index);
 
 			// now I would like to render some information about the currently controlled
 			// agent....
@@ -277,8 +369,7 @@ public class GameSystem {
 	}
 	
 	public void finish() { 
-		Event finishEvent = new Event(EventType.FINISH);
-		EventManager.inst().dispatchImmediate(finishEvent);
+		EventManager.inst().dispatchImmediate(new FinishEvent());
 		
 		EventManager.inst().finish();
 		Blackboard.inst().finish();

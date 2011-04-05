@@ -5,20 +5,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-
-import de.matthiasmann.twl.DialogLayout;
 import de.matthiasmann.twl.ScrollPane;
 import de.matthiasmann.twl.TextArea;
 import de.matthiasmann.twl.Widget;
 import de.matthiasmann.twl.model.HTMLTextAreaModel;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
-import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
-import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 
 public class MessageConsole {
 
@@ -45,29 +38,29 @@ public class MessageConsole {
 	 * will add it to the console and continue going.
 	 */
 	private void addListeners() { 
-		EventManager.inst().registerForAll(EventType.CONSOLE_MESSAGE, new EventListener() {
-			@Override
-			public void onEvent(Event e) {
-				GameObject obj = (GameObject) e.getValue("object");
-				String message = (String) e.getValue("message");
-
-				Console console = _consoles.get(obj.getName());
-				String oldText = console.model.getHtml();
-				console.model.setHtml(oldText + message);
-			} 
-		});
-		
-		EventManager.inst().registerForAll(EventType.CHANGE_CAMERA_FOLLOWING, new EventListener() { 
-			@Override
-			public void onEvent(Event e) {
-				PhysicsObject oldObj = (PhysicsObject) e.getValue("previous-object");
-				PhysicsObject newObj = (PhysicsObject) e.getValue("new-object");
-				
-				logger.debug("Were following: " + oldObj.getName() + " now following: " + newObj.getName());
-				_consoles.get(oldObj.getName()).textArea.setVisible(false);
-				_consoles.get(newObj.getName()).textArea.setVisible(true);
-			} 
-		});
+//		EventManager.inst().registerForAll(EventType.CONSOLE_MESSAGE, new EventListener() {
+//			@Override
+//			public void onEvent(Event e) {
+//				GameObject obj = (GameObject) e.getValue("object");
+//				String message = (String) e.getValue("message");
+//
+//				Console console = _consoles.get(obj.getName());
+//				String oldText = console.model.getHtml();
+//				console.model.setHtml(oldText + message);
+//			} 
+//		});
+//		
+//		EventManager.inst().registerForAll(EventType.CHANGE_CAMERA_FOLLOWING, new EventListener() { 
+//			@Override
+//			public void onEvent(Event e) {
+//				PhysicsObject oldObj = (PhysicsObject) e.getValue("previous-object");
+//				PhysicsObject newObj = (PhysicsObject) e.getValue("new-object");
+//				
+//				logger.debug("Were following: " + oldObj.getName() + " now following: " + newObj.getName());
+//				_consoles.get(oldObj.getName()).textArea.setVisible(false);
+//				_consoles.get(newObj.getName()).textArea.setVisible(true);
+//			} 
+//		});
 	}
 	
 	private Console makeTextArea(PhysicsObject obj) {

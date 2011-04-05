@@ -14,6 +14,8 @@ import edu.arizona.simulator.ww2d.blackboard.entry.DistanceEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.FoodEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
+import edu.arizona.simulator.ww2d.events.player.RequestEatEvent;
 import edu.arizona.simulator.ww2d.fsm.FSM;
 import edu.arizona.simulator.ww2d.fsm.State;
 import edu.arizona.simulator.ww2d.fsm.TransitionTest;
@@ -22,9 +24,7 @@ import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Align;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Arrive;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Seek;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.GoalEnum;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
@@ -146,36 +146,21 @@ public class DefendGoal implements Goal {
 //				logger.debug(_parent.getName() + " [enter] Arrive state within DefendGoal");
 				fsm.setUserData("enteredArrive", System.currentTimeMillis());
 				
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Arrive.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _food.getPPosition());
-				EventManager.inst().dispatch(e);
+				BehaviorEvent event = new BehaviorEvent(Arrive.class, true, _parent);
+				event.setTarget(_food.getPPosition());
+				EventManager.inst().dispatch(event);
 				
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _food.getPPosition());
-				EventManager.inst().dispatch(e);
+				event = new BehaviorEvent(Align.class, true, _parent);
+				event.setTarget(_food.getPPosition());
+				EventManager.inst().dispatch(event);
 			}
 
 			@Override
 			public void exitState(FSM fsm) {
 //				logger.debug(_parent.getName() + " [exit] Arrive state within DefendGoal");
 
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Arrive.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
-				
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Arrive.class, false, _parent));
+				EventManager.inst().dispatch(new BehaviorEvent(Align.class, false, _parent));
 			}
 
 			@Override
@@ -192,11 +177,7 @@ public class DefendGoal implements Goal {
 			@Override
 			public void exitState(FSM fsm) {
 //				logger.debug(_parent.getName() + " [exit] Turn state within DefendGoal");
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Align.class, false, _parent));
 			}
 
 			@Override
@@ -207,12 +188,9 @@ public class DefendGoal implements Goal {
 				if (current - 1000 > entered) { 
 					float radians = (float) Math.toRadians(MathUtils.random.nextInt(180));
 					float desired = _parent.getHeading() + radians;
-					
-					Event e = new Event(EventType.BEHAVIOR_EVENT);
-					e.addRecipient(_parent);
-					e.addParameter("name", Align.class);
-					e.addParameter("status", true);
-					e.addParameter("target", desired);
+
+					BehaviorEvent e = new BehaviorEvent(Align.class, true, _parent);
+					e.setTarget(desired);
 					EventManager.inst().dispatch(e);
 					
 					fsm.setUserData("entered", current+1000L);
@@ -232,20 +210,13 @@ public class DefendGoal implements Goal {
 			@Override
 			public void exitState(FSM fsm) {
 //				logger.debug(_parent.getName() + " [exit] chaseAway state within DefendGoal");
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Seek.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Seek.class, false, _parent));
 			}
 
 			@Override
 			public void update(FSM fsm, long delta) {
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Seek.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _target.getPPosition());
+				BehaviorEvent e = new BehaviorEvent(Seek.class, true, _parent);
+				e.setTarget(_target.getPPosition());
 				EventManager.inst().dispatch(e);
 			} 
 		};
@@ -256,11 +227,8 @@ public class DefendGoal implements Goal {
 //				logger.debug(_parent.getName() + " [enter] backAway state within DefendGoal");
 				Vec2 direction = MathUtils.toVec2((float) Math.PI + _parent.getHeading());
 				
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Seek.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _parent.getPPosition().add(direction.mul(100)));
+				BehaviorEvent e = new BehaviorEvent(Seek.class, true, _parent);
+				e.setTarget(_parent.getPPosition().add(direction.mul(100)));
 				EventManager.inst().dispatch(e);
 				
 				fsm.setUserData("entered", System.currentTimeMillis());
@@ -269,11 +237,7 @@ public class DefendGoal implements Goal {
 			@Override
 			public void exitState(FSM fsm) {
 				logger.debug(_parent.getName() + " [exit] backAway state within DefendGoal");
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Seek.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Seek.class, false, _parent));
 			}
 
 			@Override
@@ -300,11 +264,7 @@ public class DefendGoal implements Goal {
 				long time = System.currentTimeMillis();
 				if (_lastEaten == 0 || time - _delay > _lastEaten) { 
 //					logger.debug(_parent.getName() + " Eating nom nom nom");
-					Event e = new Event(EventType.REQUEST_EAT);
-					e.addRecipient(_food);
-					e.addParameter("requestor", _parent);
-					EventManager.inst().dispatch(e);
-					
+					EventManager.inst().dispatch(new RequestEatEvent(_parent, _food));
 					_lastEaten = time;
 				}
 			} 

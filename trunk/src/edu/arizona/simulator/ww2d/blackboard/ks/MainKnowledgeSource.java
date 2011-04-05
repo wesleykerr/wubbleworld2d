@@ -20,12 +20,14 @@ import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.player.EnergyEvent;
+import edu.arizona.simulator.ww2d.events.system.ChangeCameraEvent;
+import edu.arizona.simulator.ww2d.events.system.ChangeControlEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -37,7 +39,7 @@ public class MainKnowledgeSource implements KnowledgeSource {
 	
 	public MainKnowledgeSource() { 
 		
-		EventManager.inst().registerForAll(EventType.CHANGE_CONTROL_EVENT, new EventListener() {
+		EventManager.inst().registerForAll(ChangeControlEvent.class, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
 				Space systemSpace = Blackboard.inst().getSpace("system");
@@ -54,10 +56,7 @@ public class MainKnowledgeSource implements KnowledgeSource {
 
 				PhysicsObject newObj = objectSpace.getCognitiveAgents().get(current);
 
-				Event controlledEvent = new Event(EventType.CHANGE_CAMERA_FOLLOWING);
-				controlledEvent.addParameter("previous-object", previousObj);
-				controlledEvent.addParameter("new-object", newObj);
-				EventManager.inst().dispatch(controlledEvent);
+				EventManager.inst().dispatch(new ChangeCameraEvent(previousObj, newObj));
 			} 
 		});
 	}
@@ -339,10 +338,7 @@ public class MainKnowledgeSource implements KnowledgeSource {
 		}
 	
 		if (energyDelta != 0) { 
-			Event e = new Event(EventType.ENERGY_EVENT);
-			e.addRecipient(obj);
-			e.addParameter("amount", energyDelta);
-			EventManager.inst().dispatch(e);
+			EventManager.inst().dispatch(new EnergyEvent(energyDelta, obj));
 		}
 	}
 	

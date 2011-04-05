@@ -10,6 +10,7 @@ import edu.arizona.simulator.ww2d.blackboard.entry.BoundedEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.MemoryEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
 import edu.arizona.simulator.ww2d.fsm.FSM;
 import edu.arizona.simulator.ww2d.fsm.State;
 import edu.arizona.simulator.ww2d.fsm.TransitionTest;
@@ -18,9 +19,7 @@ import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Align;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Arrive;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Seek;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.GoalEnum;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
@@ -167,36 +166,21 @@ public class KickBallGoal implements Goal {
 				float distance = bPos.sub(_parent.getPPosition()).length();
 						
 				// the desired distance is 10 so that we can start running
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Arrive.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _parent.getPPosition().add(direction.mul(10-distance)));
-				EventManager.inst().dispatch(e);
+				BehaviorEvent event = new BehaviorEvent(Arrive.class, true, _parent);
+				event.setTarget(_parent.getPPosition().add(direction.mul(10-distance)));
+				EventManager.inst().dispatch(event);
 				
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", true);
-				e.addParameter("target", bPos);
-				EventManager.inst().dispatch(e);
+				event = new BehaviorEvent(Align.class, true, _parent);
+				event.setTarget(bPos);
+				EventManager.inst().dispatch(event);
 
 				fsm.setUserData("entered", System.currentTimeMillis());
 			}
 
 			@Override
 			public void exitState(FSM fsm) {
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Arrive.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
-
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Arrive.class, false, _parent));
+				EventManager.inst().dispatch(new BehaviorEvent(Align.class, false, _parent));
 			}
 
 			@Override
@@ -220,19 +204,8 @@ public class KickBallGoal implements Goal {
 			@Override
 			public void exitState(FSM fsm) {
 //				logger.debug(_parent.getName() + " [exit-KickBall] seek");
-
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Seek.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
-				
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
-				
+				EventManager.inst().dispatch(new BehaviorEvent(Seek.class, false, _parent));
+				EventManager.inst().dispatch(new BehaviorEvent(Align.class, false, _parent));
 
 				AgentSpace space = Blackboard.inst().getSpace(AgentSpace.class, _parent.getName());
 				ValueEntry turn = space.get(Variable.turnModifier);
@@ -244,19 +217,13 @@ public class KickBallGoal implements Goal {
 
 			@Override
 			public void update(FSM fsm, long delta) { 
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Seek.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _ball.getPPosition());
-				EventManager.inst().dispatch(e);
+				BehaviorEvent event = new BehaviorEvent(Seek.class, true, _parent);
+				event.setTarget(_ball.getPPosition());
+				EventManager.inst().dispatch(event);
 				
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _ball.getPPosition());
-				EventManager.inst().dispatch(e);
+				event = new BehaviorEvent(Align.class, true, _parent);
+				event.setTarget(_ball.getPPosition());
+				EventManager.inst().dispatch(event);
 			} 
 		};
 		
@@ -269,22 +236,14 @@ public class KickBallGoal implements Goal {
 
 			@Override
 			public void exitState(FSM fsm) { 
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Align.class, false, _parent));
 			}
 
 			@Override
 			public void update(FSM fsm, long delta) {
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _ball.getPPosition());
-				EventManager.inst().dispatch(e);
+				BehaviorEvent event = new BehaviorEvent(Align.class, true, _parent);
+				event.setTarget(_ball.getPPosition());
+				EventManager.inst().dispatch(event);
 			} 
 		};
 		

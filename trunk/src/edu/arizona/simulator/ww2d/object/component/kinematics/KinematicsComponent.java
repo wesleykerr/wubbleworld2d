@@ -4,12 +4,12 @@ import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.jbox2d.common.Vec2;
 
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.player.KinematicEvent;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.component.Component;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 
 public class KinematicsComponent extends Component {
     private static Logger logger = Logger.getLogger( KinematicsComponent.class );
@@ -29,17 +29,12 @@ public class KinematicsComponent extends Component {
 	public KinematicsComponent(GameObject owner) { 
 		super(owner);
 		
-		EventManager.inst().register(EventType.KINEMATIC_EVENT, _parent, new EventListener() {
+		EventManager.inst().register(KinematicEvent.class, _parent, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
-				/**
-				 * KINEMATIC_EVENT
-				 *  Payload:
-				 *      target - the target location
-				 *      movement - The kinematic movement class
-				 */
-				_target = (Vec2) e.getValue("target");
-				_behavior = (Behavior) e.getValue("movement");
+				KinematicEvent event = (KinematicEvent) e;
+				_target = event.getTarget();
+				_behavior = event.getMovement();
 				
 				logger.debug("New target: " + _target);
 				logger.debug("New pattern: " + _behavior);

@@ -7,11 +7,10 @@ import org.jbox2d.common.Vec2;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
+import edu.arizona.simulator.ww2d.events.player.SetWaypointsAndTimes;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 
 public class PathScenario2 implements Scenario {
 
@@ -61,11 +60,7 @@ public class PathScenario2 implements Scenario {
 		times1.add(0);
 		times1.add(0);
 
-		Event waypoint1 = new Event(EventType.SET_WAYPOINTS_AND_TIMES);
-		waypoint1.addRecipient(obj1);
-		waypoint1.addParameter("waypoints", waypoints1);
-		waypoint1.addParameter("times", times1);
-		EventManager.inst().dispatch(waypoint1);
+		EventManager.inst().dispatch(new SetWaypointsAndTimes(waypoints1, times1, obj1));
 		
 		List<Vec2> waypoints2 = new ArrayList<Vec2>();
 		waypoints2.add(o2Close);
@@ -77,11 +72,7 @@ public class PathScenario2 implements Scenario {
 		times2.add(0);
 		times2.add(0);
 
-		Event waypoint2 = new Event(EventType.SET_WAYPOINTS_AND_TIMES);
-		waypoint2.addRecipient(obj2);
-		waypoint2.addParameter("waypoints", waypoints2);
-		waypoint2.addParameter("times", times2);
-		EventManager.inst().dispatch(waypoint2);
+		EventManager.inst().dispatch(new SetWaypointsAndTimes(waypoints2, times2, obj2));
 		
 		// Set positions and orientations
 		obj2.getBody().setXForm(obj2.getPPosition(), radians + PI);

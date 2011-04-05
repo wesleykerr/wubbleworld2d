@@ -5,13 +5,14 @@ import org.dom4j.Element;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.player.EnergyEvent;
+import edu.arizona.simulator.ww2d.events.player.RequestEatEvent;
+import edu.arizona.simulator.ww2d.events.spawn.RemoveGameObject;
 import edu.arizona.simulator.ww2d.object.GameObject;
-import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.SlickGlobals;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 
 public class FoodComponent extends Component {
     private static Logger logger = Logger.getLogger( FoodComponent.class );
@@ -23,14 +24,14 @@ public class FoodComponent extends Component {
 	public void init(float store) { 
 //		logger.debug("Setting the store value : " + store);
 		_parent.setUserData("store", store);
-		EventManager.inst().register(EventType.REQUEST_EAT, _parent, new EventListener() {
+		EventManager.inst().register(RequestEatEvent.class, _parent, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
+				RequestEatEvent event = (RequestEatEvent) e; 
 				float store = _parent.getUserData("store", Float.class);
 //				logger.debug("received food request: " + store);
 				if (store > 0) { 
-					PhysicsObject target = (PhysicsObject) e.getValue("requestor");
-					dispatchEvents(target);
+					dispatchEvents(event.getRequestor());
 					
 					// decrease the amount of food in the store					
 					_parent.setUserData("store", store-1);
@@ -44,11 +45,8 @@ public class FoodComponent extends Component {
 	 * who has requested to eat.
 	 * @param target
 	 */
-	private void dispatchEvents(PhysicsObject target) { 
-		Event e = new Event(EventType.ENERGY_EVENT);
-		e.addRecipient(target);
-		e.addParameter("amount", 2f);
-		EventManager.inst().dispatch(e);
+	private void dispatchEvents(GameObject target) { 
+		EventManager.inst().dispatch(new EnergyEvent(2f, target));
 	}
 	
 	@Override
@@ -60,9 +58,7 @@ public class FoodComponent extends Component {
 		// save the new value.
 		_parent.setUserData("store", store);
 		if (store <= 0) { 
-			Event e = new Event(EventType.REMOVE_OBJECT_EVENT);
-			e.addParameter("object", _parent);
-			EventManager.inst().dispatch(e);
+			EventManager.inst().dispatch(new RemoveGameObject(_parent));
 		}
 	}
 	

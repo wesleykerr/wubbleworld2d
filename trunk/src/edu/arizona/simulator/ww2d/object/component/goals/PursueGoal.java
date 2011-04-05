@@ -10,6 +10,7 @@ import edu.arizona.simulator.ww2d.blackboard.entry.BoundedEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.CollisionEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
 import edu.arizona.simulator.ww2d.fsm.FSM;
 import edu.arizona.simulator.ww2d.fsm.State;
 import edu.arizona.simulator.ww2d.fsm.TransitionTest;
@@ -18,9 +19,7 @@ import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Pursue;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Seek;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.utils.Accumulator;
-import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.GoalEnum;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -221,23 +220,14 @@ public class PursueGoal implements Goal {
 				if (_target == null)
 					return;
 				
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Pursue.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _target.getName());
-				
-				EventManager.inst().dispatch(e);
+				BehaviorEvent event = new BehaviorEvent(Pursue.class, true, _parent);
+				event.setTarget(_target.getName());
+				EventManager.inst().dispatch(event);
 			}
 
 			@Override
 			public void exitState(FSM fsm) {
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Pursue.class);
-				e.addParameter("status", false);
-				
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Pursue.class, false, _parent));
 			}
 
 			@Override
@@ -252,23 +242,16 @@ public class PursueGoal implements Goal {
 			public void enterState(FSM fsm) {
 				Vec2 direction = MathUtils.toVec2((float) Math.PI + _parent.getHeading());
 				
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Seek.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _parent.getPPosition().add(direction.mul(100)));
-				EventManager.inst().dispatch(e);
-				
+				BehaviorEvent event = new BehaviorEvent(Seek.class, true, _parent);
+				event.setTarget(_parent.getPPosition().add(direction.mul(100)));
+				EventManager.inst().dispatch(event);
+
 				fsm.setUserData("entered", System.currentTimeMillis());
 			}
 
 			@Override
 			public void exitState(FSM fsm) {
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Seek.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Seek.class, false, _parent));
 			}
 
 			@Override

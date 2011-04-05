@@ -5,6 +5,8 @@ import org.apache.log4j.Logger;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
+import edu.arizona.simulator.ww2d.events.player.BehaviorWeightEvent;
 import edu.arizona.simulator.ww2d.fsm.FSM;
 import edu.arizona.simulator.ww2d.fsm.State;
 import edu.arizona.simulator.ww2d.fsm.TransitionTest;
@@ -13,8 +15,6 @@ import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Align;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.ObstacleAvoidance;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Wander;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.GoalEnum;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -96,27 +96,10 @@ public class WanderGoal implements Goal {
 				space.get(Variable.turnModifier).setValue(1.0f);
 				space.get(Variable.moveModifier).setValue(1.0f);
 
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Wander.class);
-				e.addParameter("status", true);
-				
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Wander.class, true, _parent));
+				EventManager.inst().dispatch(new BehaviorEvent(ObstacleAvoidance.class, true, _parent));
 
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", ObstacleAvoidance.class);
-				e.addParameter("status", true);
-				
-				EventManager.inst().dispatch(e);
-
-				e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", ObstacleAvoidance.class);
-				e.addParameter("weight", 5.0f);
-				
-				EventManager.inst().dispatch(e);
-				
+				EventManager.inst().dispatch(new BehaviorWeightEvent(ObstacleAvoidance.class, 5.0f, _parent));
 				_count = 0;
 			}
 
@@ -124,28 +107,11 @@ public class WanderGoal implements Goal {
 			public void exitState(FSM fsm) {
 				logger.debug("deactivate");
 				_status = GoalEnum.inactive;
-				
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Wander.class);
-				e.addParameter("status", false);
-				
-				EventManager.inst().dispatch(e);
-				
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", ObstacleAvoidance.class);
-				e.addParameter("status", false);
-				
-				EventManager.inst().dispatch(e);
 
-				e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", ObstacleAvoidance.class);
-				e.addParameter("weight", 1.0f);
+				EventManager.inst().dispatch(new BehaviorEvent(Wander.class, false, _parent));
+				EventManager.inst().dispatch(new BehaviorEvent(ObstacleAvoidance.class, false, _parent));
 				
-				EventManager.inst().dispatch(e);
-				
+				EventManager.inst().dispatch(new BehaviorWeightEvent(ObstacleAvoidance.class, 1.0f, _parent));
 			}
 
 			@Override
@@ -158,23 +124,14 @@ public class WanderGoal implements Goal {
 			@Override
 			public void enterState(FSM fsm) {
 				// we need to align ourselves in the complete opposite direction	
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _parent.getHeading() + (float) Math.PI);
-				
-				EventManager.inst().dispatch(e);
+				BehaviorEvent event = new BehaviorEvent(Align.class, true, _parent);
+				event.setTarget(_parent.getHeading() + (float) Math.PI);
+				EventManager.inst().dispatch(event);
 			}
 
 			@Override
 			public void exitState(FSM fsm) { 
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_parent);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", false);
-				
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Align.class, false, _parent));
 			}
 
 			@Override

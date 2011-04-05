@@ -2,6 +2,8 @@ package edu.arizona.simulator.ww2d.system;
 
 import org.newdawn.slick.Graphics;
 
+import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
+
 public interface Subsystem {
 
     /**
@@ -9,7 +11,7 @@ public interface Subsystem {
      * it from the other subsystems.
      * @return
      */
-    public int getId();
+    public SubsystemType getId();
 
     /**
      * Called every update cycle.  Order is predetermined

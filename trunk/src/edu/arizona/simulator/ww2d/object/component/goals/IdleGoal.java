@@ -5,11 +5,10 @@ import java.util.Random;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Align;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.GoalEnum;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -54,13 +53,9 @@ public class IdleGoal implements Goal {
 			int randomAngle = r.nextInt(360);
 			float radians = (float) Math.toRadians(randomAngle);
 			
-			Event e = new Event(EventType.BEHAVIOR_EVENT);
-			e.addRecipient(_parent);
-			e.addParameter("name", Align.class);
-			e.addParameter("status", true);
-			e.addParameter("target", radians);
-			
-			EventManager.inst().dispatch(e);
+			BehaviorEvent event = new BehaviorEvent(Align.class, true, _parent);
+			event.setTarget(radians);
+			EventManager.inst().dispatch(event);
 
 			AgentSpace space = Blackboard.inst().getSpace(AgentSpace.class, _parent.getName());
 			space.get(Variable.state).setValue("turning");
@@ -75,12 +70,7 @@ public class IdleGoal implements Goal {
 	@Override
 	public void terminate() {
 		_status = GoalEnum.inactive;
-		Event e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", Align.class);
-		e.addParameter("status", false);
-		
-		EventManager.inst().dispatch(e);
+		EventManager.inst().dispatch(new BehaviorEvent(Align.class, false, _parent));
 	}
 
 	@Override

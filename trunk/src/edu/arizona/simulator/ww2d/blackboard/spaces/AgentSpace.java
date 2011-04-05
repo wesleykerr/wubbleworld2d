@@ -22,13 +22,14 @@ import edu.arizona.simulator.ww2d.blackboard.entry.DistanceEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.FoodEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.MemoryEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.system.UpdateEnd;
+import edu.arizona.simulator.ww2d.events.system.UpdateStart;
 import edu.arizona.simulator.ww2d.logging.FluentStore;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 public class AgentSpace extends Space {
@@ -73,7 +74,7 @@ public class AgentSpace extends Space {
 			AgentHelper.recordSystem(this);
 
 			// Recording takes place in the postUpdate method.
-			EventManager.inst().registerForAll(EventType.UPDATE_END, new EventListener() { 
+			EventManager.inst().registerForAll(UpdateEnd.class, new EventListener() { 
 				@Override
 				public void onEvent(Event e) { 
 					postUpdate();
@@ -81,7 +82,7 @@ public class AgentSpace extends Space {
 			});
 		}
 		
-		EventManager.inst().registerForAll(EventType.UPDATE_START, new EventListener() {
+		EventManager.inst().registerForAll(UpdateStart.class, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
 				preUpdate();

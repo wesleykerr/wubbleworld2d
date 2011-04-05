@@ -10,16 +10,15 @@ import org.apache.log4j.Logger;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.AuditoryEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.MemoryEntry;
-import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
+import edu.arizona.simulator.ww2d.events.player.BehaviorWeightEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.FleeFrom;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.ObstacleAvoidance;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.utils.Accumulator;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.GoalEnum;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
@@ -70,35 +69,14 @@ public class FleeGoal implements Goal {
 		_target = objectSpace.getPhysicsObject((String) dynamicObjects.iterator().next());
 		
 		// turn on Separation
-		Event e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", FleeFrom.class);
-		e.addParameter("status", true);
-		e.addParameter("target", _target.getName());
-
-		EventManager.inst().dispatch(e);
-
-		e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", FleeFrom.class);		
-		e.addParameter("weight", 1.0f);
-
-		EventManager.inst().dispatch(e);
-
-		// turn on ObstacleAvoidance
-		e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", ObstacleAvoidance.class);
-		e.addParameter("status", true);
+		BehaviorEvent event = new BehaviorEvent(FleeFrom.class, true, _parent);
+		event.setTarget(_target.getName());
+		EventManager.inst().dispatch(event);
+		EventManager.inst().dispatch(new BehaviorWeightEvent(FleeFrom.class, 1.0f, _parent));
 		
-		EventManager.inst().dispatch(e);
-
-		e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", ObstacleAvoidance.class);		
-		e.addParameter("weight", 2.0f);
-
-		EventManager.inst().dispatch(e);
+		// turn on ObstacleAvoidance
+		EventManager.inst().dispatch(new BehaviorEvent(ObstacleAvoidance.class, true, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(ObstacleAvoidance.class, 1.0f, _parent));
 	}
 
 	@Override
@@ -171,35 +149,11 @@ public class FleeGoal implements Goal {
 	public void terminate() {
 		logger.debug(_parent.getName() + " deactivating run away...");
 
-		// turn on Separation
-		Event e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", FleeFrom.class);
-		e.addParameter("status", false);
-		
-		EventManager.inst().dispatch(e);
-		
-		e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", FleeFrom.class);		
-		e.addParameter("weight", 1.0f);
+		EventManager.inst().dispatch(new BehaviorEvent(FleeFrom.class, false, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(FleeFrom.class, 1.0f, _parent));
 
-		EventManager.inst().dispatch(e);
-
-		// turn on ObstacleAvoidance
-		e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", ObstacleAvoidance.class);
-		e.addParameter("status", false);
-		
-		EventManager.inst().dispatch(e);
-		
-		e = new Event(EventType.BEHAVIOR_WEIGHT_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", ObstacleAvoidance.class);		
-		e.addParameter("weight", 1.0f);
-
-		EventManager.inst().dispatch(e);		
+		EventManager.inst().dispatch(new BehaviorEvent(ObstacleAvoidance.class, false, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(ObstacleAvoidance.class, 1.0f, _parent));
 	}
 
 	public float desireability() { 

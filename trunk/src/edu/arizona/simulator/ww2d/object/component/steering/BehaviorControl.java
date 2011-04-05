@@ -13,6 +13,10 @@ import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
+import edu.arizona.simulator.ww2d.events.player.BehaviorWeightEvent;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.object.component.Component;
@@ -27,11 +31,8 @@ import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Seek;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Separation;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Wander;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.SlickGlobals;
 import edu.arizona.simulator.ww2d.utils.SteeringOutput;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 public class BehaviorControl extends Component {
@@ -39,15 +40,15 @@ public class BehaviorControl extends Component {
 
     private PhysicsObject _entity;
     
-    private Map<Class,Behavior> _behaviors;
-    private Map<Class,Float> _weights;
+    private Map<Class<? extends Behavior>,Behavior> _behaviors;
+    private Map<Class<? extends Behavior>,Float> _weights;
     
 	public BehaviorControl(GameObject entity) { 
 		super(entity);
 		_entity = (PhysicsObject) entity;
 		
-		_behaviors = new HashMap<Class,Behavior>();
-		_weights = new HashMap<Class,Float>();
+		_behaviors = new HashMap<Class<? extends Behavior>,Behavior>();
+		_weights = new HashMap<Class<? extends Behavior>,Float>();
 		_renderPriority = 100;
 
 		addAll();
@@ -55,20 +56,19 @@ public class BehaviorControl extends Component {
 	}
 	
 	private void addListeners() { 
-		EventManager.inst().register(EventType.BEHAVIOR_EVENT, _parent, new EventListener() {
+		EventManager.inst().register(BehaviorEvent.class, _parent, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
-				Class c = (Class) e.getValue("name");
-				_behaviors.get(c).onEvent(e);
+				BehaviorEvent event = (BehaviorEvent) e;
+				_behaviors.get(event.getBehaviorClass()).onEvent(event);
 			} 
 		});
 
-		EventManager.inst().register(EventType.BEHAVIOR_WEIGHT_EVENT, _parent, new EventListener() {
+		EventManager.inst().register(BehaviorWeightEvent.class, _parent, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
-				Class c = (Class) e.getValue("name");
-				Float weight = (Float) e.getValue("weight");
-				_weights.put(c, weight);
+				BehaviorWeightEvent event = (BehaviorWeightEvent) e;
+				_weights.put(event.getBehaviorClass(), event.getWeight());
 			} 
 		});
 	}

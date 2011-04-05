@@ -2,7 +2,6 @@ package edu.arizona.simulator.ww2d.blackboard.ks;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.jbox2d.common.Vec2;
 
@@ -14,13 +13,12 @@ import edu.arizona.simulator.ww2d.blackboard.entry.FoodEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.MemoryEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
-import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.system.UpdateEnd;
 import edu.arizona.simulator.ww2d.logging.FluentStore;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -41,7 +39,7 @@ public class GlobalKS implements KnowledgeSource {
 		_fluentStore = new FluentStore("global");
 		_init = true;
 		
-		EventManager.inst().registerForAll(EventType.UPDATE_END, new EventListener() { 
+		EventManager.inst().registerForAll(UpdateEnd.class, new EventListener() { 
 			@Override
 			public void onEvent(Event e) { 
 				postUpdate();
