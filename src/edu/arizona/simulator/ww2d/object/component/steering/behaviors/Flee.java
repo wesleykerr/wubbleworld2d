@@ -3,8 +3,8 @@ package edu.arizona.simulator.ww2d.object.component.steering.behaviors;
 import org.jbox2d.common.Vec2;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
-import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.SteeringOutput;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -34,13 +34,13 @@ public class Flee extends Behavior {
 	}
 
 	@Override
-	public void onEvent(Event e) {
-		_isOn = (Boolean) e.getValue("status");
+	public void onEvent(BehaviorEvent e) {
+		_isOn = e.getState();
 		
 		if (!_isOn)
 			return;
 		
-		Object target = e.getValue("target");
+		Object target = e.getTarget();
 		if (target instanceof Vec2) { 
 			setTarget((Vec2) target);
 		} else { 

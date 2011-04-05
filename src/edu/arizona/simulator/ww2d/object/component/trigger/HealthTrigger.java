@@ -10,8 +10,8 @@ import org.newdawn.slick.SlickException;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.system.CollisionEvent;
 import edu.arizona.simulator.ww2d.object.GameObject;
-import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 public class HealthTrigger extends Trigger {
@@ -47,11 +47,11 @@ public class HealthTrigger extends Trigger {
 	}
 	
 	@Override
-	protected void collision(Event e) {
+	protected void collision(CollisionEvent e) {
 		if (!_active)
 			return;
 		
-		ContactPoint cp = (ContactPoint) e.getValue("contact-point");
+		ContactPoint cp = e.getContactPoint();
 		GameObject target = (GameObject) cp.shape1.getUserData();
 		if (target == null || target == _parent)
 			target = (GameObject) cp.shape2.getUserData();

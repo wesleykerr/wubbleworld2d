@@ -1,10 +1,10 @@
-package edu.arizona.simulator.ww2d.factory;
+package edu.arizona.simulator.ww2d.system;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -18,67 +18,76 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
+import org.newdawn.slick.Graphics;
 
 import edu.arizona.simulator.ww2d.blackboard.AgentHelper;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.spawn.CreateGameObject;
+import edu.arizona.simulator.ww2d.events.spawn.CreatePhysicsObject;
+import edu.arizona.simulator.ww2d.events.spawn.CreateWall;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.object.component.Component;
-import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
+import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
-public class ObjectFactory {
-    private static Logger logger = Logger.getLogger( ObjectFactory.class );
+public class SpawnSubsystem implements Subsystem {
+    private static Logger logger = Logger.getLogger( SpawnSubsystem.class.getName() );
 
-    private static ObjectFactory _inst;
     
-    private ObjectFactory() { 
+    public SpawnSubsystem() { 
     	// register for create object and create physics object events.
-    	EventManager.inst().registerForAll(EventType.CREATE_GAME_OBJECT, new EventListener() {
+    	EventManager.inst().registerForAll(CreateGameObject.class, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
-				makeGameObject((Element) e.getValue("element"));
+				CreateGameObject event = (CreateGameObject) e;
+				makeGameObject(event.getElement());
 			} 
     	});
     	
-    	EventManager.inst().registerForAll(EventType.CREATE_PHYSICS_OBJECT, new EventListener() {
+    	EventManager.inst().registerForAll(CreatePhysicsObject.class, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
-				makePhysicsObject((Element) e.getValue("element"));
+				CreatePhysicsObject event = (CreatePhysicsObject) e;
+				makePhysicsObject(event.getElement());
 			} 
     	});
     	
-    	EventManager.inst().registerForAll(EventType.CREATE_WALL, new EventListener() { 
+    	EventManager.inst().registerForAll(CreateWall.class, new EventListener() { 
 			@Override
 			public void onEvent(Event e) {
-				String name = (String) e.getValue("name");
-				Vec2 position = (Vec2) e.getValue("position");
-				Vec2 dimensions = (Vec2) e.getValue("dimensions");
+				CreateWall event = (CreateWall) e;
+				String name = event.getName();
+				Vec2 position = event.getPosition();
+				Vec2 dimensions = event.getDimensions();
 				makeWall(name, position.x, position.y, dimensions.x, dimensions.y);
 			} 
     	});
-    	
-    	EventManager.inst().registerForAll(EventType.FINISH, new EventListener() {
-			@Override
-			public void onEvent(Event e) {
-				finish();
-			} 
-    		
-    	});
     }
     
-    public static ObjectFactory inst() { 
-    	if (_inst == null) 
-    		_inst = new ObjectFactory();
-    	return _inst;
-    }
+
+	@Override
+	public SubsystemType getId() {
+		return SubsystemType.SpawnSubsystem;
+	}
+
+	@Override
+	public void update(int eps) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void render(Graphics g) {
+		// TODO Auto-generated method stub
+		
+	}
     
     /**
      * Construct a new game object from the parameters specified within
@@ -96,7 +105,7 @@ public class ObjectFactory {
     	int renderPriority = Integer.parseInt(e.attributeValue("renderPriority"));
     	ObjectType objType = ObjectType.valueOf(e.attributeValue("type"));
 		
-		logger.debug("Creating: " + name + " renderPriority: " + renderPriority);
+		logger.finest("Creating: " + name + " renderPriority: " + renderPriority);
 		GameObject obj = new GameObject(name, objType, renderPriority);
 		addComponents(e, obj);
 		
@@ -127,7 +136,7 @@ public class ObjectFactory {
     	if (e.attribute("hasMass") != null)
     		hasMass = Boolean.parseBoolean(e.attributeValue("hasMass"));
     	
-		logger.debug("Creating: " + name + " renderPriority: " + renderPriority);
+		logger.finest("Creating: " + name + " renderPriority: " + renderPriority);
 		PhysicsObject obj = new PhysicsObject(name, objType, renderPriority);
 		
 		// what is the type ... static or dynamic
@@ -361,6 +370,6 @@ public class ObjectFactory {
 	}
 	
 	public void finish() { 
-		_inst = null;
+
 	}
 }

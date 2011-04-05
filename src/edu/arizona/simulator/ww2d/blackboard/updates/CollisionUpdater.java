@@ -9,11 +9,12 @@ import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.CollisionEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.system.CollisionEvent;
+import edu.arizona.simulator.ww2d.events.system.ContactEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 
 /**
@@ -30,14 +31,15 @@ public class CollisionUpdater {
     private static Logger logger = Logger.getLogger( CollisionUpdater.class );
 
 	public CollisionUpdater() { 
-		EventManager.inst().registerForAll(EventType.COLLISION_EVENT, new CollisionListener());
-		EventManager.inst().registerForAll(EventType.CONTACT_RESULT_EVENT, new ContactResultListener());
+		EventManager.inst().registerForAll(CollisionEvent.class, new CollisionListener());
+		EventManager.inst().registerForAll(ContactEvent.class, new ContactResultListener());
 	}
 
 	class ContactResultListener implements EventListener {
 		@Override
 		public void onEvent(Event e) {
-			ContactResult cr = (ContactResult) e.getValue("contact-result");
+			ContactEvent event = (ContactEvent) e;
+			ContactResult cr = event.getContactResult();
 
 			// update the generic collision information.
 			String key = CollisionEntry.key(cr);
@@ -54,8 +56,9 @@ public class CollisionUpdater {
 			// places on the blackboard.  We will be using shared references in order
 			// to speed things up.  On persist, you only need to update the
 			// the ObjectSpace collision entry.
-			ContactPoint cp = (ContactPoint) e.getValue("contact-point");
-			String type = (String) e.getValue("type");
+			CollisionEvent event = (CollisionEvent) e;
+			ContactPoint cp = event.getContactPoint();
+			String type = event.getType();
 			
 			if ("add".equals(type))  
 				add(cp);

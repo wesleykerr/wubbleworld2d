@@ -3,8 +3,8 @@ package edu.arizona.simulator.ww2d.object.component.steering.behaviors;
 import org.apache.log4j.Logger;
 import org.newdawn.slick.Graphics;
 
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
-import edu.arizona.simulator.ww2d.utils.Event;
 import edu.arizona.simulator.ww2d.utils.SteeringOutput;
 
 /**
@@ -29,7 +29,7 @@ public abstract class Behavior {
 		return _isOn;
 	}
 
-	public abstract void onEvent(Event e);
+	public abstract void onEvent(BehaviorEvent e);
 	public abstract SteeringOutput getSteering(float moveModifier, float turnModifier);
 	
 	/**

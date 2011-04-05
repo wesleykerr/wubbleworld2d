@@ -11,15 +11,18 @@ import org.newdawn.slick.Graphics;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
+import edu.arizona.simulator.ww2d.events.player.SetWaypoints;
+import edu.arizona.simulator.ww2d.events.player.SetWaypointsAndTimes;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Align;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Arrive;
+import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Behavior;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Seek;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 public class PathComponent extends Component {
@@ -47,20 +50,18 @@ public class PathComponent extends Component {
 		_active = false;
 
 		// Add in the energy updates that come in from eating and what not
-		EventManager.inst().register(EventType.SET_WAYPOINTS, _parent, new EventListener() {
+		EventManager.inst().register(SetWaypoints.class, _parent, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
-				List<Vec2> list = (List<Vec2>) e.getValue("waypoints");
-				setPath(list);
+				setPath(((SetWaypoints) e).getWaypoints());
 			} 
 		});
 		
-		EventManager.inst().register(EventType.SET_WAYPOINTS_AND_TIMES, _parent, new EventListener() {
+		EventManager.inst().register(SetWaypointsAndTimes.class, _parent, new EventListener() {
 			@Override
 			public void onEvent(Event e) { 
-				List<Vec2> list = (List<Vec2>) e.getValue("waypoints");
-				List<Integer> times = (List<Integer>) e.getValue("times");
-				setPath(list, times);
+				SetWaypointsAndTimes event = (SetWaypointsAndTimes) e;
+				setPath(event.getWaypoints(), event.getTimes());
 			}
 		});
 	}
@@ -143,25 +144,19 @@ public class PathComponent extends Component {
 		_current += 1;
 		
 		// Dispatch the events....
-		Event e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		
+		Class<? extends Behavior> bClass = null;
 		if (_current >= _waypoints.size()-1 || _currentTime > 0)
-			e.addParameter("name", Arrive.class);
+			bClass = Arrive.class;
 		else
-			e.addParameter("name", Seek.class);
-
-		e.addParameter("status", true);
-		e.addParameter("target", _currentWP);
-		EventManager.inst().dispatch(e);
-
+			bClass = Seek.class;
 		
-		e = new Event(EventType.BEHAVIOR_EVENT);
-		e.addRecipient(_parent);
-		e.addParameter("name", Align.class);
-		e.addParameter("status", true);
-		e.addParameter("target", _currentWP);
-		EventManager.inst().dispatch(e);		
+		BehaviorEvent e1 = new BehaviorEvent(bClass, true, _parent);
+		e1.setTarget(_currentWP);
+		EventManager.inst().dispatch(e1);
+		
+		BehaviorEvent e2 = new BehaviorEvent(Align.class, true, _parent);
+		e2.setTarget(_currentWP);
+		EventManager.inst().dispatch(e2);
 	}
 	
     private boolean shouldWeStop() {

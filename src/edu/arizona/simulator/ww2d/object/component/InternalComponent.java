@@ -8,16 +8,12 @@ import org.newdawn.slick.Graphics;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.BoundedEntry;
-import edu.arizona.simulator.ww2d.blackboard.entry.CollisionEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.player.EnergyEvent;
 import edu.arizona.simulator.ww2d.object.GameObject;
-import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
-import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
-import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 /**
@@ -32,23 +28,17 @@ import edu.arizona.simulator.ww2d.utils.enums.Variable;
 public class InternalComponent extends Component {
     private static Logger logger = Logger.getLogger( InternalComponent.class );
 
-    private PhysicsObject _obj;
-    
     private float _energyDelta;
     
 	public InternalComponent(GameObject obj) { 
 		super(obj);
 		
-		_obj = (PhysicsObject) obj;
-		
 		// Add in the energy updates that come in from eating and what not
-		EventManager.inst().register(EventType.ENERGY_EVENT, _parent, new EventListener() {
+		EventManager.inst().register(EnergyEvent.class, _parent, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
-				float amount = (Float) e.getValue("amount");
-				if (_obj.getName().equals("agent4"))
-					logger.debug(_obj.getName() + " received health increase " + amount);
-				_energyDelta += amount;
+				EnergyEvent event = (EnergyEvent) e;
+				_energyDelta += event.getAmount();
 			} 
 		});
 	}

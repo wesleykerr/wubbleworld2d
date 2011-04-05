@@ -8,19 +8,22 @@ import org.jbox2d.common.Vec2;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.BoundedEntry;
-import edu.arizona.simulator.ww2d.blackboard.entry.DistanceEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.spawn.CreateGameObject;
+import edu.arizona.simulator.ww2d.events.spawn.CreatePhysicsObject;
+import edu.arizona.simulator.ww2d.events.spawn.RemoveGameObject;
+import edu.arizona.simulator.ww2d.events.system.FinishEvent;
+import edu.arizona.simulator.ww2d.events.system.UpdateEnd;
 import edu.arizona.simulator.ww2d.logging.FluentStore;
 import edu.arizona.simulator.ww2d.logging.StateDatabase;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.SonarReading;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -33,36 +36,36 @@ public class ReplayKnowledgeSource implements KnowledgeSource {
 		_fluentStore = new FluentStore("replay");
 		_init = true;
 		
-		EventListener createListener = new EventListener() {
+		EventManager.inst().registerForAll(CreateGameObject.class, new EventListener() {
 			@Override
 			public void onEvent(Event e) {
-				Space systemSpace = Blackboard.inst().getSpace("system");
-				long time = systemSpace.get(Variable.logicalTime).get(Long.class);
-				
-				String xml = ((Element) e.getValue("element")).asXML();
-
-				StateDatabase db = _fluentStore.getDB();
-				db.recordEvent(e.getId().toString(), xml, time);
-			} 
-		};
-		
-		EventManager.inst().registerForAll(EventType.CREATE_GAME_OBJECT, createListener);
-		EventManager.inst().registerForAll(EventType.CREATE_PHYSICS_OBJECT, createListener);
-		
-		EventManager.inst().registerForAll(EventType.REMOVE_OBJECT_EVENT, new EventListener() {
-			@Override
-			public void onEvent(Event e) {
-				Space systemSpace = Blackboard.inst().getSpace("system");
-				long time = systemSpace.get(Variable.logicalTime).get(Long.class);
-
-				GameObject obj = (GameObject) e.getValue("object");
-				
-				StateDatabase db = _fluentStore.getDB();
-				db.recordEvent(e.getId().toString(), obj.getName(), time);
+				CreateGameObject event = (CreateGameObject) e;
+				saveCreate(e, event.getElement());
 			} 
 		});
 		
-		EventManager.inst().registerForAll(EventType.UPDATE_END, new EventListener() { 
+		EventManager.inst().registerForAll(CreatePhysicsObject.class, new EventListener() {
+			@Override
+			public void onEvent(Event e) {
+				CreatePhysicsObject event = (CreatePhysicsObject) e;
+				saveCreate(e, event.getElement());
+			} 
+		});
+		
+		EventManager.inst().registerForAll(RemoveGameObject.class, new EventListener() {
+			@Override
+			public void onEvent(Event e) {
+				RemoveGameObject event = (RemoveGameObject) e;
+				
+				Space systemSpace = Blackboard.inst().getSpace("system");
+				long time = systemSpace.get(Variable.logicalTime).get(Long.class);
+
+				StateDatabase db = _fluentStore.getDB();
+				db.recordEvent(e.getClass().getName(), event.getGameObject().getName(), time);
+			} 
+		});
+		
+		EventManager.inst().registerForAll(UpdateEnd.class, new EventListener() { 
 			@Override
 			public void onEvent(Event e) { 
 				postUpdate();
@@ -70,14 +73,14 @@ public class ReplayKnowledgeSource implements KnowledgeSource {
 		});
 
 		
-		EventManager.inst().registerForAll(EventType.FINISH, new EventListener() { 
+		EventManager.inst().registerForAll(FinishEvent.class, new EventListener() { 
 			@Override
 			public void onEvent(Event e) {
 				Space systemSpace = Blackboard.inst().getSpace("system");
 				long time = systemSpace.get(Variable.logicalTime).get(Long.class);
 
 				StateDatabase db = _fluentStore.getDB();
-				db.recordEvent(e.getId().toString(), time+"", 0);
+				db.recordEvent(e.getClass().getName(), time+"", 0);
 			} 
 		});
 	}
@@ -94,6 +97,20 @@ public class ReplayKnowledgeSource implements KnowledgeSource {
 	public void update() { 		
 		if (_init) 
 			init();
+	}
+	
+	/**
+	 * Write out the XML element to the database
+	 * for replay opportunities.
+	 * @param element
+	 */
+	private void saveCreate(Event e, Element element) { 
+		Space systemSpace = Blackboard.inst().getSpace("system");
+		long time = systemSpace.get(Variable.logicalTime).get(Long.class);
+		
+		StateDatabase db = _fluentStore.getDB();
+		db.recordEvent(e.getClass().getName(), element.asXML(), time);
+
 	}
 	
 	public void postUpdate() {

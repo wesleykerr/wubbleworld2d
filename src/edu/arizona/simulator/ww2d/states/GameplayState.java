@@ -1,6 +1,7 @@
 package edu.arizona.simulator.ww2d.states;
 
 import org.apache.log4j.Logger;
+import org.jbox2d.common.Vec2;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -16,6 +17,13 @@ import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.movement.BackwardEvent;
+import edu.arizona.simulator.ww2d.events.movement.ForwardEvent;
+import edu.arizona.simulator.ww2d.events.movement.LeftEvent;
+import edu.arizona.simulator.ww2d.events.movement.RightEvent;
+import edu.arizona.simulator.ww2d.events.movement.StrafeLeftEvent;
+import edu.arizona.simulator.ww2d.events.movement.StrafeRightEvent;
+import edu.arizona.simulator.ww2d.events.system.ChangeControlEvent;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.gui.TWLInputAdapter;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
@@ -23,9 +31,8 @@ import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.system.GameSystem;
 import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.States;
+import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 public class GameplayState extends BHGameState {
@@ -36,6 +43,7 @@ public class GameplayState extends BHGameState {
 	private Scenario _scenario;
 	
 	private GameSystem _gameSystem;
+	private boolean _shiftDown;
 
     private LWJGLRenderer lwjglRenderer;
     private ThemeManager theme;
@@ -62,7 +70,7 @@ public class GameplayState extends BHGameState {
 	@Override
 	public void init(GameContainer container, StateBasedGame game) throws SlickException {
 		_gameSystem = new GameSystem(container.getWidth(), container.getHeight(), false);
-		_gameSystem.addSubsystem(GameSystem.Systems.PhysicsSubystem, new PhysicsSubsystem());
+		_gameSystem.addSubsystem(SubsystemType.PhysicsSubsystem, new PhysicsSubsystem());
 		_gameSystem.loadLevel(_levelFile, _agentsFile, _scenario);
 		
 //        root = new Widget();
@@ -122,6 +130,14 @@ public class GameplayState extends BHGameState {
 		
 		_gameSystem.render(g);
 		_feng.render(container, game, g);
+		
+		g.setColor(Color.white);
+		if (_gameSystem.getCameraMode()) { 
+			g.drawString("Input Mode: camera", 10, container.getHeight()-20);
+		} else { 
+			g.drawString("Input Mode: player", 10, container.getHeight()-20);
+		}
+		
 //		twlInputAdapter.render();
 	}
 
@@ -131,20 +147,76 @@ public class GameplayState extends BHGameState {
 			_gameSystem.update(millis);
 //		twlInputAdapter.update();
 	}
+	
+	private void cameraKey(int key) { 
+		float delta = 5;
+		if (_shiftDown) { 
+			delta = 10;
+		}
+		
+		switch (key) { 
+		case Input.KEY_W:
+			_gameSystem.translate(new Vec2(0, -delta));
+			break;
+		case Input.KEY_S:
+			_gameSystem.translate(new Vec2(0, delta));
+			break;
+		case Input.KEY_A:
+			_gameSystem.translate(new Vec2(-delta, 0));
+			break;
+		case Input.KEY_D:
+			_gameSystem.translate(new Vec2(delta, 0));
+			break;
+		default:
+				
+		}
+	}
 
 	@Override
 	public void keyPressed(int key, char c) {
-		if (key == Input.KEY_F1) {
-			Event event = new Event(EventType.CHANGE_CONTROL_EVENT);
-			EventManager.inst().dispatch(event);
+		if (_gameSystem.getCameraMode()) {
+			cameraKey(key);
+		} else { 
+			handleKey(key, true);
 		}
 		
-		handleKey(key, true);
+		float delta = 0.01f;
+		switch (key) {
+		case Input.KEY_F1:
+			EventManager.inst().dispatch(new ChangeControlEvent());
+			break;
+		case Input.KEY_LSHIFT:
+		case Input.KEY_RSHIFT:
+			_shiftDown = true;
+			break;
+		case Input.KEY_EQUALS:
+			if (_shiftDown)
+				delta = 0.05f;
+			_gameSystem.scale(delta);
+			break;
+		case Input.KEY_MINUS:
+			if (_shiftDown)
+				delta = 0.05f;
+			_gameSystem.scale(-delta);
+			break;
+		}
 	}
 	
 	@Override
 	public void keyReleased(int key, char c) { 
-		handleKey(key, false);
+		if (!_gameSystem.getCameraMode()) {
+			handleKey(key, false);
+		} 
+		
+		switch (key) { 
+		case Input.KEY_F2:
+			_gameSystem.flipCameraMode();
+			break;
+		case Input.KEY_LSHIFT:
+		case Input.KEY_RSHIFT:
+			_shiftDown = false;
+			break;
+		}
 	}
 	
 	private void handleKey(int key, boolean state) { 
@@ -153,43 +225,24 @@ public class GameplayState extends BHGameState {
 		ValueEntry entry = systemSpace.get(Variable.controlledObject);
 		PhysicsObject obj = objectSpace.getCognitiveAgents().get(entry.get(Integer.class));
 		
-		Event event = null;
 		switch (key) { 
 		case Input.KEY_W:
-			event = new Event(EventType.FORWARD_EVENT);
-			event.addRecipient(obj);
-			event.addParameter("state", state);
-			EventManager.inst().dispatch(event);
+			EventManager.inst().dispatch(new ForwardEvent(state, obj));
 			break;
 		case Input.KEY_S:
-			event = new Event(EventType.BACKWARD_EVENT);
-			event.addRecipient(obj);
-			event.addParameter("state", state);
-			EventManager.inst().dispatch(event);
+			EventManager.inst().dispatch(new BackwardEvent(state, obj));
 			break;
 		case Input.KEY_A:
-			event = new Event(EventType.LEFT_EVENT);
-			event.addRecipient(obj);
-			event.addParameter("state", state);
-			EventManager.inst().dispatch(event);
+			EventManager.inst().dispatch(new LeftEvent(state, obj));
 			break;
 		case Input.KEY_D:
-			event = new Event(EventType.RIGHT_EVENT);
-			event.addRecipient(obj);
-			event.addParameter("state", state);
-			EventManager.inst().dispatch(event);
+			EventManager.inst().dispatch(new RightEvent(state, obj));
 			break;
 		case Input.KEY_Q:
-			event = new Event(EventType.STRAFE_LEFT_EVENT);
-			event.addRecipient(obj);
-			event.addParameter("state", state);
-			EventManager.inst().dispatch(event);
+			EventManager.inst().dispatch(new StrafeLeftEvent(state, obj));
 			break;
 		case Input.KEY_E:
-			event = new Event(EventType.STRAFE_RIGHT_EVENT);
-			event.addRecipient(obj);
-			event.addParameter("state", state);
-			EventManager.inst().dispatch(event);
+			EventManager.inst().dispatch(new StrafeRightEvent(state, obj));
 			break;
 		}
 	}

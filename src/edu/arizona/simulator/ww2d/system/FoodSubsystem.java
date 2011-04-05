@@ -1,8 +1,8 @@
 package edu.arizona.simulator.ww2d.system;
 
 import java.util.Random;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -13,13 +13,15 @@ import org.newdawn.slick.Graphics;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.Event;
+import edu.arizona.simulator.ww2d.events.EventListener;
+import edu.arizona.simulator.ww2d.events.spawn.CreatePhysicsObject;
+import edu.arizona.simulator.ww2d.events.spawn.RemoveGameObject;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.EventListener;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
+import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 /**
@@ -30,7 +32,7 @@ import edu.arizona.simulator.ww2d.utils.enums.Variable;
  *
  */
 public class FoodSubsystem implements Subsystem {
-    private static Logger logger = Logger.getLogger( FoodSubsystem.class );
+    private static Logger logger = Logger.getLogger( FoodSubsystem.class.getName() );
 	
 	private int _counter = 0;
 	
@@ -73,10 +75,11 @@ public class FoodSubsystem implements Subsystem {
 	}
 	
 	private void addListeners() { 
-		EventManager.inst().registerForAll(EventType.REMOVE_OBJECT_EVENT, new EventListener() { 
+		EventManager.inst().registerForAll(RemoveGameObject.class, new EventListener() { 
 			@Override
 			public void onEvent(Event e) { 
-				GameObject obj = (GameObject) e.getValue("object");
+				RemoveGameObject event = (RemoveGameObject) e;
+				GameObject obj = event.getGameObject();
 				if (obj.getType() != ObjectType.food)
 					return;
 
@@ -92,8 +95,8 @@ public class FoodSubsystem implements Subsystem {
 	}
 	
 	@Override
-	public int getId() {
-		return GameSystem.Systems.FoodSubsystem.ordinal();
+	public SubsystemType getId() {
+		return SubsystemType.FoodSubsystem;
 	}
 
 	@Override
@@ -133,8 +136,7 @@ public class FoodSubsystem implements Subsystem {
 		_template.element("bodyDef").attribute("y").setText(position.y+"");
 		_storeComponent.attribute("store").setText(store+"");
 		
-		Event e = new Event(EventType.CREATE_PHYSICS_OBJECT);
-		e.addParameter("element", _template);
+		Event e = new CreatePhysicsObject(world, _template);
 		EventManager.inst().dispatchImmediate(e);
 	}
 

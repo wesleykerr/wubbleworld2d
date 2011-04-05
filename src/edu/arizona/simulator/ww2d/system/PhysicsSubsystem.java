@@ -21,11 +21,12 @@ import org.newdawn.slick.Graphics;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
+import edu.arizona.simulator.ww2d.events.system.CollisionEvent;
+import edu.arizona.simulator.ww2d.events.system.ContactEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.utils.DistanceResults;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
+import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 public class PhysicsSubsystem implements Subsystem, ContactListener {
@@ -41,8 +42,8 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
     }
     
 	@Override
-	public int getId() {
-		return GameSystem.Systems.PhysicsSubystem.ordinal();
+	public SubsystemType getId() {
+		return SubsystemType.PhysicsSubsystem;
 	}
 	
 	private void addListeners() { 
@@ -142,14 +143,7 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 		PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
 		PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
 		
-		Event e = new Event(EventType.COLLISION_EVENT);
-		e.addRecipient(obj1);
-		e.addRecipient(obj2);
-		
-		e.addParameter("contact-point", copy(cp));
-		e.addParameter("type", "add");
-		
-		EventManager.inst().dispatch(e);
+		EventManager.inst().dispatch(new CollisionEvent(copy(cp), "add", obj1, obj2));
 		
 //		logger.debug("Collision [add]: " + obj1.getName() + " " + obj2.getName() + " " + cp.id.features.toString());
 	}
@@ -163,14 +157,7 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 		PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
 		PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
 
-		Event e = new Event(EventType.COLLISION_EVENT);
-		e.addRecipient(obj1);
-		e.addRecipient(obj2);
-		
-		e.addParameter("contact-point", copy(cp));
-		e.addParameter("type", "persist");
-		
-		EventManager.inst().dispatch(e);
+		EventManager.inst().dispatch(new CollisionEvent(copy(cp), "persist", obj1, obj2));
 //		logger.debug("Collision [persist]: " + obj1.getName() + " " + obj2.getName() + " " + cp.id.features.toString());
 	}
 
@@ -188,14 +175,7 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 		
 //		logger.debug(obj1.getName() + " done colliding with " + obj2.getName());
 		_contactMap.remove(cp.id.features.toString());
-		Event e = new Event(EventType.COLLISION_EVENT);
-		e.addRecipient(obj1);
-		e.addRecipient(obj2);
-		
-		e.addParameter("contact-point", copy(cp));
-		e.addParameter("type", "remove");
-		
-		EventManager.inst().dispatch(e);
+		EventManager.inst().dispatch(new CollisionEvent(copy(cp), "remove", obj1, obj2));
 //		logger.debug("Collision [remove]: " + obj1.getName() + " " + obj2.getName() + " " + cp.id.features.toString());
 	}
 
@@ -206,14 +186,7 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 		PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
 		PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
 		
-		Event e = new Event(EventType.CONTACT_RESULT_EVENT);
-		e.addRecipient(obj1);
-		e.addRecipient(obj2);
-		
-		e.addParameter("contact-result", copy(cp));
-		e.addParameter("type", "remove");
-		
-		EventManager.inst().dispatch(e);
+		EventManager.inst().dispatch(new ContactEvent(copy(cp), obj1, obj2));
 //		logger.debug("Collision [result]: " + obj1.getName() + " " + obj2.getName() + " " + cp.id.features.toString());
 	}
 

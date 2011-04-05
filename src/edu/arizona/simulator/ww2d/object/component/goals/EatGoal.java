@@ -8,6 +8,8 @@ import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.entry.BoundedEntry;
 import edu.arizona.simulator.ww2d.blackboard.entry.FoodEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
+import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
+import edu.arizona.simulator.ww2d.events.player.RequestEatEvent;
 import edu.arizona.simulator.ww2d.fsm.FSM;
 import edu.arizona.simulator.ww2d.fsm.State;
 import edu.arizona.simulator.ww2d.fsm.TransitionTest;
@@ -15,8 +17,6 @@ import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Align;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.Arrive;
 import edu.arizona.simulator.ww2d.system.EventManager;
-import edu.arizona.simulator.ww2d.utils.Event;
-import edu.arizona.simulator.ww2d.utils.enums.EventType;
 import edu.arizona.simulator.ww2d.utils.enums.GoalEnum;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -127,19 +127,13 @@ public class EatGoal implements Goal {
 			@Override
 			public void enterState(FSM fsm) {
 				fsm.setUserData("entered", System.currentTimeMillis());
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_obj);
-				e.addParameter("name", Arrive.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _food.getPPosition());
-				EventManager.inst().dispatch(e);
+				BehaviorEvent event = new BehaviorEvent(Arrive.class, true, _obj);
+				event.setTarget(_food.getPPosition());
+				EventManager.inst().dispatch(event);
 
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_obj);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", true);
-				e.addParameter("target", _food.getPPosition());
-				EventManager.inst().dispatch(e);
+				event = new BehaviorEvent(Align.class, true, _obj);
+				event.setTarget(_food.getPPosition());
+				EventManager.inst().dispatch(event);
 				
 				// Eventually if we fail to reach the food
 				// then we need to plan a path to the food
@@ -147,17 +141,8 @@ public class EatGoal implements Goal {
 
 			@Override
 			public void exitState(FSM fsm) {
-				Event e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_obj);
-				e.addParameter("name", Arrive.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
-
-				e = new Event(EventType.BEHAVIOR_EVENT);
-				e.addRecipient(_obj);
-				e.addParameter("name", Align.class);
-				e.addParameter("status", false);
-				EventManager.inst().dispatch(e);
+				EventManager.inst().dispatch(new BehaviorEvent(Arrive.class, false, _obj));
+				EventManager.inst().dispatch(new BehaviorEvent(Align.class, false, _obj));
 			}
 
 			@Override
@@ -184,11 +169,7 @@ public class EatGoal implements Goal {
 				long time = System.currentTimeMillis();
 				if (_lastEaten == 0 || time - _delay > _lastEaten) { 
 //					logger.debug(_obj.getName() + " Eating nom nom nom");
-					Event e = new Event(EventType.REQUEST_EAT);
-					e.addRecipient(_food);
-					e.addParameter("requestor", _obj);
-					EventManager.inst().dispatch(e);
-					
+					EventManager.inst().dispatch(new RequestEatEvent(_obj, _food));
 					_lastEaten = time;
 				}
 			} 
