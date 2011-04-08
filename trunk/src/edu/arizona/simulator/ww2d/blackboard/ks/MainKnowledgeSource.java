@@ -23,7 +23,6 @@ import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 import edu.arizona.simulator.ww2d.events.Event;
 import edu.arizona.simulator.ww2d.events.EventListener;
 import edu.arizona.simulator.ww2d.events.player.EnergyEvent;
-import edu.arizona.simulator.ww2d.events.system.ChangeCameraEvent;
 import edu.arizona.simulator.ww2d.events.system.ChangeControlEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
@@ -45,18 +44,11 @@ public class MainKnowledgeSource implements KnowledgeSource {
 				Space systemSpace = Blackboard.inst().getSpace("system");
 				ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 
-				int size = objectSpace.getCognitiveAgents().size();
+				int size = objectSpace.getControllableSize();
 				ValueEntry entry = systemSpace.get(Variable.controlledObject);
 				int current = entry.get(Integer.class);
-
-				PhysicsObject previousObj = objectSpace.getCognitiveAgents().get(current);
-
 				current = (current + 1) % size;
 				entry.setValue(current);
-
-				PhysicsObject newObj = objectSpace.getCognitiveAgents().get(current);
-
-				EventManager.inst().dispatch(new ChangeCameraEvent(previousObj, newObj));
 			} 
 		});
 	}

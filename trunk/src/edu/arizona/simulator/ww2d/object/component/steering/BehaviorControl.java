@@ -145,7 +145,7 @@ public class BehaviorControl extends Component {
 		int index = systemSpace.get(Variable.controlledObject).get(Integer.class);
 		if (index >= 0) {
 			PhysicsObject us = (PhysicsObject) _parent;
-			PhysicsObject con = objectSpace.getCognitiveAgents().get(index);
+			PhysicsObject con = objectSpace.getControllableObject(index);
 			if (us == con) { 
 				Vec2 pos = us.getPosition();
 				Color blackAlpha = new Color(Color.black);

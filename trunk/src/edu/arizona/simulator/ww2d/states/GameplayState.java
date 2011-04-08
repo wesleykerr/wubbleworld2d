@@ -223,7 +223,7 @@ public class GameplayState extends BHGameState {
 		Space systemSpace = Blackboard.inst().getSpace("system");
 		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 		ValueEntry entry = systemSpace.get(Variable.controlledObject);
-		PhysicsObject obj = objectSpace.getCognitiveAgents().get(entry.get(Integer.class));
+		PhysicsObject obj = objectSpace.getControllableObject(entry.get(Integer.class));
 		
 		switch (key) { 
 		case Input.KEY_W:
