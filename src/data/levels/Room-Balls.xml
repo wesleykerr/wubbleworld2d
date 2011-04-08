@@ -95,6 +95,7 @@
 					<renderPriority value="100" />
 					<image name="data/images/ball.png" scale="0.03125" />
 				</component>
+				<component className="edu.arizona.simulator.ww2d.object.component.TopDownControl" />
 			</components>
 		</physicsObject>
 	</objects>

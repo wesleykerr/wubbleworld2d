@@ -34,6 +34,7 @@ import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.SlickGlobals;
+import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
@@ -302,7 +303,7 @@ public class GameSystem {
 			PhysicsObject pobj = null; 
 			int index = systemSpace.get(Variable.controlledObject).get(Integer.class);
 			if (index >= 0) {
-				pobj = objectSpace.getCognitiveAgents().get(index);
+				pobj = objectSpace.getControllableObject(index);
 				pos = pobj.getPosition().mul(_scale);
 			}
 		}
@@ -343,28 +344,29 @@ public class GameSystem {
 		
 		int index = systemSpace.get(Variable.controlledObject).get(Integer.class);
 		if (index >= 0) {
-			PhysicsObject pobj = objectSpace.getCognitiveAgents().get(index);
+			PhysicsObject pobj = objectSpace.getControllableObject(index);
+			if (pobj.getType() == ObjectType.cognitiveAgent) {
+				// now I would like to render some information about the currently controlled
+				// agent....
+				AgentSpace space = Blackboard.inst().getSpace(AgentSpace.class, pobj.getName());
+				BoundedEntry energy = space.getBounded(Variable.energy);
 
-			// now I would like to render some information about the currently controlled
-			// agent....
-			AgentSpace space = Blackboard.inst().getSpace(AgentSpace.class, pobj.getName());
-			BoundedEntry energy = space.getBounded(Variable.energy);
+				BoundedEntry valence = space.getBounded(Variable.valence);
+				BoundedEntry arousal = space.getBounded(Variable.arousal);
 
-			BoundedEntry valence = space.getBounded(Variable.valence);
-			BoundedEntry arousal = space.getBounded(Variable.arousal);
+				String target = space.get(Variable.target).get(String.class);
 
-			String target = space.get(Variable.target).get(String.class);
+				Color blackAlpha = new Color(Color.black);
+				blackAlpha.a = 0.5f;
+				g.setColor(blackAlpha);
+				g.fillRect(490, 0, 220, 60);
 
-			Color blackAlpha = new Color(Color.black);
-			blackAlpha.a = 0.5f;
-			g.setColor(blackAlpha);
-			g.fillRect(490, 0, 220, 60);
-
-			SlickGlobals.textFont.drawString(500, 0, "Name: " + pobj.getName());
-			SlickGlobals.textFont.drawString(500, 10, "Valence: " + GameGlobals.nf.format(valence.getValue()) + 
-					" Arousal: " + GameGlobals.nf.format(arousal.getValue()));
-			SlickGlobals.textFont.drawString(500, 20, "Energy: " + GameGlobals.nf.format(energy.getValue()));
-			SlickGlobals.textFont.drawString(500, 30, "Target: " + target);
+				SlickGlobals.textFont.drawString(500, 0, "Name: " + pobj.getName());
+				SlickGlobals.textFont.drawString(500, 10, "Valence: " + GameGlobals.nf.format(valence.getValue()) + 
+						" Arousal: " + GameGlobals.nf.format(arousal.getValue()));
+				SlickGlobals.textFont.drawString(500, 20, "Energy: " + GameGlobals.nf.format(energy.getValue()));
+				SlickGlobals.textFont.drawString(500, 30, "Target: " + target);
+			}
 		}
 	}
 	

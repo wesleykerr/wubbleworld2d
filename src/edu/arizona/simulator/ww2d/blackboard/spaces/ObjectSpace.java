@@ -31,6 +31,8 @@ public class ObjectSpace extends Space {
 
 	private List<PhysicsObject> _cognitiveAgents;
 	
+	private List<String> _controllableObjects;
+	
 	private List<GameObject> _renderObjects;
 	
 	// buffered distance memory
@@ -47,6 +49,8 @@ public class ObjectSpace extends Space {
 		_physicsObjects = new HashMap<String,PhysicsObject>();
 		_dynamicObjects = new HashMap<String,PhysicsObject>();
 		_cognitiveAgents = new ArrayList<PhysicsObject>();
+		
+		_controllableObjects = new ArrayList<String>();
 		
 		_distanceMemory = new LinkedList<Map<String,Map<String,DistanceEntry>>>();
 		
@@ -127,6 +131,31 @@ public class ObjectSpace extends Space {
 		// we don't expect the name to be shared 
 		_physicsObjects.remove(obj.getName());
 		_dynamicObjects.remove(obj.getName());
+	}
+	
+	public int getControllableSize() { 
+		return _controllableObjects.size();
+	}
+	
+	/**
+	 * Add the name of this object to the set of 
+	 * objects that can be controlled.
+	 * @param name
+	 */
+	public void addControllableObject(String name) { 
+		if (!_controllableObjects.contains(name))
+			_controllableObjects.add(name);
+	}
+	
+	/**
+	 * Retrieve the PhysicsObject that is currently 
+	 * being controlled.
+	 * @param index
+	 * @return
+	 */
+	public PhysicsObject getControllableObject(int index) { 
+		String name = _controllableObjects.get(index);
+		return getPhysicsObject(name);
 	}
 	
 	public Collection<GameObject> getRenderObjects() { 

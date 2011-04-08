@@ -6,6 +6,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
+import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 import edu.arizona.simulator.ww2d.events.Event;
 import edu.arizona.simulator.ww2d.events.EventListener;
@@ -36,6 +37,10 @@ public class TopDownControl extends Component {
       
 	public TopDownControl(GameObject obj) { 
 		super(obj);
+
+		logger.info("Adding " + obj.getName() + " to the list of controllable objects");
+		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
+		objectSpace.addControllableObject(obj.getName());
 		
 		_body = ((PhysicsObject) obj).getBody();
 		_commands = new boolean[6];
