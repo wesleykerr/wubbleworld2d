@@ -81,8 +81,9 @@ public class GameSystem {
 		// so that everything will work properly.
 		_systems.put(SubsystemType.SpawnSubsystem, new SpawnSubsystem());
 		
-		_cameraPos = new Vec2(0,0);
-		_scale = 0.2f;
+		_cameraMode = GameGlobals.cameraMode;
+		_cameraPos = GameGlobals.cameraPos;
+		_scale = GameGlobals.cameraScale;
 	}
 
 	/**
