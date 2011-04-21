@@ -6,7 +6,7 @@
 		<!-- random="true" -->
 		<bodyDef x="5.0" y="5.0" radius="0.5" />
 		<!-- <shapeDef type="circle" density="0.2" friction="0.5" restitution="0.25" radius="0.5" /> -->
-		<shapeDef type="circle" density="0.2" friction="0.0" restitution="0.5" radius="0.5" />
+		<shapeDef type="circle" density="0.2" friction="0.0" restitution="0.5" radius="1.0" />
 	
 		<components>
 			
@@ -17,7 +17,8 @@
 			
 			<component className="edu.arizona.simulator.ww2d.object.component.SpriteVisual">
 				<renderPriority value="100" />
-				<image name="data/images/half-circle.png" scale="0.03125" />
+				<!-- scale 0.03125 -->
+				<image name="data/images/half-circle.png" scale="0.0625" />
 			</component>
 				
 			<!-- <component className="edu.arizona.simulator.ww2d.object.component.steering.BehaviorControl" /> -->

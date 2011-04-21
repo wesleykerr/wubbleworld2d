@@ -26,7 +26,7 @@ public class Main extends StateBasedGame {
 	private String _levelFile = _bw_path + "data/levels/Room-Blocksworld.xml";
 	private String _agentsFile = _bw_path + "data/levels/Agents-Blocksworld.xml";
 	
-	private Scenario _scenario = new BlocksworldScenario(); // new VisibleScenario("claw", "ball1");
+	private Scenario _scenario; // new VisibleScenario("claw", "ball1");
 	
 	private FengWrapper _fengWrapper;
 	
@@ -36,13 +36,17 @@ public class Main extends StateBasedGame {
 	
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
+		
+		_scenario = new BlocksworldScenario();
+		
 		_fengWrapper = new FengWrapper(container);
 		
-		addState(new SplashState(_fengWrapper, States.MainMenuState.ordinal()));
-		addState(new MainMenuState(_fengWrapper));
+		// addState(new SplashState(_fengWrapper, States.MainMenuState.ordinal()));
+		// addState(new MainMenuState(_fengWrapper));
 		addState(new GameplayState(_fengWrapper, _levelFile, _agentsFile, _scenario));
 		
-		enterState(States.SplashState.ordinal());
+		// enterState(States.SplashState.ordinal());
+		enterState(States.GameplayState.ordinal());
 	}
 	
 	@Override
