@@ -21,19 +21,24 @@ public class BlockFactory {
 	}
 	
 	public void create(
-			float x, float y, float width,
+			float x, float y, float angle, float width,
+			float linearDamping, float angularDamping, 
 			float density, float friction, float restitution) {
 		Space systemSpace = Blackboard.inst().getSpace("system");
 		World world = systemSpace.get(Variable.physicsWorld).get(World.class);
 		
-		Element blockDef = blockDef(x,y,width,density,friction,restitution);
+		Element blockDef = blockDef(
+				x,y,angle,width,
+				linearDamping, angularDamping,
+				density,friction,restitution);
 		
 		Event e = new CreatePhysicsObject(world, blockDef);
 		EventManager.inst().dispatchImmediate(e);
 	}
 
 	private Element blockDef(
-			float x, float y, float width,
+			float x, float y, float angle, float width,
+			float linearDamping, float angularDamping, 
 			float density, float friction, float restitution) {
 		
 		Document document = DocumentHelper.createDocument();
@@ -47,7 +52,10 @@ public class BlockFactory {
 		// create location for body
 		template.addElement("bodyDef")
 			.addAttribute("x", Float.toString(x))
-			.addAttribute("y", Float.toString(y));
+			.addAttribute("y", Float.toString(y))
+			.addAttribute("angle", Float.toString(angle))
+			.addAttribute("linearDamping", Float.toString(linearDamping))
+			.addAttribute("angularDamping", Float.toString(angularDamping));
 		
 		// create shape definition, with physics
 		Element shape = template.addElement("shapeDef")

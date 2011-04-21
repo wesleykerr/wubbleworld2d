@@ -13,15 +13,18 @@ public class BlocksworldScenario implements Scenario {
 	public BlocksworldScenario() {
 		_blockFactory = new BlockFactory();
 		
-		GameGlobals.cameraPos = new Vec2(25,25);
+		float physicsScale = 12.0f;
+		// cameraPos is in rendering scale, so need to adjust coordinates
+		// from physics to rendering
+		GameGlobals.cameraPos = new Vec2(25*physicsScale,25*physicsScale);
 		GameGlobals.cameraScale = 1.0f;
 	}
 	
 	@Override
 	public void setup() {
-		// x,y,width,density,friction,restitution
-		_blockFactory.create(2.0f, 2.0f, 1.0f, 0.05f, 0.2f, 0.5f);
-		_blockFactory.create(2.0f, 4.0f, 1.0f, 0.05f, 0.2f, 0.5f);
+		// x,y,angle,width,linearDamping, angularDamping,density,friction,restitution
+		_blockFactory.create(10.0f, 10.0f, 0.0f, 3.0f, 1.0f, 1.0f, 0.05f, 0.2f, 0.5f);
+		_blockFactory.create(10.0f, 20.0f, 2.0f, 3.0f, 1.0f, 1.0f, 0.05f, 0.2f, 0.5f);
 	}
 
 }
