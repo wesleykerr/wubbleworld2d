@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<level>
+	<physicsScale value="12" />
+	<physics>
+		<aabb>
+			<min x="-2" y="-2" />
+			<max x="52" y="52" />
+		</aabb>
+		<gravity x="0" y="9.81" /> <!-- 9.81m/s -->
+		<doSleep value="true" />		
+	</physics>
+	
+	<!-- Do not add a food system to this room -->	
+	<foodSubsystem value="false" />
+	
+	<objects>
+	
+		<gameObject name="background" renderPriority="0" type="visual" >
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" scale="true">
+					<shapeDef type="polygon">
+						<vertex x="0" y="0" />
+						<vertex x="0" y="50" />
+						<vertex x="50" y="50" />
+						<vertex x="50" y="0" />
+					</shapeDef>
+					<color r="0.0" g="1.0" b="0.5" a="1.0" />
+				</component>
+			</components>
+		</gameObject>
+		 	
+		<physicsObject name="wall-west" renderPriority="1" type="wall" >
+			<bodyDef x="0.25" y="25" />
+			<shapeDef type="polygon">
+				<vertex x="-0.25" y="-25" />
+				<vertex x="0.25" y="-25" />
+				<vertex x="0.25" y="25" />
+				<vertex x="-.25" y="25" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="0.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>
+		<physicsObject name="wall-east" renderPriority="1" type="wall" >
+			<bodyDef x="49.875" y="25" />  <!-- x=99.75 -->
+			<shapeDef type="polygon">
+				<vertex x="-0.25" y="-25" />
+				<vertex x="0.25" y="-25" />
+				<vertex x="0.25" y="25" />
+				<vertex x="-.25" y="25" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="0.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>		
+		<physicsObject name="wall-north" renderPriority="1" type="wall" >
+			<bodyDef x="25" y="0.25" />
+			<shapeDef type="polygon">
+				<vertex x="-24.75" y="-0.25" />  <!-- 49.50 -->
+				<vertex x="24.75" y="-0.25" />
+				<vertex x="24.75" y="0.25" />
+				<vertex x="-24.75" y="0.25" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="0.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>			
+		<physicsObject name="wall-south" renderPriority="1" type="wall" >
+			<bodyDef x="25" y="49.875" />  <!-- 99.75 -->
+			<shapeDef type="polygon">
+				<vertex x="-24.75" y="-0.25" />
+				<vertex x="24.75" y="-0.25" />
+				<vertex x="24.75" y="0.25" />
+				<vertex x="-24.75" y="0.25" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="0.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>
+		
+		<!-- **************************************************************************************** -->
+		
+		<physicsObject name="ball1" renderPriority="100" type="dynamic" hasMass="true" >
+			<bodyDef x="15.0" y="2.0" />
+			<!-- <bodyDef random="true" radius="0.25" />  -->
+			<!-- density=0.2 friction=0.5 restitution=0.25 radius="0.25"-->
+			<shapeDef type="circle" density="0.05" friction="0.01" restitution="1.0" radius="1.0" />
+		
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="1.0" g="0.0" b="1.0" a="1.0" />
+				</component>
+				<!--
+				<component className="edu.arizona.simulator.ww2d.object.component.SpriteVisual">
+					<renderPriority value="100" />
+					<image name="data/images/ball.png" scale="0.03125" />
+				</component>
+				-->
+			</components>
+		</physicsObject>
+		
+		<physicsObject name="box1" renderPriority="100" type="dynamic" hasMass="true" >
+			<bodyDef x="10.0" y="5.0" />
+			<!-- density=0.2 friction=0.5 restitution=0.25 -->
+			<shapeDef type="polygon" density="0.05" friction="0.2" restitution="0.5">
+				<vertex x="-1.0" y="-1.0" />
+				<vertex x="1.0" y="-1.0" />
+				<vertex x="1.0" y="1.0" />
+				<vertex x="-1.0" y="1.0" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>
+		
+		<physicsObject name="box2" renderPriority="100" type="dynamic" hasMass="true" >
+			<bodyDef x="10.0" y="40.0" angle="0.0" linearDamping="3.0" angularDamping="1.0" />
+			<!-- density=0.2 friction=0.5 restitution=0.25 -->
+			<shapeDef type="polygon" density="0.05" friction="0.2" restitution="0.5">
+				<vertex x="-1.0" y="-1.0" />
+				<vertex x="1.0" y="-1.0" />
+				<vertex x="1.0" y="1.0" />
+				<vertex x="-1.0" y="1.0" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="0.5" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>
+		<physicsObject name="triangle-0" renderPriority="100" type="dynamic" hasMass="true">
+			<bodyDef x="10.0" y="10.0" angle="0.0" linearDamping="1.0" angularDamping="1.0"/>
+			<shapeDef type="polygon" density=".05" friction="0.2" restitution="0.5">
+				<vertex x="-1.0" y="-1.0" />
+				<vertex x="1.0" y="1.0" />
+				<vertex x="-1.0" y="1.0" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="1.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>
+		
+	</objects>
+</level>
