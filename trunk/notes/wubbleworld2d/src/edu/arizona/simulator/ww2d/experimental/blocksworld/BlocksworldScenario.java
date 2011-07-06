@@ -1,4 +1,4 @@
-package edu.arizona.simulator.ww2d.experimental.blocksworld;
+package edu.arizona.simulator.ww2d.experimental.blocksworld; 
 
 import org.jbox2d.common.Vec2;
 import org.newdawn.slick.geom.Vector2f;
@@ -12,13 +12,11 @@ import edu.arizona.simulator.ww2d.utils.GameGlobals;
 public class BlocksworldScenario implements Scenario {
 
 	BlockFactory _blockFactory;
-
 	TriangleFactory _triangleFactory;
 	RampFactory _rampFactory;
 	
 	public BlocksworldScenario() {
 		_blockFactory = new BlockFactory();
-
 		_triangleFactory = new TriangleFactory();
 		_rampFactory = new RampFactory();
 		
@@ -39,7 +37,7 @@ public class BlocksworldScenario implements Scenario {
 		//_triangleFactory.create(new Vector2f(10.0f,30.0f),new Vector2f(10.0f,25.0f),new Vector2f(15.0f,25.0f),0.0f,1.0f,1.0f,.05f,0.2f,0.5f,true);
 		//_triangleFactory.create(new Vector2f(9.5f,9.5f),new Vector2f(9.5f,11.5f),new Vector2f(11.5f,11.5f),0.0f,1.0f,1.0f,.05f,0.2f,0.5f,false);
 		//_rampFactory.create(new Vector2f(10f,30f), new Vector2f(5,25), true, 1.0f, 1.0f, .05f, .2f, .5f, false);
-		_rampFactory.create(new Vector2f(10f,30f), new Vector2f(5,25), false, 1.0f, 1.0f, .05f, .2f, .5f, false);
+		//_rampFactory.create(new Vector2f(10f,30f), new Vector2f(5,25), false, 1.0f, 1.0f, .05f, .2f, .5f, false);
 	}
 
 }
