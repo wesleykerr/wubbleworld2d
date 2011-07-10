@@ -30,6 +30,7 @@ public class GameSystem {
     private static Logger logger = Logger.getLogger( GameSystem.class );
 
 	private Map<SubsystemType,Subsystem> _systems;
+	private Map<SubsystemType,Subsystem> _enabled;
 
 	private boolean _cameraMode;
 	private Vec2 _cameraPos;
@@ -38,6 +39,7 @@ public class GameSystem {
 	public GameSystem(int width, int height, boolean global) { 
 		logger.debug("New GameSystem");
 		_systems = new TreeMap<SubsystemType,Subsystem>();
+		_enabled = new TreeMap<SubsystemType,Subsystem>();
 		
 		final Space systemSpace = new Space();
 		final ObjectSpace objectSpace = new ObjectSpace();
@@ -67,7 +69,7 @@ public class GameSystem {
 
 		// Add the SpawnSubsystem into the gameplay system
 		// so that everything will work properly.
-		_systems.put(SubsystemType.SpawnSubsystem, new SpawnSubsystem());
+		addSubsystem(SubsystemType.SpawnSubsystem, new SpawnSubsystem());
 		
 		_cameraMode = GameGlobals.cameraMode;
 		_cameraPos = GameGlobals.cameraPos;
@@ -75,12 +77,14 @@ public class GameSystem {
 	}
 
 	/**
-	 * Add a subsystem to our map.
+	 * Add a subsystem to our map.  By default the subsystem is
+	 * automatically enabled.
 	 * @param id
 	 * @param s
 	 */
 	public void addSubsystem(SubsystemType id, Subsystem s) {
 		_systems.put(id, s);
+		_enabled.put(id, s);
 	}
 	
 	/**
@@ -90,6 +94,24 @@ public class GameSystem {
 	 */
 	public Subsystem getSubsystem(SubsystemType id) { 
 		return _systems.get(id);
+	}
+	
+	/**
+	 * Enable the specific subsystem so that the update
+	 * method is called.
+	 * @param id
+	 */
+	public void enable(SubsystemType id) { 
+		_enabled.put(id, _systems.get(id));
+	}
+	
+	/**
+	 * Disable the specific subsystem so that the update
+	 * method is temporarily not called.
+	 * @param id
+	 */
+	public void disable(SubsystemType id) { 
+		_enabled.remove(id);
 	}
 	
 	/**
@@ -155,7 +177,7 @@ public class GameSystem {
 		// update.
 		EventManager.inst().dispatchImmediate(new UpdateStart());
 		
-		for (Subsystem s : _systems.values()) { 
+		for (Subsystem s : _enabled.values()) { 
 			s.update(elapsed);
 		}
 		
@@ -234,7 +256,7 @@ public class GameSystem {
 		}
 		
 		// Now render each of the subsystems
-		for (Subsystem sub : _systems.values()) { 
+		for (Subsystem sub : _enabled.values()) { 
 			sub.render(g);
 		}
 		
