@@ -26,6 +26,7 @@ import edu.arizona.simulator.ww2d.events.movement.StrafeRightEvent;
 import edu.arizona.simulator.ww2d.events.system.ChangeControlEvent;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.gui.TWLInputAdapter;
+import edu.arizona.simulator.ww2d.level.DefaultLoader;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.system.EventManager;
@@ -71,7 +72,9 @@ public class GameplayState extends BHGameState {
 	public void init(GameContainer container, StateBasedGame game) throws SlickException {
 		_gameSystem = new GameSystem(container.getWidth(), container.getHeight(), false);
 		_gameSystem.addSubsystem(SubsystemType.PhysicsSubsystem, new PhysicsSubsystem());
-		_gameSystem.loadLevel(_levelFile, _agentsFile, _scenario);
+		
+		DefaultLoader loader = new DefaultLoader(_levelFile, _agentsFile, _scenario);
+		loader.load(_gameSystem);
 		
 //        root = new Widget();
 //        root.setTheme("");

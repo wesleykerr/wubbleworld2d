@@ -1,19 +1,11 @@
 package edu.arizona.simulator.ww2d.system;
 
-import java.net.URL;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
@@ -23,15 +15,11 @@ import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
 import edu.arizona.simulator.ww2d.blackboard.spaces.AgentSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
-import edu.arizona.simulator.ww2d.events.spawn.CreateGameObject;
-import edu.arizona.simulator.ww2d.events.spawn.CreatePhysicsObject;
-import edu.arizona.simulator.ww2d.events.spawn.CreateWall;
 import edu.arizona.simulator.ww2d.events.system.FinishEvent;
 import edu.arizona.simulator.ww2d.events.system.UpdateEnd;
 import edu.arizona.simulator.ww2d.events.system.UpdateStart;
 import edu.arizona.simulator.ww2d.object.GameObject;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
-import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.SlickGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
@@ -96,6 +84,15 @@ public class GameSystem {
 	}
 	
 	/**
+	 * Return the subsystem associated with the given id.
+	 * @param id
+	 * @return
+	 */
+	public Subsystem getSubsystem(SubsystemType id) { 
+		return _systems.get(id);
+	}
+	
+	/**
 	 * Increment or decrement the scale value by delta
 	 * @param delta
 	 */
@@ -151,104 +148,6 @@ public class GameSystem {
 	 */
 	public void setCamera(Vec2 pos) { 
 		_cameraPos = pos;
-	}
-
-	
-	public void loadLevel(String levelName, String agentsFile, Scenario scenario) { 
-		logger.debug("Loading level: " + levelName);
-		
-		Space systemSpace = Blackboard.inst().getSpace("system");
-
-		SAXReader reader = new SAXReader(false);
-		try {
-			URL url = this.getClass().getClassLoader().getResource(levelName);
-			Document doc = reader.read(url);
-			Element root = doc.getRootElement();
-		
-			float physicsScale = Float.parseFloat(root.element("physicsScale").attributeValue("value"));
-			systemSpace.put(Variable.physicsScale, new ValueEntry(physicsScale));
-
-			PhysicsSubsystem physics = (PhysicsSubsystem) _systems.get(SubsystemType.PhysicsSubsystem);
-			physics.fromXML(root.element("physics"));
-
-			Element objects = root.element("objects");
-			if (objects.attribute("walls") != null && Boolean.parseBoolean(objects.attributeValue("walls"))) 
-				makeWalls(physics);
-
-			World world = systemSpace.get(Variable.physicsWorld).get(World.class);
-			List physicsObjs = objects.elements("physicsObject");
-			for (int i = 0; i < physicsObjs.size(); ++i) { 
-				Element obj = (Element) physicsObjs.get(i);
-				EventManager.inst().dispatchImmediate(new CreatePhysicsObject(world, obj));
-			}
-			List gameObjs = objects.elements("gameObject");
-			for (int i = 0; i < gameObjs.size(); ++i) { 
-				Element obj = (Element) gameObjs.get(i);
-				EventManager.inst().dispatchImmediate(new CreateGameObject(obj));
-			}
-			
-			Element food = root.element("foodSubsystem");
-			if (food == null || Boolean.parseBoolean(food.attributeValue("value"))) {
-				addSubsystem(SubsystemType.FoodSubsystem, new FoodSubsystem());
-			}
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		}
-		
-		if (agentsFile != null) {
-			try {
-				URL url = this.getClass().getClassLoader().getResource(agentsFile);
-				Document doc = reader.read(url);
-				Element root = doc.getRootElement();
-
-				World world = systemSpace.get(Variable.physicsWorld).get(World.class);
-				List physicsObjs = root.elements("physicsObject");
-				for (int i = 0; i < physicsObjs.size(); ++i) { 
-					Element obj = (Element) physicsObjs.get(i);
-					EventManager.inst().dispatchImmediate(new CreatePhysicsObject(world, obj));
-				}
-
-			} catch (DocumentException e) {
-				e.printStackTrace();
-			}		
-		}
-
-		// TODO: here we need to decide what we want to do when we are done loading.
-		// Maybe we place a boolean value into the space that a knowledge source watches
-		// for.
-		if (scenario != null)
-			scenario.setup();
-	}
-	
-	/**
-	 * Construct walls that are on the boundaries of the physics world.
-	 */
-	private void makeWalls(PhysicsSubsystem physics) { 
-		// walls are always 0.5 units wide and as long as the world - 2 (+1 buffer on each side)
-		AABB aabb = physics.getWorldAABB();
-		float width = (aabb.upperBound.x - aabb.lowerBound.x);
-		float height = (aabb.upperBound.y - aabb.lowerBound.y);
-		
-		float w = 0.125f;
-		float w2 = 2.0f*w;
-		
-		
-		sendWallEvent("wall1", new Vec2(w, height/2), new Vec2(w2,  height));
-		sendWallEvent("wall3", new Vec2(width-w, height/2), new Vec2(w2, height));
-
-		sendWallEvent("wall2", new Vec2(width/2, w), new Vec2(width, w2));
-		sendWallEvent("wall4", new Vec2(width/2, height-w), new Vec2(width, w2));
-		
-	}
-	
-	/**
-	 * Send the actual Wall event out to whoever is listening.
-	 * @param name
-	 * @param position
-	 * @param dimensions
-	 */
-	private void sendWallEvent(String name, Vec2 position, Vec2 dimensions) { 
-		EventManager.inst().dispatchImmediate(new CreateWall("wall1", position, dimensions));
 	}
 	
 	public void update(int elapsed) {
