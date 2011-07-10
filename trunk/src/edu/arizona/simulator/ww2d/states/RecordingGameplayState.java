@@ -20,6 +20,7 @@ import org.newdawn.slick.state.StateBasedGame;
 
 import edu.arizona.simulator.ww2d.Record;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
+import edu.arizona.simulator.ww2d.level.DefaultLoader;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.system.GameSystem;
 import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
@@ -62,7 +63,9 @@ public class RecordingGameplayState extends BHGameState {
 		super.enter(container, game);
 		_gameSystem = new GameSystem(container.getWidth(), container.getHeight(), false);
 		_gameSystem.addSubsystem(SubsystemType.PhysicsSubsystem, new PhysicsSubsystem());
-		_gameSystem.loadLevel(_levelFile, _agentsFile, _scenario);
+
+		DefaultLoader loader = new DefaultLoader(_levelFile, _agentsFile, _scenario);
+		loader.load(_gameSystem);
 		
 		_enteredTime = System.currentTimeMillis();
 	}
