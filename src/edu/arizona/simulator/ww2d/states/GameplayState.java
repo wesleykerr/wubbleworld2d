@@ -9,32 +9,15 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
-import de.matthiasmann.twl.GUI;
-import de.matthiasmann.twl.Widget;
-import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
-import de.matthiasmann.twl.theme.ThemeManager;
-import edu.arizona.simulator.ww2d.blackboard.Blackboard;
-import edu.arizona.simulator.ww2d.blackboard.entry.ValueEntry;
-import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
-import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
-import edu.arizona.simulator.ww2d.events.movement.BackwardEvent;
-import edu.arizona.simulator.ww2d.events.movement.ForwardEvent;
-import edu.arizona.simulator.ww2d.events.movement.LeftEvent;
-import edu.arizona.simulator.ww2d.events.movement.RightEvent;
-import edu.arizona.simulator.ww2d.events.movement.StrafeLeftEvent;
-import edu.arizona.simulator.ww2d.events.movement.StrafeRightEvent;
 import edu.arizona.simulator.ww2d.events.system.ChangeControlEvent;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
-import edu.arizona.simulator.ww2d.gui.TWLInputAdapter;
 import edu.arizona.simulator.ww2d.level.DefaultLoader;
-import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.system.EventManager;
 import edu.arizona.simulator.ww2d.system.GameSystem;
 import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
 import edu.arizona.simulator.ww2d.utils.enums.States;
 import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
-import edu.arizona.simulator.ww2d.utils.enums.Variable;
 
 public class GameplayState extends BHGameState {
 	private static Logger logger = Logger.getLogger( GameplayState.class );
@@ -46,14 +29,7 @@ public class GameplayState extends BHGameState {
 	private GameSystem _gameSystem;
 	private boolean _shiftDown;
 
-    private LWJGLRenderer lwjglRenderer;
-    private ThemeManager theme;
-    private GUI gui;
-    private Widget root;
-    private TWLInputAdapter twlInputAdapter;
-    
     private long _enterTime;
-    private boolean _update;
     
     public GameplayState(FengWrapper feng, String levelFile, String agentsFile, Scenario scenario) {
 		super(feng);
@@ -75,32 +51,6 @@ public class GameplayState extends BHGameState {
 		
 		DefaultLoader loader = new DefaultLoader(_levelFile, _agentsFile, _scenario);
 		loader.load(_gameSystem);
-		
-//        root = new Widget();
-//        root.setTheme("");
-//
-//        // save Slick's GL state while loading the theme
-//        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-//        try {
-//                lwjglRenderer = new LWJGLRenderer();
-//                theme = ThemeManager.createThemeManager(GameplayState.class.getClassLoader()
-//                                .getResource("data/themes/gui/simple.xml"), lwjglRenderer);
-//                gui = new GUI(root, lwjglRenderer);
-//                gui.applyTheme(theme);
-//        } catch (LWJGLException e) {
-//                e.printStackTrace();
-//        } catch(IOException e){
-//                e.printStackTrace();
-//        } finally {
-//                // restore Slick's GL state
-//                GL11.glPopAttrib();
-//        }
-//
-//        // connect input
-//        twlInputAdapter = new TWLInputAdapter(gui, container.getInput());
-//        container.getInput().addPrimaryListener(twlInputAdapter);		
-//
-//		new MessageConsole(root);
 	}
 
 	@Override 
@@ -140,15 +90,12 @@ public class GameplayState extends BHGameState {
 		} else { 
 			g.drawString("Input Mode: player", 10, container.getHeight()-20);
 		}
-		
-//		twlInputAdapter.render();
 	}
 
 	@Override
 	public void update(GameContainer container, StateBasedGame game, int millis) throws SlickException {
 		if (_enterTime + 5000 < System.currentTimeMillis())
 			_gameSystem.update(millis);
-//		twlInputAdapter.update();
 	}
 	
 	private void cameraKey(int key) { 
@@ -221,32 +168,5 @@ public class GameplayState extends BHGameState {
 			break;
 		}
 	}
-	
-	private void handleKey(int key, boolean state) { 
-		Space systemSpace = Blackboard.inst().getSpace("system");
-		ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
-		ValueEntry entry = systemSpace.get(Variable.controlledObject);
-		PhysicsObject obj = objectSpace.getControllableObject(entry.get(Integer.class));
-		
-		switch (key) { 
-		case Input.KEY_W:
-			EventManager.inst().dispatch(new ForwardEvent(state, obj));
-			break;
-		case Input.KEY_S:
-			EventManager.inst().dispatch(new BackwardEvent(state, obj));
-			break;
-		case Input.KEY_A:
-			EventManager.inst().dispatch(new LeftEvent(state, obj));
-			break;
-		case Input.KEY_D:
-			EventManager.inst().dispatch(new RightEvent(state, obj));
-			break;
-		case Input.KEY_Q:
-			EventManager.inst().dispatch(new StrafeLeftEvent(state, obj));
-			break;
-		case Input.KEY_E:
-			EventManager.inst().dispatch(new StrafeRightEvent(state, obj));
-			break;
-		}
-	}
+
 }
