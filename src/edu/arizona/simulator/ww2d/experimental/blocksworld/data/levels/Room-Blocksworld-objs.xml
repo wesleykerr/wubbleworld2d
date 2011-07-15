@@ -113,7 +113,7 @@
 			</components>
 			<fsc>
 				<state>
-					<action className="edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.MoveAction" dx="0.0" dy="-1.0" ax="0.0" ay="0.0">
+					<action className="edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.MoveAction" dx="0.0" dy="-0.01" ax="0.0" ay="0.0">
 					</action>
 				</state>
 				<state>
