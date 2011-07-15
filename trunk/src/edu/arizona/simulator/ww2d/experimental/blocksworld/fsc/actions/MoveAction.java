@@ -24,7 +24,11 @@ public class MoveAction extends Action {
 
 	@Override
 	public void execute() {
-		Vec2 pos = owner.getPosition();
+		
+		// Jeff --- getPosition returns the position of the object in _screen_ coordinates
+		// whereas you want the position of the object in _world_ coordinates.
+		//Vec2 pos = owner.getPosition();
+		Vec2 pos = owner.getPPosition();
 		Vec2 newPos = new Vec2();
 		
 		// Update position
