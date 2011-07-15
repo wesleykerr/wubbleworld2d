@@ -5,4 +5,6 @@ public enum SubsystemType {
 	FoodSubsystem,
 	SpawnSubsystem,
 	PathfindingSubsystem,
+	LearningSubsystem,
+	FSCSubsystem
 }
