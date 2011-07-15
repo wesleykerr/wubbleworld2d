@@ -42,6 +42,8 @@
 					<color r="0.0" g="0.0" b="0.0" a="1.0" />
 				</component>
 			</components>
+			<fsc>
+			</fsc>
 		</physicsObject>
 		<physicsObject name="wall-east" renderPriority="1" type="wall" >
 			<bodyDef x="49.875" y="25" />  <!-- x=99.75 -->
@@ -56,6 +58,8 @@
 					<color r="0.0" g="0.0" b="0.0" a="1.0" />
 				</component>
 			</components>
+			<fsc>
+			</fsc>
 		</physicsObject>		
 		<physicsObject name="wall-north" renderPriority="1" type="wall" >
 			<bodyDef x="25" y="0.25" />
@@ -70,6 +74,8 @@
 					<color r="0.0" g="0.0" b="0.0" a="1.0" />
 				</component>
 			</components>
+			<fsc>
+			</fsc>
 		</physicsObject>			
 		<physicsObject name="wall-south" renderPriority="1" type="wall" >
 			<bodyDef x="25" y="49.875" />  <!-- 99.75 -->
@@ -105,6 +111,18 @@
 				</component>
 				-->
 			</components>
+			<fsc>
+				<state>
+					<action className="edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.MoveAction" dx="0.0" dy="-1.0" ax="0.0" ay="0.0">
+					</action>
+				</state>
+				<state>
+				</state>
+				<transition from="0" to="1">
+					<both className="edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.ContactAction">
+					</both>
+				</transition>
+			</fsc>
 		</physicsObject>
 		
 		<physicsObject name="box1" renderPriority="100" type="dynamic" hasMass="true" >

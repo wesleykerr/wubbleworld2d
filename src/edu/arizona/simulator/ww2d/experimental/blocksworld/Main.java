@@ -7,6 +7,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+import edu.arizona.simulator.ww2d.experimental.blocksworld.states.BlocksworldState;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.states.BHGameState;
@@ -23,7 +24,7 @@ public class Main extends StateBasedGame {
 	private static Logger logger = Logger.getLogger( Main.class );
 	
 	private String _bw_path = "edu/arizona/simulator/ww2d/experimental/blocksworld/";
-	private String _levelFile = _bw_path + "data/levels/Room-Blocksworld.xml";
+	private String _levelFile = _bw_path + "data/levels/Room-Blocksworld-objs.xml";
 	private String _agentsFile = _bw_path + "data/levels/Agents-Blocksworld.xml";
 	
 	private Scenario _scenario; // new VisibleScenario("claw", "ball1");
@@ -37,13 +38,13 @@ public class Main extends StateBasedGame {
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
 		
-		_scenario = new BlocksworldScenario();
+		_scenario = new BlocksworldNullScenario();
 		
 		_fengWrapper = new FengWrapper(container);
 		
 		// addState(new SplashState(_fengWrapper, States.MainMenuState.ordinal()));
 		// addState(new MainMenuState(_fengWrapper));
-		addState(new GameplayState(_fengWrapper, _levelFile, _agentsFile, _scenario));
+		addState(new BlocksworldState(_fengWrapper, _levelFile, _agentsFile, _scenario));
 		
 		// enterState(States.SplashState.ordinal());
 		enterState(States.GameplayState.ordinal());
