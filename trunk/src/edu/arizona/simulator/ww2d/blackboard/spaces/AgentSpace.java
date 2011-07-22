@@ -222,10 +222,7 @@ public class AgentSpace extends Space {
 		entry.update(cp);
 	}
 	
-	public void remove(ContactPoint cp) { 
-		PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
-		PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
-
+	public void remove(ContactPoint cp, PhysicsObject obj1, PhysicsObject obj2) { 
 		PhysicsObject obj = obj1;
 		if (obj.getName().equals(_name)) { 
 			obj = obj2;

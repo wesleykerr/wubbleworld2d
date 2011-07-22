@@ -42,7 +42,7 @@ public class CollisionUpdater {
 			ContactResult cr = event.getContactResult();
 
 			// update the generic collision information.
-			String key = CollisionEntry.key(cr);
+			String key = CollisionEntry.key(cr, event.getPhysicsObject1(), event.getPhysicsObject2());
 			ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 			CollisionEntry entry = objectSpace.getCollision(key);
 			entry.update(cr);
@@ -61,19 +61,20 @@ public class CollisionUpdater {
 			String type = event.getType();
 			
 			if ("add".equals(type))  
-				add(cp);
+				add(event);
 			else if ("persist".equals(type)) 
-				persist(cp);
+				persist(event);
 			else if ("remove".equals(type))
-				remove(cp);
+				remove(event);
 		}
 			
-		private void add(ContactPoint cp) { 
+		private void add(CollisionEvent event) { 
 			ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 			
-			CollisionEntry entry = new CollisionEntry(cp);
-			PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
-			PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
+			PhysicsObject obj1 = event.getPhysicsObject1();
+			PhysicsObject obj2 = event.getPhysicsObject2();
+
+			CollisionEntry entry = new CollisionEntry(event.getContactPoint(), obj1, obj2);
 
 			objectSpace.addCollision(entry);
 			if (Blackboard.inst().spaceExists(obj1.getName())) {
@@ -92,29 +93,33 @@ public class CollisionUpdater {
 		 * shared references.
 		 * @param cp
 		 */
-		private void persist(ContactPoint cp) { 
+		private void persist(CollisionEvent event) { 
 			ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
-			CollisionEntry entry = objectSpace.getCollision(CollisionEntry.key(cp));
-			entry.update(cp);
+			PhysicsObject obj1 = event.getPhysicsObject1();
+			PhysicsObject obj2 = event.getPhysicsObject2();
+
+			String key = CollisionEntry.key(event.getContactPoint(), obj1, obj2);
+			CollisionEntry entry = objectSpace.getCollision(key);
+			entry.update(event.getContactPoint());
 		}
 		
-		private void remove(ContactPoint cp) { 
+		private void remove(CollisionEvent event) { 
 			ObjectSpace objectSpace = Blackboard.inst().getSpace(ObjectSpace.class, "object");
-			String key = CollisionEntry.key(cp);
 			
-			PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
-			PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
+			PhysicsObject obj1 = event.getPhysicsObject1();
+			PhysicsObject obj2 = event.getPhysicsObject2();
+			String key = CollisionEntry.key(event.getContactPoint(), obj1, obj2);
 
 			objectSpace.removeCollision(key, obj1, obj2);
 			
 			if (Blackboard.inst().spaceExists(obj1.getName())) {
 				AgentSpace space1 = Blackboard.inst().getSpace(AgentSpace.class, obj1.getName());
-				space1.remove(cp);
+				space1.remove(event.getContactPoint(), obj1, obj2);
 			}
 			
 			if (Blackboard.inst().spaceExists(obj2.getName())) {
 				AgentSpace space2 = Blackboard.inst().getSpace(AgentSpace.class, obj2.getName());
-				space2.remove(cp);
+				space2.remove(event.getContactPoint(), obj1, obj2);
 			}
 		}
 	}
