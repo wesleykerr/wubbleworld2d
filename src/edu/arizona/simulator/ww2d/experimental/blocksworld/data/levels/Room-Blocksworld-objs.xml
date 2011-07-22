@@ -121,7 +121,7 @@
 					</action>
 				</state> -->
 				<state>
-					<action name="MoveAction" dx="0.0" dy="10" ax="0.0" ay="0.0">
+					<action name="MoveAction" dx="0.0" dy="-10" ax="0.0" ay="0.0">
 					</action>
 				</state>
 				<state>
