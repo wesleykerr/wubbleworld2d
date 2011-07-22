@@ -10,12 +10,15 @@ import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.FSCState;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.StateFieldSpace;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
+import edu.arizona.simulator.ww2d.system.GameSystem;
+import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
 import edu.arizona.simulator.ww2d.system.Subsystem;
 import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 
 public class FSCSubsystem implements Subsystem {
 
 	HashMap<PhysicsObject,FSCState> statemap = new HashMap<PhysicsObject,FSCState>();
+	public static GameSystem system;
 	
 	public FSCSubsystem(){
 		super();
@@ -35,6 +38,7 @@ public class FSCSubsystem implements Subsystem {
 				statemap.put(obj, statemap.get(obj).update(eps));
 			}
 		}
+		((PhysicsSubsystem) FSCSubsystem.system.getSubsystem(SubsystemType.PhysicsSubsystem)).getPhysics().step(0f,0);
 	}
 
 	@Override

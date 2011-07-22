@@ -1,8 +1,12 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions;
 
 import org.jbox2d.common.Vec2;
+
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.Action;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.systems.FSCSubsystem;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
+import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
+import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 
 public class MoveAction extends Action {
 
@@ -37,7 +41,6 @@ public class MoveAction extends Action {
 		dy += (ay * fraction);
 
 		owner.setPosition(newPos);
-
 		
 	}
 
