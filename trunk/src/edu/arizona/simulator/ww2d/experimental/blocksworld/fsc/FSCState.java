@@ -8,11 +8,13 @@ public class FSCState {
 	protected LinkedList<FSCTransition> transitions;
 	protected LinkedList<Action> actions;
 	protected PhysicsObject owner;
+	private FSCTransition nullTrans;
 	
 	public FSCState(PhysicsObject owner){
 		transitions = new LinkedList<FSCTransition>();
 		actions = new LinkedList<Action>();
 		this.owner = owner;
+		nullTrans = new FSCTransition(owner);
 	}
 
 	public PhysicsObject getOwner(){
@@ -44,36 +46,46 @@ public class FSCState {
 		actions = new LinkedList<Action>();
 	}
 	
-	public FSCState enter(FSCState prev, FSCTransition trans){
+	public FSCState enter(FSCState prev, FSCTransition trans, int elapsed){
 		// Initiate
+		for(Action action : actions){
+			action.execute(elapsed);
+		}
 		return this;
 	}
 	
-	public FSCState exit(FSCState next, FSCTransition trans){
+	public FSCState exit(FSCState next, FSCTransition trans, int elapsed){
 		// Finish up
-		trans.transAction();
-		return next.enter(this, trans);
+		trans.transAction(0);
+		trans.resetChecks();
+		trans.migrateRequiredData(this);
+		return next.enter(this, trans, elapsed);
 	}
 	
-	public void action(){
+	public void action(int elapsed){
 		for(Action action : actions){
-			if(action.check()){
-				action.execute();
+			if(action.check(elapsed)){
+				action.execute(elapsed);
 			}
 		}
 	}
 	
-	public FSCTransition check(){
+	public FSCTransition check(int elapsed){
+		for(FSCTransition trans : transitions){
+			if(trans.check(elapsed)){
+				return trans;
+			}
+		}
+		
 		return null;
 	}
 	
 	public FSCState update(int elapsed){
-		FSCTransition trans = check();
+		FSCTransition trans = check(elapsed);
 		if(trans == null){
-			action();
-			return this;
+			return this.enter(this, nullTrans, elapsed);
 		} else {
-			return exit(trans.getNextState(),trans);
+			return exit(trans.getNextState(),trans, elapsed);
 		}
 	}
 }

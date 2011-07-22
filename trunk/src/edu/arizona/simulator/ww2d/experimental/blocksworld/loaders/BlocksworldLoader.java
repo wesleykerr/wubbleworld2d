@@ -12,10 +12,12 @@ import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.Action;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.Check;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.FSCState;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.FSCTransition;
-import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.ContactAction;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.ContactCheck;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.MoveAction;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.TimeCheck;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.systems.FSCSubsystem;
 import edu.arizona.simulator.ww2d.level.DefaultLoader;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
@@ -37,7 +39,8 @@ public class BlocksworldLoader extends DefaultLoader {
 		super.load(gameSystem);
 		ObjectSpace objSpace = (ObjectSpace) Blackboard.inst().getSpace(
 				"object");
-		FSCSubsystem fscSubsystem = (FSCSubsystem) gameSystem.getSubsystem(SubsystemType.FSCSubsystem);
+		FSCSubsystem fscSubsystem = (FSCSubsystem) gameSystem
+				.getSubsystem(SubsystemType.FSCSubsystem);
 		try {
 			URL url = this.getClass().getClassLoader().getResource(_levelFile);
 			Document doc = reader.read(url);
@@ -49,7 +52,7 @@ public class BlocksworldLoader extends DefaultLoader {
 				for (int i = 0; i < physicsObjs.size(); ++i) {
 					Element obj = (Element) physicsObjs.get(i);
 					Element fsc = obj.element("fsc");
-					if(fsc == null){
+					if (fsc == null) {
 						continue;
 					}
 					List<Element> states = fsc.elements("state");
@@ -99,38 +102,42 @@ public class BlocksworldLoader extends DefaultLoader {
 		if (actions != null) {
 			for (int i = 0; i < actions.size(); i++) {
 				Element action = actions.get(i);
-				trans.addCheck(parseAction(trans.getOwner(), action));
-			}
-		}
-
-		actions = root.elements("both");
-		if (actions != null) {
-			for (int i = 0; i < actions.size(); i++) {
-				Element action = actions.get(i);
-				trans.addBoth(parseAction(trans.getOwner(), action));
+				trans.addCheck(parseCheck(trans.getOwner(), action));
 			}
 		}
 	}
 
 	private Action parseAction(PhysicsObject owner, Element action) {
-		try {
-			String classpath = "edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.";
-			Class cl = Class.forName(action.attributeValue("className"));
-			String name = cl.getCanonicalName();
-			if (name.equals(classpath + "MoveAction")) {
-				float dx = Float.parseFloat(action.attributeValue("dx"));
-				float dy = Float.parseFloat(action.attributeValue("dy"));
-				float ax = Float.parseFloat(action.attributeValue("ax"));
-				float ay = Float.parseFloat(action.attributeValue("ay"));
-				return new MoveAction(owner, dx, dy, ax, ay);
-			} else if (name.equals(classpath + "ContactAction")) {
-				return new ContactAction(owner);
-			}
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		String name = action.attributeValue("name");
+		Action toReturn = null;
+		if (name.equals("MoveAction")) {
+			float dx = Float.parseFloat(action.attributeValue("dx"));
+			float dy = Float.parseFloat(action.attributeValue("dy"));
+			float ax = Float.parseFloat(action.attributeValue("ax"));
+			float ay = Float.parseFloat(action.attributeValue("ay"));
+			toReturn = new MoveAction(owner, dx, dy, ax, ay);
 		}
+		
+		if(toReturn != null){
+			List<Element> checks = action.elements("check");
+			for(Element check : checks){
+				Check c = parseCheck(owner,check);
+				if(c != null){
+					toReturn.addCheck(c);
+				}
+			}
+		}
+		return toReturn;
+	}
 
+	private Check parseCheck(PhysicsObject owner, Element check) {
+		String name = check.attributeValue("name");
+		if (name.equals("ContactCheck")) {
+			return new ContactCheck(owner);
+		} else if(name.equals("TimeCheck")){
+			int interval = Integer.parseInt(check.attributeValue("interval"));
+			return new TimeCheck(owner,interval);
+		}
 		return null;
 	}
 

@@ -113,14 +113,30 @@
 			</components>
 			<fsc>
 				<state>
-					<action className="edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.MoveAction" dx="0.0" dy="-0.01" ax="0.0" ay="0.0">
+					<action name="MoveAction" dx="0.0" dy="10" ax="0.0" ay="0.0">
+					</action>
+				</state>
+				<state>
+					<action name="MoveAction" dx="0.0" dy="-10" ax="0.0" ay="0.0">
+					</action>
+				</state>
+				<state>
+					<action name="MoveAction" dx="0.0" dy="10" ax="0.0" ay="0.0">
 					</action>
 				</state>
 				<state>
 				</state>
 				<transition from="0" to="1">
-					<both className="edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.ContactAction">
-					</both>
+					<check name="TimeCheck" interval="4000">
+					</check>
+				</transition>
+				<transition from="1" to="2">
+					<check name="TimeCheck" interval="2000">
+					</check>
+				</transition>
+				<transition from="2" to="3">
+					<check name="TimeCheck" interval="2000">
+					</check>
 				</transition>
 			</fsc>
 		</physicsObject>
