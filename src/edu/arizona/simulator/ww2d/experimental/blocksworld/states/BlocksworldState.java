@@ -72,6 +72,7 @@ public class BlocksworldState extends BHGameState {
 		_gameSystem.addSubsystem(SubsystemType.LearningSubsystem,
 				new LearningSubsystem());
 		_gameSystem.disable(SubsystemType.FSCSubsystem);
+		FSCSubsystem.system = _gameSystem;
 		BlocksworldLoader loader = new BlocksworldLoader(_levelFile, _agentsFile,
 				_scenario);
 		loader.load(_gameSystem);
