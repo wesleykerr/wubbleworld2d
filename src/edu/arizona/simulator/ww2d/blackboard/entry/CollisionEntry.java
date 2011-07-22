@@ -26,9 +26,9 @@ public class CollisionEntry extends Entry {
 	private float _normalImpulse;
 	private float _tangentImpulse;
 	
-	public CollisionEntry(ContactPoint cp) { 
-		_obj1 = (PhysicsObject) cp.shape1.getUserData();
-		_obj2 = (PhysicsObject) cp.shape2.getUserData();
+	public CollisionEntry(ContactPoint cp, PhysicsObject obj1, PhysicsObject obj2) { 
+		_obj1 = obj1;
+		_obj2 = obj2;
 
 		if (_obj1.getName().compareTo(_obj2.getName()) < 0) { 
 			_name = _obj1.getName() + " " + _obj2.getName();
@@ -43,7 +43,7 @@ public class CollisionEntry extends Entry {
 		_processed = false;
 		
 		_id = cp.id.features.toString();
-		_key = key(cp);
+		_key = key(cp, _obj1, _obj2);
 	}
 	
 	public void update(ContactPoint cp) { 
@@ -119,10 +119,7 @@ public class CollisionEntry extends Entry {
 		
 	}
 	
-	public static String key(ContactPoint cp) { 
-		PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
-		PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
-		
+	public static String key(ContactPoint cp, PhysicsObject obj1, PhysicsObject obj2) { 
 		String name = "";
 		if (obj1.getName().compareTo(obj2.getName()) < 0) { 
 			name = obj1.getName() + " " + obj2.getName();
@@ -133,10 +130,7 @@ public class CollisionEntry extends Entry {
 		return name + cp.id.features.toString();
 	}
 	
-	public static String key(ContactResult cp) { 
-		PhysicsObject obj1 = (PhysicsObject) cp.shape1.getUserData();
-		PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
-		
+	public static String key(ContactResult cp, PhysicsObject obj1, PhysicsObject obj2) { 
 		String name = "";
 		if (obj1.getName().compareTo(obj2.getName()) < 0) { 
 			name = obj1.getName() + " " + obj2.getName();
