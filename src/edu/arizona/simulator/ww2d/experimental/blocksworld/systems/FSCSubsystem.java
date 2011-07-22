@@ -8,6 +8,7 @@ import org.newdawn.slick.Graphics;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.FSCState;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.StateFieldSpace;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.Subsystem;
 import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
@@ -18,6 +19,7 @@ public class FSCSubsystem implements Subsystem {
 	
 	public FSCSubsystem(){
 		super();
+		Blackboard.inst().addSpace("statefield", new StateFieldSpace());
 	}
 
 	@Override

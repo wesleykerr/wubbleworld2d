@@ -2,23 +2,24 @@ package edu.arizona.simulator.ww2d.experimental.blocksworld.fsc;
 
 import java.util.LinkedList;
 
+import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 
 public class FSCTransition {
 	FSCState next;
-	LinkedList<Action> checks;
+	LinkedList<Check> checks;
 	LinkedList<Action> transActions;
 	PhysicsObject owner;
 	
 	public FSCTransition(PhysicsObject owner){
 		next = null;
-		checks = new LinkedList<Action>();
+		checks = new LinkedList<Check>();
 		transActions = new LinkedList<Action>();
 		this.owner = owner;
 	}
 	
-	public void addCheck(Action action){
-		checks.add(action);
+	public void addCheck(Check check){
+		checks.add(check);
 	}
 	
 	public void addAction(Action action){
@@ -34,26 +35,11 @@ public class FSCTransition {
 	}
 	
 	public void purgeChecks(){
-		checks = new LinkedList<Action>();
+		checks = new LinkedList<Check>();
 	}
 	
 	public void purgeActions(){
 		transActions = new LinkedList<Action>();
-	}
-	
-	public void addBoth(Action action){
-		addCheck(action);
-		addAction(action);
-	}
-	
-	public void removeBoth(Action action){
-		removeCheck(action);
-		removeAction(action);
-	}
-	
-	public void purgeBoth(){
-		purgeChecks();
-		purgeActions();
 	}
 	
 	public void setNextState(FSCState next){
@@ -68,10 +54,16 @@ public class FSCTransition {
 		return owner;
 	}
 	
+	public void resetChecks(){
+		for(Check c : checks){
+			c.reset();
+		}
+	}
+	
 	// All criteria must be met to continue
-	public boolean check(){
-		for(Action a : checks){
-			if(!a.check()){
+	public boolean check(int elapsed){
+		for(Check check : checks){
+			if(!check.check(elapsed)){
 				return false;
 			}
 		}
@@ -80,9 +72,25 @@ public class FSCTransition {
 	
 	
 	// Do all setup registered to this transition
-	public void transAction(){
+	public void transAction(int elapsed){
 		for(Action a : transActions){
-			a.execute();
+			a.execute(elapsed);
 		}
+	}
+
+	public void migrateRequiredData(FSCState prevState) {
+		StateFieldSpace sfs = (StateFieldSpace)Blackboard.inst().getSpace("statefield");
+		for(String field : requiredDataFields()){
+			sfs.copy(prevState, next, field);
+		}
+	}
+	
+	public LinkedList<String> requiredDataFields(){
+		LinkedList<String> toReturn = new LinkedList<String>();
+		for(Check c : checks){
+			toReturn.addAll(c.requiredFields());
+		}
+		
+		return toReturn;
 	}
 }
