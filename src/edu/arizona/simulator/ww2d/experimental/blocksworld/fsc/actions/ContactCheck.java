@@ -66,7 +66,7 @@ public class ContactCheck extends Check {
 	}
 
 	public void reset() {
-		ObjectSpace objSpace = (ObjectSpace) Blackboard.inst().getSpace(
+		/*ObjectSpace objSpace = (ObjectSpace) Blackboard.inst().getSpace(
 				"object");
 		for (CollisionEntry obj : objSpace.getCollisions()) {
 			if (obj.getObject1().equals(owner)
@@ -75,7 +75,8 @@ public class ContactCheck extends Check {
 						"remove", owner, obj.getOther(owner));
 				EventManager.inst().dispatch(ce);
 			}
-		}
+		}*/
+		collision = false;
 	}
 
 }
