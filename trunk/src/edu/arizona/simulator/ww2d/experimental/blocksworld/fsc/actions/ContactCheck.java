@@ -1,12 +1,5 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions;
 
-import java.util.Collection;
-
-import org.jbox2d.dynamics.contacts.ContactPoint;
-
-import edu.arizona.simulator.ww2d.blackboard.Blackboard;
-import edu.arizona.simulator.ww2d.blackboard.entry.CollisionEntry;
-import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.events.Event;
 import edu.arizona.simulator.ww2d.events.EventListener;
 import edu.arizona.simulator.ww2d.events.system.CollisionEvent;

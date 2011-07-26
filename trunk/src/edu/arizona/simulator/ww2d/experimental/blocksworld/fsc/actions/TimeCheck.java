@@ -21,6 +21,7 @@ public class TimeCheck extends Check {
 	
 	public void reset(){
 		currTime = 0;
+		interval /= 2;
 	}
 
 }
