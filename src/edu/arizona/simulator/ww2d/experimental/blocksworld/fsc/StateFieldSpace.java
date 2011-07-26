@@ -1,6 +1,7 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.fsc;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 
@@ -34,6 +35,32 @@ public class StateFieldSpace extends Space {
 		}
 		
 		return fields.get(name);
+	}
+	
+	public LinkedList<Field> getAll(FSCState state){
+		HashMap<String, Field> fields = info.get(state);
+		if(fields == null){
+			return null;
+		}
+		
+		LinkedList<Field> toReturn = new LinkedList<Field>();
+		toReturn.addAll(fields.values());
+		return toReturn;
+	}
+	
+	public LinkedList<String> getAllNames(FSCState state){
+		HashMap<String, Field> fields = info.get(state);
+		if(fields == null){
+			return null;
+		}
+		
+		LinkedList<String> toReturn = new LinkedList<String>();
+		toReturn.addAll(fields.keySet());
+		return toReturn;
+	}
+	
+	public HashMap<String,Field> getMap(FSCState state){
+		return info.get(state);
 	}
 	
 	public void copy(FSCState state1, FSCState state2, String name){

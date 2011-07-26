@@ -1,7 +1,6 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.systems;
 
 import java.util.Collection;
-import java.util.HashMap;
 
 import org.newdawn.slick.Graphics;
 
@@ -9,6 +8,7 @@ import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.FSCState;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.StateFieldSpace;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.StateObjectSpace;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.GameSystem;
 import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
@@ -17,12 +17,12 @@ import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 
 public class FSCSubsystem implements Subsystem {
 
-	HashMap<PhysicsObject,FSCState> statemap = new HashMap<PhysicsObject,FSCState>();
 	public static GameSystem system;
 	
 	public FSCSubsystem(){
 		super();
 		Blackboard.inst().addSpace("statefield", new StateFieldSpace());
+		Blackboard.inst().addSpace("statespace", new StateObjectSpace());
 	}
 
 	@Override
@@ -33,11 +33,18 @@ public class FSCSubsystem implements Subsystem {
 	@Override
 	public void update(int eps) {
 		Collection<PhysicsObject> objs = ((ObjectSpace)Blackboard.inst().getSpace("object")).getPhysicsObjects();
+		StateObjectSpace sobjSpace = (StateObjectSpace)Blackboard.inst().getSpace("statespace");
 		for(PhysicsObject obj : objs){
-			if(statemap.get(obj) != null){
-				statemap.put(obj, statemap.get(obj).update(eps));
+			FSCState state = sobjSpace.get(obj);
+			if(state != null){
+				FSCState newState = state.update(eps);
+				if(!newState.equals(state)){
+					sobjSpace.transition(obj, newState);
+				}
 			}
 		}
+		
+		sobjSpace.update(eps);
 		((PhysicsSubsystem) FSCSubsystem.system.getSubsystem(SubsystemType.PhysicsSubsystem)).getPhysics().step(0f,0);
 	}
 
@@ -54,7 +61,7 @@ public class FSCSubsystem implements Subsystem {
 	}
 	
 	public void put(PhysicsObject obj, FSCState initialState){
-		statemap.put(obj, initialState);
+		((StateObjectSpace)Blackboard.inst().getSpace("statespace")).put(obj, initialState);
 	}
 
 }
