@@ -113,34 +113,32 @@
 			</components>
 			<fsc>
 				<state>
-					<action name="MoveAction" dx="0.0" dy="10" ax="0.0" ay="0.0">
-					</action>
+					<state>
+						<action name="MoveAction">
+							<func name="AccelerateFunction" ax="0.0" ay="1.0">
+							</func>
+						</action>
+					</state>
+					<state>
+						<action name="MoveAction">
+							<func name="AccelerateFunction" ax="0.0" ay="1.0"></func>
+						</action>
+					</state>
+					<transition from="0" to="0">
+						<check name="ContactCheck"></check>
+						<func name="SimpleReboundFunction"></func>
+					</transition>
+					<transition from="1" to="0">
+						<check name="TimeCheck"></check>
+					</transition>
 				</state>
-				<!-- <state>
-					<action name="MoveAction" dx="0.0" dy="-10" ax="0.0" ay="0.0">
-					</action>
-				</state> -->
 				<state>
-					<action name="MoveAction" dx="0.0" dy="-10" ax="0.0" ay="0.0">
-					</action>
 				</state>
-				<state>
-				</state>
-				<!-- <transition from="0" to="1">
-					<check name="TimeCheck" interval="4000">
-					</check>
-				</transition> -->
+				
 				<transition from="0" to="1">
+					<check name="ZeroVelocityCheck"></check>
 					<check name="ContactCheck"></check>
 				</transition>
-				<transition from="1" to="0">
-					<check name="TimeCheck" interval="2000">
-					</check>
-				</transition>
-				<!--  <transition from="2" to="3">
-					<check name="TimeCheck" interval="2000">
-					</check>
-				</transition> -->
 			</fsc>
 		</physicsObject>
 		
@@ -158,6 +156,35 @@
 					<color r="0.0" g="0.0" b="1.0" a="1.0" />
 				</component>
 			</components>
+			<fsc>
+				<state>
+					<state>
+						<action name="MoveAction">
+							<func name="AccelerateFunction" ax="0.0" ay="1.0">
+							</func>
+						</action>
+					</state>
+					<state>
+						<action name="MoveAction">
+							<func name="AccelerateFunction" ax="0.0" ay="1.0"></func>
+						</action>
+					</state>
+					<transition from="0" to="0">
+						<check name="ContactCheck"></check>
+						<func name="SimpleReboundFunction"></func>
+					</transition>
+					<transition from="1" to="0">
+						<check name="TimeCheck"></check>
+					</transition>
+				</state>
+				<state>
+				</state>
+				
+				<transition from="0" to="1">
+					<check name="ZeroVelocityCheck"></check>
+					<check name="ContactCheck"></check>
+				</transition>
+			</fsc>
 		</physicsObject>
 		
 		<physicsObject name="box2" renderPriority="100" type="dynamic" hasMass="true" >
@@ -174,6 +201,35 @@
 					<color r="0.0" g="0.0" b="0.5" a="1.0" />
 				</component>
 			</components>
+			<fsc>
+				<state>
+					<state>
+						<action name="MoveAction">
+							<func name="AccelerateFunction" ax="0.0" ay="1.0">
+							</func>
+						</action>
+					</state>
+					<state>
+						<action name="MoveAction">
+							<func name="AccelerateFunction" ax="0.0" ay="1.0"></func>
+						</action>
+					</state>
+					<transition from="0" to="0">
+						<check name="ContactCheck"></check>
+						<func name="SimpleReboundFunction"></func>
+					</transition>
+					<transition from="1" to="0">
+						<check name="TimeCheck"></check>
+					</transition>
+				</state>
+				<state>
+				</state>
+				
+				<transition from="0" to="1">
+					<check name="ZeroVelocityCheck"></check>
+					<check name="ContactCheck"></check>
+				</transition>
+			</fsc>
 		</physicsObject>
 		
 	</objects>

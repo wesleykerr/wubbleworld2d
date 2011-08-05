@@ -1,10 +1,20 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.fsc;
 
-public abstract class Field {
-
+public class Field {
+	public Object data;
+	public String name;
+	
+	public Field(String name,Object data){
+		this.data = data;
+		this.name = name;
+	}
+	
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
+	}
+	
+	public Object getData(){
+		return data;
 	}
 
 }

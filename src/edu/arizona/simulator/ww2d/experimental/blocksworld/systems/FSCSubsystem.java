@@ -7,7 +7,7 @@ import org.newdawn.slick.Graphics;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.FSCState;
-import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.StateFieldSpace;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.ObjectFieldSpace;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.StateObjectSpace;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.GameSystem;
@@ -21,7 +21,7 @@ public class FSCSubsystem implements Subsystem {
 	
 	public FSCSubsystem(){
 		super();
-		Blackboard.inst().addSpace("statefield", new StateFieldSpace());
+		Blackboard.inst().addSpace("objectfield", new ObjectFieldSpace());
 		Blackboard.inst().addSpace("statespace", new StateObjectSpace());
 	}
 
@@ -33,17 +33,20 @@ public class FSCSubsystem implements Subsystem {
 	@Override
 	public void update(int eps) {
 		Collection<PhysicsObject> objs = ((ObjectSpace)Blackboard.inst().getSpace("object")).getPhysicsObjects();
+		ObjectFieldSpace ofs = (ObjectFieldSpace) Blackboard.inst().getSpace("objectfield");
 		StateObjectSpace sobjSpace = (StateObjectSpace)Blackboard.inst().getSpace("statespace");
 		for(PhysicsObject obj : objs){
 			FSCState state = sobjSpace.get(obj);
+			ofs.preUpdate(obj);
 			if(state != null){
 				FSCState newState = state.update(eps);
 				if(!newState.equals(state)){
 					sobjSpace.transition(obj, newState);
 				}
 			}
+			ofs.update(obj);
 		}
-		
+		ofs.purgeAll();
 		sobjSpace.update(eps);
 		((PhysicsSubsystem) FSCSubsystem.system.getSubsystem(SubsystemType.PhysicsSubsystem)).getPhysics().step(0f,0);
 	}

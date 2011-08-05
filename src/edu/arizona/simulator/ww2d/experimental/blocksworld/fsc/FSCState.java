@@ -8,6 +8,7 @@ public class FSCState {
 	protected LinkedList<FSCTransition> transitions;
 	protected LinkedList<Action> actions;
 	protected PhysicsObject owner;
+	protected FSCState substate;
 	private FSCTransition nullTrans;
 	
 	public FSCState(PhysicsObject owner){
@@ -15,6 +16,11 @@ public class FSCState {
 		actions = new LinkedList<Action>();
 		this.owner = owner;
 		nullTrans = new FSCTransition(owner);
+		substate = null;
+	}
+	
+	public FSCTransition getNullTransition(){
+		return nullTrans;
 	}
 
 	public PhysicsObject getOwner(){
@@ -36,6 +42,7 @@ public class FSCState {
 	
 	public void addAction(Action action){
 		actions.add(action);
+		nullTrans.addFunctions(action.getFunctions());
 	}
 	
 	public void removeAction(Action action){
@@ -46,8 +53,16 @@ public class FSCState {
 		actions = new LinkedList<Action>();
 	}
 	
+	public void setSubstate(FSCState state){
+		substate = state;
+	}
+	
 	public FSCState enter(FSCState prev, FSCTransition trans, int elapsed){
 		// Initiate
+		trans.applyTransforms(prev, elapsed);
+		if(substate != null){
+			substate = substate.update(elapsed);
+		}
 		for(Action action : actions){
 			action.execute(elapsed);
 		}
@@ -56,9 +71,8 @@ public class FSCState {
 	
 	public FSCState exit(FSCState next, FSCTransition trans, int elapsed){
 		// Finish up
-		trans.transAction(0);
-		trans.resetChecks();
-		trans.migrateRequiredData(this);
+		//trans.transAction(0);
+		//trans.resetChecks();
 		return next.enter(this, trans, elapsed);
 	}
 	
