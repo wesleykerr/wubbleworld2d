@@ -1,5 +1,6 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.fsc;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
@@ -10,12 +11,14 @@ public class FSCTransition {
 	LinkedList<Check> checks;
 	LinkedList<Action> transActions;
 	PhysicsObject owner;
+	LinkedList<Function> functions;
 	
 	public FSCTransition(PhysicsObject owner){
 		next = null;
 		checks = new LinkedList<Check>();
 		transActions = new LinkedList<Action>();
 		this.owner = owner;
+		functions = new LinkedList<Function>();
 	}
 	
 	public void addCheck(Check check){
@@ -54,6 +57,7 @@ public class FSCTransition {
 		return owner;
 	}
 	
+	@Deprecated
 	public void resetChecks(){
 		for(Check c : checks){
 			c.reset();
@@ -72,16 +76,10 @@ public class FSCTransition {
 	
 	
 	// Do all setup registered to this transition
+	@Deprecated
 	public void transAction(int elapsed){
 		for(Action a : transActions){
 			a.execute(elapsed);
-		}
-	}
-
-	public void migrateRequiredData(FSCState prevState) {
-		StateFieldSpace sfs = (StateFieldSpace)Blackboard.inst().getSpace("statefield");
-		for(String field : requiredDataFields()){
-			sfs.copy(prevState, next, field);
 		}
 	}
 	
@@ -92,5 +90,30 @@ public class FSCTransition {
 		}
 		
 		return toReturn;
+	}
+
+	public void addFunctions(LinkedList<Function> functions) {
+		this.functions.addAll(functions);
+	}
+	
+	public void addFunction(Function func){
+		functions.add(func);
+	}
+
+	public void applyTransforms(FSCState prev, int elapsed) {
+		ObjectFieldSpace ofs = (ObjectFieldSpace) Blackboard.inst().getSpace("objectfield");
+		HashMap<String, Field> fields = ofs.getMap(owner);
+		// Make sure we don't have straggler data that's no longer relevant
+//		if(fields != null && !fields.isEmpty())
+//			ofs.purge(owner);
+//		else{
+//			fields = ofs.getEphemeral().get(owner);
+//		}
+		
+		for(Function f : functions){
+			if(fields != null&& f.satisfied(new LinkedList<String>(fields.keySet()))){
+				f.calculate(elapsed, fields);
+			}
+		}
 	}
 }
