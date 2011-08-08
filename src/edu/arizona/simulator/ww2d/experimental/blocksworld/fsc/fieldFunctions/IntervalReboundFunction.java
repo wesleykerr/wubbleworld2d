@@ -7,7 +7,7 @@ import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.Field;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.Function;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.ObjectFieldSpace;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
-
+@Deprecated
 public class IntervalReboundFunction extends Function{
 
 	public IntervalReboundFunction(PhysicsObject owner) {

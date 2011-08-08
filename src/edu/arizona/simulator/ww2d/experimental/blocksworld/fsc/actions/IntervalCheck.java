@@ -4,7 +4,7 @@ import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.Check;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.ObjectFieldSpace;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
-
+@Deprecated
 public class IntervalCheck extends Check {
 
 	public IntervalCheck(PhysicsObject owner) {

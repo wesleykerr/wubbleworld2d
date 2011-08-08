@@ -37,6 +37,8 @@ public class ContactCheck extends Check {
 					ofs.addTemp(owner,
 							new Field("collideObject", ce.getPhysicsObject1()));
 				}
+				
+				ofs.addTemp(owner, new Field("contactPoint",ce.getContactPoint()));
 				// collision = true;
 			} else if (ce.getType().equals("remove")) {
 				// collision = false;
