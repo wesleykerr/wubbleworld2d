@@ -24,7 +24,7 @@ public class Main extends StateBasedGame {
 	private static Logger logger = Logger.getLogger( Main.class );
 	
 	private String _bw_path = "edu/arizona/simulator/ww2d/experimental/blocksworld/";
-	private String _levelFile = _bw_path + "data/levels/Room-Blocksworld-objs.xml";
+	private String _levelFile = _bw_path + "data/levels/Room-Blocksworld-objs-angle-test.xml";
 	private String _agentsFile = _bw_path + "data/levels/Agents-Blocksworld.xml";
 	
 	private Scenario _scenario; // new VisibleScenario("claw", "ball1");

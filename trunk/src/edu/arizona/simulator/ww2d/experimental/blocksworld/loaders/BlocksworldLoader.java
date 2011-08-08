@@ -23,6 +23,7 @@ import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.MoveActio
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.TimeCheck;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.ZeroVelocityCheck;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.AccelerateFunction;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.CollisionReboundFunction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.IntervalChangeFunction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.IntervalReboundFunction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.MaintainDataFunction;
@@ -212,6 +213,8 @@ public class BlocksworldLoader extends DefaultLoader {
 			return new MaintainDataFunction(owner, retainers);
 		} else if (name.equals("SimpleReboundFunction")) {
 			return new SimpleReboundFunction(owner);
+		} else if (name.equals("CollisionReboundFunction")){
+			return new CollisionReboundFunction(owner);
 		}
 		return null;
 	}
