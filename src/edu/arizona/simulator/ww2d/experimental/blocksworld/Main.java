@@ -38,7 +38,7 @@ public class Main extends StateBasedGame {
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
 		
-		_scenario = new BlocksworldNullScenario();
+		_scenario = new BlocksworldScenario();
 		
 		_fengWrapper = new FengWrapper(container);
 		

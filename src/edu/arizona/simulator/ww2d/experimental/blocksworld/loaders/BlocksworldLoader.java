@@ -24,6 +24,7 @@ import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.TimeCheck
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.ZeroVelocityCheck;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.AccelerateFunction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.CollisionReboundFunction;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.FractionalDecelerationFunction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.IntervalChangeFunction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.IntervalReboundFunction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.MaintainDataFunction;
@@ -215,6 +216,10 @@ public class BlocksworldLoader extends DefaultLoader {
 			return new SimpleReboundFunction(owner);
 		} else if (name.equals("CollisionReboundFunction")){
 			return new CollisionReboundFunction(owner);
+		} else if(name.equals("FractionalDecelerationFunction")){
+			float dxScale = Float.parseFloat(function.attributeValue("dxScale"));
+			float dyScale = Float.parseFloat(function.attributeValue("dyScale"));
+			return new FractionalDecelerationFunction(owner,dxScale,dyScale);
 		}
 		return null;
 	}

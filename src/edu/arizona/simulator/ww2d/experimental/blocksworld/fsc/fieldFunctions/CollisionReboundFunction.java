@@ -31,21 +31,17 @@ public class CollisionReboundFunction extends Function {
 		ContactPoint cp = (ContactPoint) fields.get("contactPoint").getData();
 		
 		Vec2 norm = cp.normal;
-//		if(cp.shape2.equals(owner)){
-//			//norm.negateLocal();
-//		}
-		
-		
-//		Vec2 vel = new Vec2(dx,dy);
-//		float cross = Vec2.cross(norm, vel);
 		
 		Vec2 vel = new Vec2(dx,dy);
 		float dot = Vec2.dot(vel, norm) / Vec2.dot(norm, norm);
-		Vec2 u = new Vec2(norm.negate().x * dot, norm.negate().y * dot);
+		Vec2 u = new Vec2(norm.x * dot, norm.y * dot);
 		Vec2 w = vel.sub(u);
 		
-		dx = w.x = u.x;
-		dy = w.y - u.y;
+		dx = w.x * cp.friction - u.x * cp.restitution;
+		dy = w.y * cp.friction - u.y * cp.restitution;
+		
+//		dx = -dx;
+//		dy = -dy;
 		
 //		float collideAngle = collision.getBody().getAngle();
 //		
@@ -58,6 +54,8 @@ public class CollisionReboundFunction extends Function {
 		ObjectFieldSpace ofs = (ObjectFieldSpace) Blackboard.inst().getSpace("objectfield");
 		ofs.addTemp(owner, new Field("dx",dx));
 		ofs.addTemp(owner, new Field("dy",dy));
+		fields.put("dx", new Field("dx",dx));
+		fields.put("dy", new Field("dy",dy));
 	}
 
 }

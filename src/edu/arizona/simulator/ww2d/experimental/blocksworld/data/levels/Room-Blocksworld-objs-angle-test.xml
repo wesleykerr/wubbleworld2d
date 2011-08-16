@@ -118,6 +118,7 @@
 					<transition from="0" to="0">
 						<check name="ContactCheck"></check>
 						<func name="CollisionReboundFunction"></func>
+						<func name="FractionalDecelerationFunction" dxScale="2.0" dyScale="2.0"></func>
 					</transition>
 					<transition from="1" to="0">
 						<check name="TimeCheck"></check>
@@ -132,5 +133,56 @@
 				</transition>
 			</fsc>
 		</physicsObject>
+		
+		<physicsObject name="ball2" renderPriority="100" type="dynamic" hasMass="true" >
+			<bodyDef x="20.0" y="2.0" />
+			<!-- <bodyDef random="true" radius="0.25" />  -->
+			<!-- density=0.2 friction=0.5 restitution=0.25 radius="0.25"-->
+			<shapeDef type="circle" density="0.05" friction="0.01" restitution="1.0" radius="1.0" />
+		
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="1.0" g="0.0" b="1.0" a="1.0" />
+				</component>
+				<!--
+				<component className="edu.arizona.simulator.ww2d.object.component.SpriteVisual">
+					<renderPriority value="100" />
+					<image name="data/images/ball.png" scale="0.03125" />
+				</component>
+				-->
+			</components>
+			<fsc>
+				<state>
+					<state>
+						<action name="MoveAction">
+							<func name="AccelerateFunction" ax="0.0" ay="1.0">
+							</func>
+						</action>
+					</state>
+					<state>
+						<action name="MoveAction">
+							<func name="AccelerateFunction" ax="0.0" ay="1.0"></func>
+						</action>
+					</state>
+					<transition from="0" to="0">
+						<check name="ContactCheck"></check>
+						<func name="CollisionReboundFunction"></func>
+						<func name="FractionalDecelerationFunction" dxScale="2.0" dyScale="2.0"></func>
+					</transition>
+					<transition from="1" to="0">
+						<check name="TimeCheck"></check>
+					</transition>
+				</state>
+				<state>
+				</state>
+				
+				<transition from="0" to="1">
+					<check name="ZeroVelocityCheck"></check>
+					<check name="ContactCheck"></check>
+				</transition>
+			</fsc>
+		</physicsObject>
+		
+		
 	</objects>
 </level>
