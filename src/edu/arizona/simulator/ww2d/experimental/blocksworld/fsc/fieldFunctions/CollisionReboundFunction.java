@@ -37,8 +37,8 @@ public class CollisionReboundFunction extends Function {
 		Vec2 u = new Vec2(norm.x * dot, norm.y * dot);
 		Vec2 w = vel.sub(u);
 		
-		dx = w.x * cp.friction - u.x * cp.restitution;
-		dy = w.y * cp.friction - u.y * cp.restitution;
+		dx = w.x * cp.friction - u.x *  cp.restitution;
+		dy = w.y * cp.friction - u.y *  cp.restitution;
 		
 //		dx = -dx;
 //		dy = -dy;

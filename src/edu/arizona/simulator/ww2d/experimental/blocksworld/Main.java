@@ -24,8 +24,9 @@ public class Main extends StateBasedGame {
 	private static Logger logger = Logger.getLogger( Main.class );
 	
 	private String _bw_path = "edu/arizona/simulator/ww2d/experimental/blocksworld/";
-	private String _levelFile = _bw_path + "data/levels/Room-Blocksworld-objs-angle-test.xml";
+	private String _levelFile = _bw_path + "data/levels/Room-Blocksworld-objs-angle-test-simple.xml";
 	private String _agentsFile = _bw_path + "data/levels/Agents-Blocksworld.xml";
+	private String _fscFile = _bw_path + "data/levels/States.xml";
 	
 	private Scenario _scenario; // new VisibleScenario("claw", "ball1");
 	
@@ -44,7 +45,7 @@ public class Main extends StateBasedGame {
 		
 		// addState(new SplashState(_fengWrapper, States.MainMenuState.ordinal()));
 		// addState(new MainMenuState(_fengWrapper));
-		addState(new BlocksworldState(_fengWrapper, _levelFile, _agentsFile, _scenario));
+		addState(new BlocksworldState(_fengWrapper, _levelFile, _agentsFile, _fscFile, _scenario));
 		
 		// enterState(States.SplashState.ordinal());
 		enterState(States.GameplayState.ordinal());

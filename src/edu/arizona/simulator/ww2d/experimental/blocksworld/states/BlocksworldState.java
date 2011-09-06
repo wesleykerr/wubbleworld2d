@@ -30,6 +30,7 @@ public class BlocksworldState extends BHGameState {
 
 	private String _levelFile;
 	private String _agentsFile;
+	private String _fscFile;
 	private Scenario _scenario;
 
 	private GameSystem _gameSystem;
@@ -46,12 +47,13 @@ public class BlocksworldState extends BHGameState {
 	private boolean physics;
 
 	public BlocksworldState(FengWrapper feng, String levelFile,
-			String agentsFile, Scenario scenario) {
+			String agentsFile, String fscFile, Scenario scenario) {
 		super(feng);
 
 		_levelFile = levelFile;
 		_agentsFile = agentsFile;
 		_scenario = scenario;
+		_fscFile = fscFile;
 		physics = true;
 	}
 
@@ -73,7 +75,7 @@ public class BlocksworldState extends BHGameState {
 				new LearningSubsystem());
 		_gameSystem.disable(SubsystemType.FSCSubsystem);
 		FSCSubsystem.system = _gameSystem;
-		BlocksworldLoader loader = new BlocksworldLoader(_levelFile, _agentsFile,
+		BlocksworldLoader loader = new BlocksworldLoader(_levelFile, _agentsFile,_fscFile,
 				_scenario);
 		loader.load(_gameSystem);
 	}
