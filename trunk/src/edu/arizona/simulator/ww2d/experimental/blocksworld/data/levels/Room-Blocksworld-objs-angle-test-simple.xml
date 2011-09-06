@@ -85,11 +85,11 @@
 				</component>
 			</components>
 		</physicsObject>
-		<physicsObject name="ball1" renderPriority="100" type="dynamic" hasMass="true" fsc="hierarchy rebound">
+		<physicsObject name="ball1" renderPriority="100" type="dynamic" hasMass="true" fsc="simple rebound">
 			<bodyDef x="15.0" y="2.0" />
 			<!-- <bodyDef random="true" radius="0.25" />  -->
 			<!-- density=0.2 friction=0.5 restitution=0.25 radius="0.25"-->
-			<shapeDef type="circle" density="0.05" friction="0.01" restitution="1.0" radius="1.0" />
+			<shapeDef type="circle" density="0.05" friction="0.01" restitution="1" radius="1.0" />
 		
 			<components>
 				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
@@ -104,11 +104,11 @@
 			</components>
 		</physicsObject>
 		
-		<physicsObject name="ball2" renderPriority="100" type="dynamic" hasMass="true" fsc="hierarchy rebound">
+		<physicsObject name="ball2" renderPriority="100" type="dynamic" hasMass="true" fsc="simple rebound">
 			<bodyDef x="20.0" y="2.0" />
 			<!-- <bodyDef random="true" radius="0.25" />  -->
 			<!-- density=0.2 friction=0.5 restitution=0.25 radius="0.25"-->
-			<shapeDef type="circle" density="0.05" friction="0.01" restitution="1.0" radius="1.0" />
+			<shapeDef type="circle" density="0.05" friction="0.01" restitution="1" radius="1.0" />
 		
 			<components>
 				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
