@@ -97,13 +97,13 @@ public class KickBallGoal implements Goal {
 
 	@Override
 	public float desireability() {
-		// get the our scents and see if we can smell any food
+		// get the our scents and see if see anything
 		AgentSpace space = Blackboard.inst().getSpace(AgentSpace.class, _parent.getName());
 		Map<String,MemoryEntry> map = space.getVisualMemories().getFirst();
 		if (map.isEmpty())
 			return 0;
 		
-		// see if there is a ball within these memories
+		// see if there is something we would like to kick within these memories
 		boolean found = false;
 		for (MemoryEntry entry : map.values()) { 
 			if (entry.obj.getType() == ObjectType.dynamic || entry.obj.getType() == ObjectType.obstacle)

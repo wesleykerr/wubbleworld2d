@@ -86,7 +86,7 @@
 
 		<!-- **************************************************************************************** -->		
 		
-		<physicsObject name="column1" renderPriority="100" type="obstacle" >
+		<physicsObject name="obj1" renderPriority="100" type="obstacle" >
 			<bodyDef random="true" radius="0.25" />
 			<shapeDef type="circle" density="0.2" friction="0.5" restitution="0.25" radius="0.45" />
 		
