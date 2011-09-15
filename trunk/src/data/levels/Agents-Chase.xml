@@ -27,7 +27,7 @@
 		</components>
 	</physicsObject>
 	
-	<physicsObject name="agent2" renderPriority="100" type="cognitiveAgent" hasMass="true" initAgent="initStaticAgent">
+	<physicsObject name="obj1" renderPriority="100" type="cognitiveAgent" hasMass="true" initAgent="initStaticAgent">
 		<bodyDef random="true" radius="0.5" />
 		<shapeDef type="circle" density="0.2" friction="0.5" restitution="0.25" radius="0.5" />
 

@@ -22,8 +22,8 @@ public class Record extends StateBasedGame {
 
 	private FengWrapper _fengWrapper;
 	
-	public static final int MILLIS = 30000;
-	public static final int REPEAT = 100;
+	public static final int MILLIS = 20000;
+	public static final int REPEAT = 30;
 	
 	public Record() {
 		super("Movie Recorder");
@@ -41,23 +41,16 @@ public class Record extends StateBasedGame {
 //		recState.addParams("talk-b", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario3());
 //		recState.addParams("collide", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario4());
 
-		recState.addParams("chase", "data/levels/Room-Empty.xml", "data/levels/Agents-Chase.xml", new VisibleScenario("agent1", "agent2"));
-		recState.addParams("flee", "data/levels/Room-Empty.xml", "data/levels/Agents-Flee.xml", new VisibleScenario("agent2", "agent1"));
-		recState.addParams("fight", "data/levels/Room-Empty.xml", "data/levels/Agents-Fight.xml", new VisibleScenario("agent1", "agent2", true));
-		recState.addParams("kick-ball", "data/levels/Room-Balls.xml", "data/levels/Agents-Kick.xml", new VisibleScenario("agent1", "ball1"));
-		recState.addParams("kick-column", "data/levels/Room-Columns.xml", "data/levels/Agents-Kick.xml", new VisibleScenario("agent1", "column1"));
+		recState.addParams("chase", "data/levels/Room-Empty.xml", "data/levels/Agents-Chase.xml", new VisibleScenario("agent1", "obj1"));
+		recState.addParams("flee", "data/levels/Room-Empty.xml", "data/levels/Agents-Flee.xml", new VisibleScenario("obj1", "agent1"));
+		recState.addParams("fight", "data/levels/Room-Empty.xml", "data/levels/Agents-Fight.xml", new VisibleScenario("agent1", "obj1", true));
+		recState.addParams("kick-ball", "data/levels/Room-Balls.xml", "data/levels/Agents-Kick.xml", new VisibleScenario("agent1", "obj1"));
+		recState.addParams("kick-column", "data/levels/Room-Columns.xml", "data/levels/Agents-Kick.xml", new VisibleScenario("agent1", "obj1"));
 		recState.addParams("eat", "data/levels/Room-Food.xml", "data/levels/Agents-Eat.xml", null);
 
 		addState(new SplashState(_fengWrapper, States.RecordingState.ordinal()));
 		addState(recState);
 		addState(new RecordingGameplayState(_fengWrapper));
-//		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Empty.xml", "data/levels/Agents-Chase.xml"));
-//		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Empty.xml", "data/levels/Agents-Flee.xml"));
-//		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Empty.xml", "data/levels/Agents-Fight.xml"));
-//		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Empty.xml", "data/levels/Agents-Wander.xml"));
-//		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Balls.xml", "data/levels/Agents-Kick.xml", null));
-//		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Columns.xml", "data/levels/Agents-Kick.xml"));
-//		addState(new RecordingGameplayState(_fengWrapper, "data/levels/Room-Food.xml", "data/levels/Agents-Eat.xml"));
 		addState(new AWTReplayState(_fengWrapper));
 
 		enterState(States.SplashState.ordinal());

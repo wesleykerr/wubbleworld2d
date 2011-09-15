@@ -27,6 +27,10 @@ import org.newdawn.slick.state.StateBasedGame;
 import com.xuggle.mediatool.IMediaWriter;
 import com.xuggle.mediatool.ToolFactory;
 
+import edu.arizona.simulator.ww2d.events.spawn.CreateGameObject;
+import edu.arizona.simulator.ww2d.events.spawn.CreatePhysicsObject;
+import edu.arizona.simulator.ww2d.events.spawn.RemoveGameObject;
+import edu.arizona.simulator.ww2d.events.system.FinishEvent;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.logging.StateDatabase;
 import edu.arizona.simulator.ww2d.object.component.ShapeVisual;
@@ -143,11 +147,11 @@ public class AWTReplayState extends BHGameState {
 
 		_db = new StateDatabase(StateDatabase.PATH + "state-replay.db", false);
 		_scale = Float.parseFloat(_db.getParameter("scale"));
-		_maxTime = Long.parseLong(_db.queryEvent("FINISH", 0));
+		_maxTime = Long.parseLong(_db.queryEvent(FinishEvent.class.getName(), 0));
 
 		_agents = new ArrayList<String>();
 		_index = -1;
-		for (String params : _db.queryEvents("CREATE_PHYSICS_OBJECT", 1)) {
+		for (String params : _db.queryEvents(CreatePhysicsObject.class.getName(), 1)) {
 			isCognitiveAgent(params);
 		}
 
@@ -245,16 +249,16 @@ public class AWTReplayState extends BHGameState {
 	}
 
 	private void updateSequential(GameContainer container, StateBasedGame game) { 
-		for (String params : _db.queryEvents("CREATE_PHYSICS_OBJECT", _time)) {
+		for (String params : _db.queryEvents(CreatePhysicsObject.class.getName(), _time)) {
 			loadObject(params);
 		}
 
-		for (String params : _db.queryEvents("CREATE_GAME_OBJECT", _time)) {
+		for (String params : _db.queryEvents(CreateGameObject.class.getName(), _time)) {
 			loadObject(params);
 		}
 
 		Set<Integer> removeSet = new HashSet<Integer>();
-		for (String params : _db.queryEvents("REMOVE_OBJECT_EVENT", _time)) { 
+		for (String params : _db.queryEvents(RemoveGameObject.class.getName(), _time)) { 
 			for (int i = 0; i < _objects.size(); ++i) { 
 				if (_objects.get(i).getName().equals(params)) {
 					removeSet.add(i);

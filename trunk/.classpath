@@ -25,16 +25,16 @@
 	<classpathentry kind="lib" path="lib/sqlitejdbc-v056.jar"/>
 	<classpathentry kind="lib" path="lib/QuickTimeDemo.jar"/>
 	<classpathentry kind="lib" path="lib/commons-math-2.1.jar"/>
-	<classpathentry kind="lib" path="lib/commons-cli.jar"/>
-	<classpathentry kind="lib" path="lib/logback-classic.jar"/>
-	<classpathentry kind="lib" path="lib/logback-core.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-api.jar"/>
-	<classpathentry kind="lib" path="lib/xuggle-xuggler.jar"/>
 	<classpathentry kind="lib" path="lib/TWL.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3_min-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3_xpath-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/oomdp.jar"/>
 	<classpathentry kind="lib" path="lib/guava-r07.jar"/>
+	<classpathentry kind="lib" path="lib/xuggler/commons-cli.jar"/>
+	<classpathentry kind="lib" path="lib/xuggler/logback-classic.jar"/>
+	<classpathentry kind="lib" path="lib/xuggler/logback-core.jar"/>
+	<classpathentry kind="lib" path="lib/xuggler/slf4j-api.jar"/>
+	<classpathentry kind="lib" path="lib/xuggler/xuggle-xuggler.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
