@@ -21,3 +21,11 @@ You should now be up and running.  To change the configuration files, we current
 This section will focus on the file `edu/arizona/simulator/ww2d/Record.java`.  We want to be able to run multiple experiments have the system do a serious amount of logging for us.  To accomplish this, we need to make sure that we have installed [http://www.xuggle.com/ xuggler] which takes care of video recording for us.  
 
 In order to make Eclipse play nice with xuggler, we need to set up some additional parameters on the Run Configuration for Record.java.  Rather than write these down, I took two screen shots and have attached them.
+
+http://code.google.com/p/wubbleworld2d/source/browse/trunk/docs/images/record-screen1.png
+
+This screen shot shows the Record configuration that we will be editing.  To get to this screen select Run Configuration from Run As.
+
+http://code.google.com/p/wubbleworld2d/source/browse/trunk/docs/images/record-screen2.png
+
+Here we show the new environment variables that we need to set up so that the Record program can find the correct xuggler libraries and programs.  If you didn't follow the default installation for xuggler or are running on windows then you may have different paths.
