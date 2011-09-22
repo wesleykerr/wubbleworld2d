@@ -1,5 +1,9 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.contacts.ContactPoint;
+import org.lwjgl.util.vector.Vector2f;
+
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.events.Event;
 import edu.arizona.simulator.ww2d.events.EventListener;
@@ -10,18 +14,16 @@ import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.ObjectFieldSpace;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.system.EventManager;
 
-public class ContactCheck extends Check {
+public class BehindContactCheck extends Check{
+	private boolean collision;
 
-	protected boolean collision;
-
-	public ContactCheck(PhysicsObject owner) {
+	public BehindContactCheck(PhysicsObject owner) {
 		super(owner);
 		collision = false;
 		CollisionListener cl = new CollisionListener();
 		EventManager.inst().register(CollisionEvent.class, owner, cl);
-		// TODO Auto-generated constructor stub
 	}
-
+	
 	private class CollisionListener implements EventListener {
 
 		@Override
@@ -50,40 +52,23 @@ public class ContactCheck extends Check {
 
 	@Override
 	public boolean check(int elapsed) {
-		/*
-		 * ObjectSpace objSpace = (ObjectSpace) Blackboard.inst().getSpace(
-		 * "object"); // Generally, checking all collisions is cheaper than
-		 * checking all objects; though in some cases could get more expensive
-		 * for(CollisionEntry obj : objSpace.getCollisions()){
-		 * if(obj.getObject1().equals(owner) || obj.getObject2().equals(owner)){
-		 * return true; } }
-		 */
-
-		/*
-		 * ObjectSpace objSpace = (ObjectSpace) Blackboard.inst().getSpace(
-		 * "object"); Collection<PhysicsObject> objs =
-		 * objSpace.getPhysicsObjects(); for (PhysicsObject obj : objs) { if
-		 * (!obj.equals(owner)) { if (obj.getBody().isTouching(owner.getBody()))
-		 * { return true; } } } return false;
-		 */
-		
-		return ((ObjectFieldSpace) Blackboard.inst().getSpace("objectfield"))
-		.retrieve(owner, "collideObject") != null;
-				/*|| ((ObjectFieldSpace) Blackboard.inst()
-						.getSpace("objectfield")).getEphemeral().get(
-						"collideObject") != null;*/
+		if(collision){
+			ContactPoint cp = (ContactPoint) ((ObjectFieldSpace)Blackboard.inst().getSpace("objectfield")).getMap(owner).get("contactPoint").getData();
+			float dx = (Float)((ObjectFieldSpace)Blackboard.inst().getSpace("objectfield")).getMap(owner).get("dx").getData();
+			float dy = (Float)((ObjectFieldSpace)Blackboard.inst().getSpace("objectfield")).getMap(owner).get("dy").getData();
+			Vec2 vel = new Vec2(dx,dy);
+			if(Vec2.dot(cp.normal, vel) < 0){
+				System.out.println("hi");
+				return true;
+			}
+		}
+		return false;
 	}
 
-	@Deprecated
+	@Override
 	public void reset() {
-		/*
-		 * ObjectSpace objSpace = (ObjectSpace) Blackboard.inst().getSpace(
-		 * "object"); for (CollisionEntry obj : objSpace.getCollisions()) { if
-		 * (obj.getObject1().equals(owner) || obj.getObject2().equals(owner)) {
-		 * CollisionEvent ce = new CollisionEvent(new ContactPoint(), "remove",
-		 * owner, obj.getOther(owner)); EventManager.inst().dispatch(ce); } }
-		 */
-		collision = false;
+		// TODO Auto-generated method stub
+		
 	}
 
 }
