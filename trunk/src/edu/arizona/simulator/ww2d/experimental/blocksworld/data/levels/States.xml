@@ -45,4 +45,29 @@
 			<check name="ContactCheck"></check>
 		</transition>
 	</fsc>
+	
+	<fsc name="simple rebound with addvel">
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.0" ay="1.0">
+				</func>
+			</action>
+		</state>
+		<state>
+		</state>
+		<transition from="0" to="1">
+			<check name="ZeroVelocityCheck"></check>
+			<check name="ContactCheck"></check>
+		</transition>
+		<transition from="0" to="0">
+			<check name="BehindContactCheck"></check>
+			<func name="AddContactVelFunction"></func>
+		</transition>
+		<transition from="0" to="0">
+			<check name="ContactCheck"></check>
+			<func name="CollisionReboundFunction"></func>
+			<func name="FractionalDecelerationFunction" dxScale="2.0"
+				dyScale="2.0"></func>
+		</transition>
+	</fsc>
 </stateDec>

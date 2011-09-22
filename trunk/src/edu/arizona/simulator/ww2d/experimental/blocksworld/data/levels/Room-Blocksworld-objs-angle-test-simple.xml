@@ -85,7 +85,7 @@
 				</component>
 			</components>
 		</physicsObject>
-		<physicsObject name="ball1" renderPriority="100" type="dynamic" hasMass="true" fsc="simple rebound">
+		<physicsObject name="ball1" renderPriority="100" type="dynamic" hasMass="true" fsc="simple rebound with addvel">
 			<bodyDef x="15.0" y="2.0" />
 			<!-- <bodyDef random="true" radius="0.25" />  -->
 			<!-- density=0.2 friction=0.5 restitution=0.25 radius="0.25"-->
@@ -104,7 +104,7 @@
 			</components>
 		</physicsObject>
 		
-		<physicsObject name="ball2" renderPriority="100" type="dynamic" hasMass="true" fsc="simple rebound">
+		<physicsObject name="ball2" renderPriority="100" type="dynamic" hasMass="true" fsc="simple rebound with addvel">
 			<bodyDef x="20.0" y="2.0" />
 			<!-- <bodyDef random="true" radius="0.25" />  -->
 			<!-- density=0.2 friction=0.5 restitution=0.25 radius="0.25"-->

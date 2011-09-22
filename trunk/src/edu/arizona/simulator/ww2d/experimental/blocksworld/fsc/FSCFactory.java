@@ -6,14 +6,14 @@ import java.util.List;
 
 import org.dom4j.Element;
 
-import edu.arizona.simulator.ww2d.blackboard.Blackboard;
-import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.BehindContactCheck;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.ContactCheck;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.IntervalCheck;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.MoveAction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.TimeCheck;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.actions.ZeroVelocityCheck;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.AccelerateFunction;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.AddContactVelFunction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.CollisionReboundFunction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.FractionalDecelerationFunction;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.fieldFunctions.IntervalChangeFunction;
@@ -142,6 +142,8 @@ public class FSCFactory {
 			return new IntervalCheck(owner);
 		} else if (name.equals("ZeroVelocityCheck")) {
 			return new ZeroVelocityCheck(owner);
+		} else if (name.equals("BehindContactCheck")){
+			return new BehindContactCheck(owner);
 		}
 		return null;
 	}
@@ -185,6 +187,8 @@ public class FSCFactory {
 			float dyScale = Float
 					.parseFloat(function.attributeValue("dyScale"));
 			return new FractionalDecelerationFunction(owner, dxScale, dyScale);
+		} else if (name.equals("AddContactVelFunction")){
+			return new AddContactVelFunction(owner);
 		}
 		return null;
 	}
