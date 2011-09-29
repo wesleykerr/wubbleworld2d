@@ -6,6 +6,7 @@ import org.jbox2d.common.Vec2;
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
 import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
+import edu.arizona.simulator.ww2d.object.component.PerceptionComponent;
 import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
 import edu.arizona.simulator.ww2d.utils.SonarReading;
@@ -18,15 +19,26 @@ public class VisibleScenario implements Scenario {
 	
 	private boolean _rotate;
 	
+	private float _range;
+	
 	public VisibleScenario(String watcher, String watched) { 
-		_watcher = watcher;
-		_watched = watched;
+		this(watcher, watched, false, PerceptionComponent.SIGHT_RANGE);
+	}
+	
+	public VisibleScenario(String watcher, String watched, float range) { 
+		this(watcher, watched, false, range);
 	}
 	
 	public VisibleScenario(String watcher, String watched, boolean rotate) { 
-		this(watcher, watched);
+		this(watcher, watched, rotate, PerceptionComponent.SIGHT_RANGE);
+	}
+	
+	public VisibleScenario(String watcher, String watched, boolean rotate, float range) { 
+		_watcher = watcher;
+		_watched = watched;
 		
 		_rotate = rotate;
+		_range = range;
 	}
 	
 	public void setup() { 
@@ -57,21 +69,31 @@ public class VisibleScenario implements Scenario {
 			float radians = (float) Math.toRadians(angle);
 			
 			Vec2 pos = watched.getPPosition();
-			float x = pos.x + (float) ((SonarReading.DISTANCE - 5) * Math.cos(radians));
-			float y = pos.y + (float) ((SonarReading.DISTANCE - 5) * Math.sin(radians));
+			float x = pos.x + (float) ((_range - 0.25f) * Math.cos(radians));
+			float y = pos.y + (float) ((_range - 0.25f) * Math.sin(radians));
 
 			Vec2 newPos = new Vec2(x,y);
 			logger.debug("\tWatcher: " + newPos);
 			if (PhysicsSubsystem.within(newPos)) { 
 				happy = true;
-				
-				Vec2 direction = pos.sub(newPos);
-				direction.normalize();
-				
-				float rad = (float) Math.atan2(direction.y, direction.x);
-				
-				watcher.getBody().setXForm(newPos, rad);
-			} 
+				watcher.getBody().setXForm(newPos, 0);
+			}
 		}
+		
+		// Make the watcher look at the watched...
+		Vec2 direction = null;
+		float rad = 0f;
+		
+		direction = watched.getPPosition().sub(watcher.getPPosition());
+		direction.normalize();
+		
+		rad = (float) Math.atan2(direction.y, direction.x);
+		watcher.getBody().setXForm(watcher.getPPosition(), rad);
+
+		direction = watcher.getPPosition().sub(watched.getPPosition());
+		direction.normalize();
+
+		rad = (float) Math.atan2(direction.y, direction.x);
+		watched.getBody().setXForm(watched.getPPosition(), rad);
 	}
 }

@@ -39,6 +39,9 @@ import edu.arizona.simulator.ww2d.utils.enums.Variable;
  */
 public class PerceptionComponent extends Component {
     private static Logger logger = Logger.getLogger( PerceptionComponent.class );
+    
+    public static final float SIGHT_RANGE = 25;
+    public static final float SMELL_RANGE = 5;
 
 	/** the number of degrees we move for each sonar */
 	public static final int DELTA_DEGREES = 1;  // don't screw this up since angles are integer.
@@ -85,8 +88,8 @@ public class PerceptionComponent extends Component {
 			
 			Vec2 ep1 = _obj.getPPosition();
 			Vec2 ep2 = new Vec2(
-					ep1.x + (float) (SonarReading.DISTANCE*Math.cos(sonarAngle)), 
-					ep1.y + (float) (SonarReading.DISTANCE*Math.sin(sonarAngle)));
+					ep1.x + (float) (SIGHT_RANGE*Math.cos(sonarAngle)), 
+					ep1.y + (float) (SIGHT_RANGE*Math.sin(sonarAngle)));
 
 			s.p1.set(ep1);
 			s.p2.set(ep2);

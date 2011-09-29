@@ -6,10 +6,9 @@ import java.awt.geom.Point2D;
 import org.jbox2d.common.Vec2;
 
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
+import edu.arizona.simulator.ww2d.object.component.PerceptionComponent;
 
-public class SonarReading {
-	public static float DISTANCE = 25;
-	
+public class SonarReading {	
 	private String _name;
 	private float _angle;
 	private float _distance;
@@ -18,7 +17,7 @@ public class SonarReading {
 	public SonarReading(String name, float angle) { 
 		_name = name;
 		_angle = angle;
-		_distance = DISTANCE;
+		_distance = PerceptionComponent.SIGHT_RANGE;
 		_interacts = null;
 	}
 	
@@ -46,7 +45,7 @@ public class SonarReading {
 	
 	public void reset() { 
 		_interacts = null;
-		_distance = DISTANCE;
+		_distance = PerceptionComponent.SIGHT_RANGE;
 	}
 	
 	public float getAngle() { 

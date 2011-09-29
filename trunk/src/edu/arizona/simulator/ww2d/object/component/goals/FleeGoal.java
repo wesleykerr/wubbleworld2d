@@ -15,6 +15,7 @@ import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.events.player.BehaviorEvent;
 import edu.arizona.simulator.ww2d.events.player.BehaviorWeightEvent;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
+import edu.arizona.simulator.ww2d.object.component.PerceptionComponent;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.FleeFrom;
 import edu.arizona.simulator.ww2d.object.component.steering.behaviors.ObstacleAvoidance;
 import edu.arizona.simulator.ww2d.system.EventManager;
@@ -32,12 +33,17 @@ public class FleeGoal implements Goal {
 	private PhysicsObject _target;
 
 	private Accumulator _accumulator;
+	private Accumulator _allClear;
+	
+	private int _delay;
 	
 	public FleeGoal(PhysicsObject obj) { 
 		_parent = obj;
 		_status = GoalEnum.inactive;
 		
-		_accumulator = new Accumulator(100);
+		_accumulator = new Accumulator(30);
+		_allClear = new Accumulator(160);
+		_delay = 0;
 	}
 	
 	@Override
@@ -76,7 +82,11 @@ public class FleeGoal implements Goal {
 		
 		// turn on ObstacleAvoidance
 		EventManager.inst().dispatch(new BehaviorEvent(ObstacleAvoidance.class, true, _parent));
-		EventManager.inst().dispatch(new BehaviorWeightEvent(ObstacleAvoidance.class, 1.0f, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(ObstacleAvoidance.class, 1.25f, _parent));
+		
+		// we have entered the flee state, so we need to make sure that we have 
+		// successfully fleed before we give up on it.
+		_allClear.reset();
 	}
 
 	@Override
@@ -87,6 +97,7 @@ public class FleeGoal implements Goal {
 	@Override
 	public GoalEnum process() {
 		AgentSpace space = Blackboard.inst().getSpace(AgentSpace.class, _parent.getName());
+		ObjectSpace object = Blackboard.inst().getSpace(ObjectSpace.class, "object");
 		space.get(Variable.state).setValue("separate");
 		
 		LinkedList<Map<String,MemoryEntry>> visual = space.getVisualMemories();
@@ -108,32 +119,31 @@ public class FleeGoal implements Goal {
 			}
 		}
 		
-		if (space.isCollidingWith(_target)) {
-			space.increaseSpeed();
-		}
+		// This section runs a couple of tests to determine if we need to make 
+		// any modifications to our flee strategy.  Should we run faster, slower
+		// etc.
 		
-		// update the accumulator with our success or failure.
-		Set<String> approaching = space.getApproaching();
-		if (approaching == null || approaching.size() == 0) 
-			_accumulator.record(1);
-		else if (approaching.contains(_target.getName())) 
-			_accumulator.record(0);
-		else
-			_accumulator.record(1);
-		
-		// if we have recorded at least half as many samples as we need then
-		// we can see if we need to speed up.
-		if (_accumulator.getSize() > 0.95f && _accumulator.getAverage() < 0.5f) { 
-			logger.debug("Accumulator size: " + _accumulator.getSize() + " " + _accumulator.getAverage());
-			space.increaseSpeed();
-			_accumulator.reset();
-		}
-		
-
-		// we no longer see anything that could hurt us
 		if (dynamicObjects.isEmpty()) {
+			// we no longer see anything that could hurt us
+			_allClear.record(1);
+			space.changeSpeed(-0.15f, 1, 2.5f);
+		} else { 
+			++_delay;
+			
+			// if the chaser is too close, then we boost...
+			float d = object.findOrAddDistance(_parent, _target).getDistance();
+			System.out.println("Distance: " + d);
+			if (d < PerceptionComponent.SMELL_RANGE && _delay >= 10) { 
+				space.changeSpeed(0.15f, 1f, 2.5f);
+				_delay = 0;
+			} else { 
+				space.changeSpeed(-0.15f, 1, 2.5f);
+			}
+		}
+
+		if (_allClear.getSize() > 0.95f && _allClear.getAverage() > 0.5) 
 			_status = GoalEnum.completed;
-		} 
+
 		
 		return _status;
 	}

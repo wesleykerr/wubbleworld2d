@@ -51,12 +51,12 @@ public class AgentSpace extends Space {
 	
 	private FluentStore  _fluentStore;
 	
-	private long _lastIncreaseSpeed;
+	private long _lastSpeedChange;
 	
 	public AgentSpace(String name) { 
 		_name = name;
 		
-		_lastIncreaseSpeed = 0L;
+		_lastSpeedChange = 0L;
 		_collisions = new HashMap<String,Map<String,CollisionEntry>>();
 
 		_self = new LinkedList<MemoryEntry>();
@@ -434,19 +434,37 @@ public class AgentSpace extends Space {
 		_fluentStore.update();
 	}
 	
-	public void increaseSpeed() { 
+	
+	/**
+	 * Change the modifiers for turning and moving
+	 * @param delta
+	 * 	  the amount to increase the modifiers
+	 * @param min
+	 *    the minimum amount that the modifier can take on
+	 * @param max
+	 *    the max amount that the modifier can take on
+	 */
+	public void changeSpeed(float delta, float min, float max) { 
 		Space systemSpace = Blackboard.inst().getSpace("system");
 		ValueEntry currentFrame = systemSpace.get(Variable.logicalTime);
-		if (currentFrame.get(Long.class) - _lastIncreaseSpeed < 60)
-			return;
+//		if (currentFrame.get(Long.class) - _lastSpeedChange < 60)
+//			return;
+		
+		float v = 0;
 		
 		ValueEntry turn = get(Variable.turnModifier);
-		turn.setValue(Math.min(turn.get(Float.class) + 0.25f, 2.5f));
+		v = turn.get(Float.class) + delta; 
+		v = Math.min(v, max);
+		v = Math.max(v, min);
+		turn.setValue(v); 
 		
 		ValueEntry move = get(Variable.moveModifier);
-		move.setValue(Math.min(move.get(Float.class) + 0.25f, 2.5f));
+		v = move.get(Float.class) + delta; 
+		v = Math.min(v, max);
+		v = Math.max(v, min);
+		move.setValue(v);
 		
 		// record that we updated the speed.
-		_lastIncreaseSpeed = currentFrame.get(Long.class);
-	}
+		_lastSpeedChange = currentFrame.get(Long.class);
+	}	
 }

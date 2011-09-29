@@ -12,7 +12,7 @@ public class GameGlobals {
 
 	public static boolean cameraMode = true;
 	public static Vec2 cameraPos = new Vec2(0,0);
-	public static float cameraScale = .5f; 
+	public static float cameraScale = 1.0f; 
 	
     static { 
 		nf = NumberFormat.getInstance();

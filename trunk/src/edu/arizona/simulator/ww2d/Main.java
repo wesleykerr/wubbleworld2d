@@ -20,9 +20,9 @@ import edu.arizona.simulator.ww2d.utils.enums.States;
 public class Main extends StateBasedGame {
     private static Logger logger = Logger.getLogger( Main.class );
     
-    private String _levelFile = "data/levels/Room-Balls.xml";
-    private String _agentsFile = null; //"data/levels/Agents-Test.xml";
-    private Scenario _scenario = null;// new VisibleScenario("agent1", "ball1");
+    private String _levelFile = "data/levels/Room-Empty.xml";
+    private String _agentsFile = "data/levels/Agents-Flee.xml";
+    private Scenario _scenario = new VisibleScenario("obj1", "agent1");// new VisibleScenario("agent1", "ball1");
 
 	private FengWrapper _fengWrapper;
 	
