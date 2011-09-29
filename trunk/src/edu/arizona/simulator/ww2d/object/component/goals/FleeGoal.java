@@ -132,7 +132,6 @@ public class FleeGoal implements Goal {
 			
 			// if the chaser is too close, then we boost...
 			float d = object.findOrAddDistance(_parent, _target).getDistance();
-			System.out.println("Distance: " + d);
 			if (d < PerceptionComponent.SMELL_RANGE && _delay >= 10) { 
 				space.changeSpeed(0.15f, 1f, 2.5f);
 				_delay = 0;
