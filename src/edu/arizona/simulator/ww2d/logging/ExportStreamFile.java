@@ -18,8 +18,8 @@ public class ExportStreamFile {
 //		"collide", "pass", "talk-a", "talk-b"
 	};
 	
-	public static String prefix = "ww2d-states/";
-	public static int numEpisodes = 100;
+	public static String prefix = "states/";
+	public static int numEpisodes = 30;
 	
 	/**
 	 * Change this function when you want to change which
@@ -39,8 +39,8 @@ public class ExportStreamFile {
 			if (!f.exists()) 
 				f.mkdir();
 
-			for (int i = 1; i <= 100; ++i) { 
-				String inputFile = prefix + "/" + className + "-" + i + "/state-global.db";
+			for (int i = 1; i <= numEpisodes; ++i) { 
+				String inputFile = prefix + className + "-" + i + "/state-global.db";
 				
 				
 				String outputFile = "logs/" + className + "/" + className + "-" + i + ".csv";
@@ -50,6 +50,7 @@ public class ExportStreamFile {
 	}
 	
 	public static void global(String inputDb, String outputFile) { 
+		System.out.println("..." + inputDb);
 		Map<String,List<Row>> globalMap = getRows(inputDb);
 		Map<String,String[]> streamMap = toStreams(globalMap);
 		writeCSV(streamMap, outputFile);

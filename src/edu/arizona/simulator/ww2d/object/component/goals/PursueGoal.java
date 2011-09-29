@@ -1,4 +1,4 @@
-package edu.arizona.simulator.ww2d.object.component.goals;
+	package edu.arizona.simulator.ww2d.object.component.goals;
 
 import java.util.Set;
 
@@ -42,7 +42,7 @@ public class PursueGoal implements Goal {
 		_status = GoalEnum.inactive;
 		_fsm = buildFSM();
 		
-		_accumulator = new Accumulator(1000);
+		_accumulator = new Accumulator(100);
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class PursueGoal implements Goal {
 		// we can see if we need to speed up.
 		if (_accumulator.getSize() > 0.95f && _accumulator.getAverage() < 0.5f) { 
 			logger.debug("Accumulator size: " + _accumulator.getSize() + " " + _accumulator.getAverage());
-			space.increaseSpeed();
+			space.changeSpeed(0.15f, 0, 2.5f);
 			_accumulator.reset();
 		}
 		

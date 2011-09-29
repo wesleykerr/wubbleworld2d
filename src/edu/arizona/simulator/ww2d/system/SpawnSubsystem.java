@@ -245,8 +245,8 @@ public class SpawnSubsystem implements Subsystem {
 		if (e.attribute("random") != null && Boolean.parseBoolean(e.attributeValue("random"))) { 
 			// need a better way for this, but hell.
 			float radius = Float.parseFloat(e.attributeValue("radius"));
-			Vec2 min = new Vec2(0.5f, 0.5f);
-			Vec2 max = new Vec2(99.5f, 99.5f);
+			Vec2 min = new Vec2(1f, 1f);
+			Vec2 max = new Vec2(99f, 99f);
 			Vec2 delta = max.sub(min).sub(new Vec2(2*radius, 2*radius));
 			
 			b.position.x = (radius + min.x) + (MathUtils.random.nextFloat() * delta.x);
