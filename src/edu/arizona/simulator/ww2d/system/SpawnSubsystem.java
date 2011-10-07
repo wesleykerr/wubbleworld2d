@@ -245,12 +245,12 @@ public class SpawnSubsystem implements Subsystem {
 		if (e.attribute("random") != null && Boolean.parseBoolean(e.attributeValue("random"))) { 
 			// need a better way for this, but hell.
 			float radius = Float.parseFloat(e.attributeValue("radius"));
-			Vec2 min = new Vec2(1f, 1f);
-			Vec2 max = new Vec2(99f, 99f);
-			Vec2 delta = max.sub(min).sub(new Vec2(2*radius, 2*radius));
+			Vec2 min = new Vec2(10f, 10f);
+			Vec2 max = new Vec2(90f, 90f);
+			Vec2 range = max.sub(min);
 			
-			b.position.x = (radius + min.x) + (MathUtils.random.nextFloat() * delta.x);
-			b.position.y = (radius + min.y) + (MathUtils.random.nextFloat() * delta.y);
+			b.position.x = min.x + (MathUtils.random.nextFloat() * range.x);
+			b.position.y = min.y + (MathUtils.random.nextFloat() * range.y);
 			
 			b.angle = (float) Math.toRadians(MathUtils.random.nextInt(360));
 			

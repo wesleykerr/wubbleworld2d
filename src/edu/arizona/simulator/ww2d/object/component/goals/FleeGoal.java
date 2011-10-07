@@ -82,7 +82,7 @@ public class FleeGoal implements Goal {
 		
 		// turn on ObstacleAvoidance
 		EventManager.inst().dispatch(new BehaviorEvent(ObstacleAvoidance.class, true, _parent));
-		EventManager.inst().dispatch(new BehaviorWeightEvent(ObstacleAvoidance.class, 1.25f, _parent));
+		EventManager.inst().dispatch(new BehaviorWeightEvent(ObstacleAvoidance.class, 1f, _parent));
 		
 		// we have entered the flee state, so we need to make sure that we have 
 		// successfully fleed before we give up on it.
@@ -126,17 +126,17 @@ public class FleeGoal implements Goal {
 		if (dynamicObjects.isEmpty()) {
 			// we no longer see anything that could hurt us
 			_allClear.record(1);
-			space.changeSpeed(-0.15f, 1, 2.5f);
+			space.setSpeed(1.0f);
 		} else { 
-			++_delay;
-			
-			// if the chaser is too close, then we boost...
-			float d = object.findOrAddDistance(_parent, _target).getDistance();
-			if (d < PerceptionComponent.SMELL_RANGE && _delay >= 10) { 
-				space.changeSpeed(0.15f, 1f, 2.5f);
-				_delay = 0;
-			} else { 
-				space.changeSpeed(-0.15f, 1, 2.5f);
+			// speed is a function of the distance between us and the object we are running from
+			float d = object.findOrAddDistance(_parent, _target).getDistance();			
+			if (d > PerceptionComponent.SMELL_RANGE)
+				space.setSpeed(1.0f);
+			else { 
+				float m = (1f - 2.5f) / (5f - 0f);
+				float speed = m*d + 2.5f;
+//				logger.debug("Distance: " + d + " -- speed: " + speed);
+				space.setSpeed(speed);
 			}
 		}
 

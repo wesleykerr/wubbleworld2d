@@ -467,4 +467,23 @@ public class AgentSpace extends Space {
 		// record that we updated the speed.
 		_lastSpeedChange = currentFrame.get(Long.class);
 	}	
+	
+	/**
+	 * Set the modifiers for the agent.
+	 * @param value
+	 */
+	public void setSpeed(float value) { 
+		Space systemSpace = Blackboard.inst().getSpace("system");
+		ValueEntry currentFrame = systemSpace.get(Variable.logicalTime);
+//		if (currentFrame.get(Long.class) - _lastSpeedChange < 60)
+//			return;
+
+		ValueEntry turn = get(Variable.turnModifier);
+		turn.setValue(value);
+
+		ValueEntry move = get(Variable.moveModifier);
+		move.setValue(value);
+		// record that we updated the speed.
+		_lastSpeedChange = currentFrame.get(Long.class);
+	}
 }

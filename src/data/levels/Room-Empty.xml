@@ -10,8 +10,7 @@
 		<doSleep value="true" />		
 	</physics>
 
-	<!-- Do not add a food system to this room -->	
-	<foodSubsystem value="true" />
+	<foodSubsystem value="true" min="3" />
 	
 	<objects>
 		<gameObject name="background" renderPriority="0" type="visual" >
@@ -30,10 +29,10 @@
 		<physicsObject name="wall1" renderPriority="1" type="wall" >
 			<bodyDef x="-0.25" y="50" />
 			<shapeDef type="polygon">
-				<vertex x="-0.25" y="-50" />
-				<vertex x="0.25" y="-50" />
-				<vertex x="0.25" y="50" />
-				<vertex x="-.25" y="50" />
+				<vertex x="-0.25" y="-40" />
+				<vertex x="0.25" y="-40" />
+				<vertex x="0.25" y="40" />
+				<vertex x="-.25" y="40" />
 			</shapeDef>
 			<components>
 				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
@@ -44,10 +43,10 @@
 		<physicsObject name="wall2" renderPriority="1" type="wall" >
 			<bodyDef x="100.25" y="50" />
 			<shapeDef type="polygon">
-				<vertex x="-0.25" y="-50" />
-				<vertex x="0.25" y="-50" />
-				<vertex x="0.25" y="50" />
-				<vertex x="-.25" y="50" />
+				<vertex x="-0.25" y="-40" />
+				<vertex x="0.25" y="-40" />
+				<vertex x="0.25" y="40" />
+				<vertex x="-.25" y="40" />
 			</shapeDef>
 			<components>
 				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
@@ -58,10 +57,10 @@
 		<physicsObject name="wall3" renderPriority="1" type="wall" >
 			<bodyDef x="50" y="-0.25" />
 			<shapeDef type="polygon">
-				<vertex x="-50.5" y="-0.25" />
-				<vertex x="50.5" y="-0.25" />
-				<vertex x="50.5" y="0.25" />
-				<vertex x="-50.5" y="0.25" />
+				<vertex x="-40" y="-0.25" />
+				<vertex x="40" y="-0.25" />
+				<vertex x="40" y="0.25" />
+				<vertex x="-40" y="0.25" />
 			</shapeDef>
 			<components>
 				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
@@ -72,10 +71,67 @@
 		<physicsObject name="wall4" renderPriority="1" type="wall" >
 			<bodyDef x="50" y="100.25" />
 			<shapeDef type="polygon">
-				<vertex x="-50.5" y="-0.25" />
-				<vertex x="50.5" y="-0.25" />
-				<vertex x="50.5" y="0.25" />
-				<vertex x="-50.5" y="0.25" />
+				<vertex x="-40" y="-0.25" />
+				<vertex x="40" y="-0.25" />
+				<vertex x="40" y="0.25" />
+				<vertex x="-40" y="0.25" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="0.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>			
+		
+		<physicsObject name="wall5" renderPriority="1" type="wall" >
+			<bodyDef x="0" y="0" />
+			<shapeDef type="polygon">
+				<vertex x="0" y="10" />
+				<vertex x="0" y="9" />
+				<vertex x="9" y="0" />
+				<vertex x="10" y="0" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="0.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>					
+		<physicsObject name="wall6" renderPriority="1" type="wall" >
+			<bodyDef x="0" y="0" />
+			<shapeDef type="polygon">
+				<vertex x="90" y="0" />
+				<vertex x="91" y="0" />
+				<vertex x="100" y="9" />
+				<vertex x="100" y="10" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="0.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>			
+		<physicsObject name="wall7" renderPriority="1" type="wall" >
+			<bodyDef x="0" y="0" />
+			<shapeDef type="polygon">
+				<vertex x="0" y="90" />
+				<vertex x="10" y="100" />
+				<vertex x="9" y="100" />
+				<vertex x="0" y="91" />
+			</shapeDef>
+			<components>
+				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+					<color r="0.0" g="0.0" b="0.0" a="1.0" />
+				</component>
+			</components>
+		</physicsObject>			
+		<physicsObject name="wall8" renderPriority="1" type="wall" >
+			<bodyDef x="0" y="0" />
+			<shapeDef type="polygon">
+				<vertex x="90" y="100" />
+				<vertex x="100" y="90" />
+				<vertex x="100" y="91" />
+				<vertex x="91" y="100" />
 			</shapeDef>
 			<components>
 				<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">

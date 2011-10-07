@@ -24,6 +24,7 @@ import edu.arizona.simulator.ww2d.level.DefaultLoader;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.system.GameSystem;
 import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
+import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.States;
 import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 import edu.arizona.simulator.ww2d.utils.enums.Variable;
@@ -61,6 +62,8 @@ public class RecordingGameplayState extends BHGameState {
 	@Override 
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException { 
 		super.enter(container, game);
+		
+//		GameGlobals.cameraMode = false;
 		_gameSystem = new GameSystem(container.getWidth(), container.getHeight(), false);
 		_gameSystem.addSubsystem(SubsystemType.PhysicsSubsystem, new PhysicsSubsystem());
 

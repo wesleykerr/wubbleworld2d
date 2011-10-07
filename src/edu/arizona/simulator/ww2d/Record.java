@@ -42,17 +42,17 @@ public class Record extends StateBasedGame {
 //		recState.addParams("talk-b", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario3());
 //		recState.addParams("collide", "data/levels/Room-Empty.xml", "data/levels/Agents-Path.xml", new PathScenario4());
 
-		recState.addParams("chase", "data/levels/Room-Empty.xml", "data/levels/Agents-Chase.xml", 
-				new VisibleScenario("agent1", "obj1", PerceptionComponent.SMELL_RANGE));
-		recState.addParams("flee", "data/levels/Room-Empty.xml", "data/levels/Agents-Flee.xml", 
-				new VisibleScenario("obj1", "agent1", PerceptionComponent.SMELL_RANGE));
-		recState.addParams("fight", "data/levels/Room-Empty.xml", "data/levels/Agents-Fight.xml", 
-				new VisibleScenario("agent1", "obj1", true, PerceptionComponent.SIGHT_RANGE));
-		recState.addParams("kick-ball", "data/levels/Room-Balls.xml", "data/levels/Agents-Kick.xml", 
-				new VisibleScenario("agent1", "obj1", PerceptionComponent.SIGHT_RANGE));
-		recState.addParams("kick-column", "data/levels/Room-Columns.xml", "data/levels/Agents-Kick.xml", 
-				new VisibleScenario("agent1", "obj1", PerceptionComponent.SIGHT_RANGE));
-		recState.addParams("eat", "data/levels/Room-Food.xml", "data/levels/Agents-Eat.xml", null);
+//		recState.addParams("chase", "data/levels/Room-Empty.xml", "data/levels/Agents-Chase.xml", 
+//				new VisibleScenario("agent1", "obj1", PerceptionComponent.SMELL_RANGE));
+//		recState.addParams("flee", "data/levels/Room-Empty.xml", "data/levels/Agents-Flee.xml", 
+//				new VisibleScenario("obj1", "agent1", PerceptionComponent.SMELL_RANGE));
+//		recState.addParams("fight", "data/levels/Room-Empty.xml", "data/levels/Agents-Fight.xml", 
+//				new VisibleScenario("agent1", "obj1", true, PerceptionComponent.SIGHT_RANGE));
+//		recState.addParams("kick-ball", "data/levels/Room-Balls.xml", "data/levels/Agents-Kick.xml", 
+//				new VisibleScenario("agent1", "obj1", PerceptionComponent.SIGHT_RANGE));
+//		recState.addParams("kick-column", "data/levels/Room-Columns.xml", "data/levels/Agents-Kick.xml", 
+//				new VisibleScenario("agent1", "obj1", PerceptionComponent.SIGHT_RANGE));
+		recState.addParams("eat", "data/levels/Room-Empty.xml", "data/levels/Agents-Eat.xml", null);
 
 		addState(new SplashState(_fengWrapper, States.RecordingState.ordinal()));
 		addState(recState);

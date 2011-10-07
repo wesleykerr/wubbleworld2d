@@ -37,13 +37,14 @@ public class FoodSubsystem implements Subsystem {
 	private int _counter = 0;
 	
 	private int _active = 0;
-	private int _minSize = 5;
+	private int _minSize;
 
 	private Element _template;
 	private Element _storeComponent;
 
-	public FoodSubsystem() { 
-
+	public FoodSubsystem(int min) { 
+		_minSize = min;
+		
 		Document document = DocumentHelper.createDocument();
         _template = document.addElement( "physicsObject" );
 
