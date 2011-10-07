@@ -145,7 +145,7 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 		PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
 		
 		EventManager.inst().dispatch(new CollisionEvent(copy(cp), "add", obj1, obj2));
-		logger.debug("Collision [add]: " + obj1.getName() + " " + obj2.getName() + " " + cp.id.features.toString());
+//		logger.debug("Collision [add]: " + obj1.getName() + " " + obj2.getName() + " " + cp.id.features.toString());
 	}
 
 	/**
@@ -158,7 +158,7 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 		PhysicsObject obj2 = (PhysicsObject) cp.shape2.getUserData();
 
 		EventManager.inst().dispatch(new CollisionEvent(copy(cp), "persist", obj1, obj2));
-		logger.debug("Collision [persist]: " + obj1.getName() + " " + obj2.getName() + " " + cp.id.features.toString());
+//		logger.debug("Collision [persist]: " + obj1.getName() + " " + obj2.getName() + " " + cp.id.features.toString());
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class PhysicsSubsystem implements Subsystem, ContactListener {
 //		logger.debug(obj1.getName() + " done colliding with " + obj2.getName());
 		_contactMap.remove(cp.id.features.toString());
 		EventManager.inst().dispatch(new CollisionEvent(copy(cp), "remove", obj1, obj2));
-		logger.debug("Collision [remove]: " + obj1.getName() + " " + obj2.getName() + " " + cp.id.features.toString());
+//		logger.debug("Collision [remove]: " + obj1.getName() + " " + obj2.getName() + " " + cp.id.features.toString());
 	}
 
 	public void result(ContactResult cp) {

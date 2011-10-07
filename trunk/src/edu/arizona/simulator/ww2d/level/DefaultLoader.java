@@ -96,7 +96,8 @@ public class DefaultLoader implements LevelLoader {
 			
 			Element food = root.element("foodSubsystem");
 			if (food == null || Boolean.parseBoolean(food.attributeValue("value"))) {
-				gameSystem.addSubsystem(SubsystemType.FoodSubsystem, new FoodSubsystem());
+				int min = Integer.parseInt(food.attributeValue("min"));
+				gameSystem.addSubsystem(SubsystemType.FoodSubsystem, new FoodSubsystem(min));
 			}
 		} catch (DocumentException e) {
 			e.printStackTrace();

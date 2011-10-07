@@ -18,7 +18,6 @@
 				<goals>
 					<goal className="edu.arizona.simulator.ww2d.object.component.goals.WanderGoal" />
 					<goal className="edu.arizona.simulator.ww2d.object.component.goals.EatGoal" />
-					<goal className="edu.arizona.simulator.ww2d.object.component.goals.DefendGoal" />
 				</goals>
 			</component>
 			<component className="edu.arizona.simulator.ww2d.object.component.steering.BehaviorControl" />
@@ -27,4 +26,32 @@
 			<component className="edu.arizona.simulator.ww2d.object.component.InternalComponent" />
 		</components>
 	</physicsObject>
+	
+	<physicsObject name="obj1" renderPriority="100" type="cognitiveAgent" hasMass="true" initAgent="initAgent">
+		<bodyDef random="true" radius="0.5" />
+		<shapeDef type="circle" density="0.2" friction="0.5" restitution="0.25" radius="0.5" />
+
+		<components>
+			<component className="edu.arizona.simulator.ww2d.object.component.ShapeVisual" fromPhysics="true">
+				<renderPriority value="99" />
+				<color r="0.0" g="0.0" b="1.0" a="1.0" />
+			</component>
+			<component className="edu.arizona.simulator.ww2d.object.component.SpriteVisual">
+				<renderPriority value="100" />
+				<image name="data/images/half-circle.png" scale="0.03125" />
+			</component>
+
+			<component className="edu.arizona.simulator.ww2d.object.component.GoalBehavior" >
+				<goals>
+					<goal className="edu.arizona.simulator.ww2d.object.component.goals.WanderGoal" />
+					<goal className="edu.arizona.simulator.ww2d.object.component.goals.EatGoal" />
+				</goals>
+			</component>
+			<component className="edu.arizona.simulator.ww2d.object.component.steering.BehaviorControl" />
+			<component className="edu.arizona.simulator.ww2d.object.component.PerceptionComponent" />
+			<component className="edu.arizona.simulator.ww2d.object.component.TopDownControl" />
+			<component className="edu.arizona.simulator.ww2d.object.component.InternalComponent" />
+		</components>
+	</physicsObject>
+	
 </agents>

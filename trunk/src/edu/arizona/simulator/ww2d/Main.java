@@ -21,8 +21,8 @@ public class Main extends StateBasedGame {
     private static Logger logger = Logger.getLogger( Main.class );
     
     private String _levelFile = "data/levels/Room-Empty.xml";
-    private String _agentsFile = "data/levels/Agents-Flee.xml";
-    private Scenario _scenario = new VisibleScenario("obj1", "agent1");// new VisibleScenario("agent1", "ball1");
+    private String _agentsFile = "data/levels/Agents-User.xml";
+    private Scenario _scenario = null; //new VisibleScenario("obj1", "agent1");// new VisibleScenario("agent1", "ball1");
 
 	private FengWrapper _fengWrapper;
 	

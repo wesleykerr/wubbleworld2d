@@ -1,5 +1,7 @@
 package edu.arizona.simulator.ww2d.scenario;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.jbox2d.common.Vec2;
 
@@ -9,7 +11,6 @@ import edu.arizona.simulator.ww2d.object.PhysicsObject;
 import edu.arizona.simulator.ww2d.object.component.PerceptionComponent;
 import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
 import edu.arizona.simulator.ww2d.utils.MathUtils;
-import edu.arizona.simulator.ww2d.utils.SonarReading;
 
 public class VisibleScenario implements Scenario {
     private static Logger logger = Logger.getLogger( VisibleScenario.class );
@@ -94,6 +95,13 @@ public class VisibleScenario implements Scenario {
 		direction.normalize();
 
 		rad = (float) Math.atan2(direction.y, direction.x);
-		watched.getBody().setXForm(watched.getPPosition(), rad);
+		
+		// Now we can add in some random noise.
+		float noise = MathUtils.random.nextFloat();
+		float range = MathUtils.PI4+MathUtils.PI4;
+		
+		noise = noise*range + (-MathUtils.PI4);
+		
+		watched.getBody().setXForm(watched.getPPosition(), rad+noise);
 	}
 }
