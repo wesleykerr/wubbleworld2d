@@ -66,19 +66,6 @@ public class BlocksworldState extends BHGameState {
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
-		_gameSystem = new GameSystem(container.getWidth(),
-				container.getHeight(), false);
-		_gameSystem.addSubsystem(SubsystemType.PhysicsSubsystem,
-				new PhysicsSubsystem());
-		_gameSystem
-				.addSubsystem(SubsystemType.FSCSubsystem, new FSCSubsystem());
-		_gameSystem.addSubsystem(SubsystemType.LearningSubsystem,
-				new LearningSubsystem("Physics 1"));
-		_gameSystem.disable(SubsystemType.FSCSubsystem);
-		FSCSubsystem.system = _gameSystem;
-		BlocksworldLoader loader = new BlocksworldLoader(_levelFile,
-				_agentsFile, _fscFile, _scenario);
-		loader.load(_gameSystem);
 	}
 
 
@@ -87,6 +74,17 @@ public class BlocksworldState extends BHGameState {
 			throws SlickException {
 		super.enter(container, game);
 		_enterTime = System.currentTimeMillis();
+		
+		System.out.println("BlocksworldState enter");
+		_gameSystem = new GameSystem(container.getWidth(), container.getHeight(), false);
+		_gameSystem.addSubsystem(SubsystemType.PhysicsSubsystem, new PhysicsSubsystem());
+		_gameSystem.addSubsystem(SubsystemType.FSCSubsystem, new FSCSubsystem());
+		_gameSystem.addSubsystem(SubsystemType.LearningSubsystem, new LearningSubsystem("Physics 1"));
+		_gameSystem.disable(SubsystemType.FSCSubsystem);
+		FSCSubsystem.system = _gameSystem;
+		BlocksworldLoader loader = new BlocksworldLoader(_levelFile,
+				_agentsFile, _fscFile, _scenario);
+		loader.load(_gameSystem);
 	}
 
 	@Override
@@ -98,12 +96,13 @@ public class BlocksworldState extends BHGameState {
 		// to the next state. If you forget then the widgets (although not
 		// rendered)
 		// could actually receive button presses.
+		System.out.println("BlocksworldState leave");
+		_gameSystem.getSubsystem(SubsystemType.LearningSubsystem).finish();
+		_gameSystem.finish();
 		_feng.getDisplay().removeAllWidgets();
 	}
 
 	public void finish() {
-		_gameSystem.finish();
-		_gameSystem.getSubsystem(SubsystemType.LearningSubsystem).finish();
 	}
 
 	@Override
@@ -137,9 +136,11 @@ public class BlocksworldState extends BHGameState {
 			throws SlickException {
 		if (_enterTime + 500 < System.currentTimeMillis())
 			_gameSystem.update(millis);
+		
+		// NOTE: this is not an else if, so update happens, and then we leave 
 		if(_enterTime + 6000 < System.currentTimeMillis()){
-			_gameSystem.finish();
 			game.enterState(States.GameplayState.ordinal());
+			return;
 		}
 		// twlInputAdapter.update();
 	}
