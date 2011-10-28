@@ -44,8 +44,9 @@ public class FSCSubsystem implements Subsystem {
 					sobjSpace.transition(obj, newState);
 				}
 			}
-			ofs.update(obj);
+//			ofs.update(obj);
 		}
+		ofs.updateAll();
 		ofs.purgeAll();
 		sobjSpace.update(eps);
 		((PhysicsSubsystem) FSCSubsystem.system.getSubsystem(SubsystemType.PhysicsSubsystem)).getPhysics().step(0f,0);
@@ -59,8 +60,6 @@ public class FSCSubsystem implements Subsystem {
 
 	@Override
 	public void finish() {
-		// TODO Auto-generated method stub
-
 	}
 	
 	public void put(PhysicsObject obj, FSCState initialState){
