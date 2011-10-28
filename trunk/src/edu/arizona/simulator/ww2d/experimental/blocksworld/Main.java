@@ -8,6 +8,7 @@ import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import edu.arizona.simulator.ww2d.experimental.blocksworld.states.BlocksworldState;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.states.CounterState;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.states.BHGameState;
@@ -45,6 +46,7 @@ public class Main extends StateBasedGame {
 		
 		// addState(new SplashState(_fengWrapper, States.MainMenuState.ordinal()));
 		// addState(new MainMenuState(_fengWrapper));
+		addState(new CounterState(_fengWrapper, 5));
 		addState(new BlocksworldState(_fengWrapper, _levelFile, _agentsFile, _fscFile, _scenario));
 		
 		// enterState(States.SplashState.ordinal());

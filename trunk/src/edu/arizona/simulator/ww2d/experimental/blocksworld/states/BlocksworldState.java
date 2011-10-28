@@ -43,6 +43,7 @@ public class BlocksworldState extends BHGameState {
 	private TWLInputAdapter twlInputAdapter;
 
 	private long _enterTime;
+	private long currTime = 0;
 	private boolean _update;
 	private boolean physics;
 
@@ -59,7 +60,7 @@ public class BlocksworldState extends BHGameState {
 
 	@Override
 	public int getID() {
-		return States.GameplayState.ordinal();
+		return States.MainMenuState.ordinal();
 	}
 
 	@Override
@@ -72,13 +73,14 @@ public class BlocksworldState extends BHGameState {
 		_gameSystem
 				.addSubsystem(SubsystemType.FSCSubsystem, new FSCSubsystem());
 		_gameSystem.addSubsystem(SubsystemType.LearningSubsystem,
-				new LearningSubsystem());
+				new LearningSubsystem("Physics 1"));
 		_gameSystem.disable(SubsystemType.FSCSubsystem);
 		FSCSubsystem.system = _gameSystem;
-		BlocksworldLoader loader = new BlocksworldLoader(_levelFile, _agentsFile,_fscFile,
-				_scenario);
+		BlocksworldLoader loader = new BlocksworldLoader(_levelFile,
+				_agentsFile, _fscFile, _scenario);
 		loader.load(_gameSystem);
 	}
+
 
 	@Override
 	public void enter(GameContainer container, StateBasedGame game)
@@ -101,6 +103,7 @@ public class BlocksworldState extends BHGameState {
 
 	public void finish() {
 		_gameSystem.finish();
+		_gameSystem.getSubsystem(SubsystemType.LearningSubsystem).finish();
 	}
 
 	@Override
@@ -123,7 +126,7 @@ public class BlocksworldState extends BHGameState {
 			g.drawString("Physics on, Learning on", 10,
 					container.getHeight() - 40);
 		} else {
-			g.drawString("FSC on, Learning off", 10, container.getHeight() - 40);
+			g.drawString("FSC on, Learning on", 10, container.getHeight() - 40);
 		}
 
 		// twlInputAdapter.render();
@@ -134,6 +137,10 @@ public class BlocksworldState extends BHGameState {
 			throws SlickException {
 		if (_enterTime + 500 < System.currentTimeMillis())
 			_gameSystem.update(millis);
+		if(_enterTime + 6000 < System.currentTimeMillis()){
+			_gameSystem.finish();
+			game.enterState(States.GameplayState.ordinal());
+		}
 		// twlInputAdapter.update();
 	}
 
@@ -170,13 +177,11 @@ public class BlocksworldState extends BHGameState {
 			if (physics) {
 				physics = false;
 				_gameSystem.disable(SubsystemType.PhysicsSubsystem);
-				_gameSystem.disable(SubsystemType.LearningSubsystem);
 				_gameSystem.enable(SubsystemType.FSCSubsystem);
 			} else {
 				physics = true;
 				_gameSystem.disable(SubsystemType.FSCSubsystem);
 				_gameSystem.enable(SubsystemType.PhysicsSubsystem);
-				_gameSystem.enable(SubsystemType.LearningSubsystem);
 			}
 			break;
 		}

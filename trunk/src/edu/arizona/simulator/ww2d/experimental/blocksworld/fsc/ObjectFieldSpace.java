@@ -3,6 +3,8 @@ package edu.arizona.simulator.ww2d.experimental.blocksworld.fsc;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import edu.arizona.simulator.ww2d.blackboard.Blackboard;
+import edu.arizona.simulator.ww2d.blackboard.spaces.ObjectSpace;
 import edu.arizona.simulator.ww2d.blackboard.spaces.Space;
 import edu.arizona.simulator.ww2d.object.PhysicsObject;
 
@@ -16,6 +18,10 @@ public class ObjectFieldSpace extends Space {
 		info = new HashMap<PhysicsObject,HashMap<String,Field>>();
 		updated = new HashMap<PhysicsObject,Boolean>();
 		ephemeral = new HashMap<PhysicsObject,HashMap<String,Field>>();
+		
+//		for(PhysicsObject obj : ((ObjectSpace) Blackboard.inst().getSpace("object")).getPhysicsObjects()){
+//			updated.put(obj, new P)
+//		}
 	}
 	
 	public void preUpdate(PhysicsObject obj){
@@ -96,6 +102,14 @@ public class ObjectFieldSpace extends Space {
 		info.put(obj, ephemeral.get(obj));
 		ephemeral.put(obj, temp);
 		updated.put(obj, true);
+	}
+	
+	public void updateAll(){
+		ObjectSpace os = (ObjectSpace) Blackboard.inst().getSpace("object");
+		for(PhysicsObject obj : os.getPhysicsObjects()){
+			info.put(obj, ephemeral.get(obj));
+			preUpdate(obj);
+		}
 	}
 	
 	public boolean updated(PhysicsObject obj){
