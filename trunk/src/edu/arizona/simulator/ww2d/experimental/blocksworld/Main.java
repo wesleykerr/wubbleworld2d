@@ -1,5 +1,7 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld;
 
+import java.util.LinkedList;
+
 import org.apache.log4j.Logger;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.GameContainer;
@@ -12,9 +14,6 @@ import edu.arizona.simulator.ww2d.experimental.blocksworld.states.CounterState;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.states.BHGameState;
-import edu.arizona.simulator.ww2d.states.GameplayState;
-import edu.arizona.simulator.ww2d.states.MainMenuState;
-import edu.arizona.simulator.ww2d.states.SplashState;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.States;
 
@@ -26,6 +25,8 @@ public class Main extends StateBasedGame {
 	
 	private String _bw_path = "edu/arizona/simulator/ww2d/experimental/blocksworld/";
 	private String _levelFile = _bw_path + "data/levels/Room-Blocksworld-objs-angle-test-simple.xml";
+	private String _levelFile2 = _bw_path + "data/levels/Room-Blocksworld-objs-angle-test.xml";
+	private String _levelFile3 = _bw_path + "data/levels/Room-Blocksworld-objs.xml";
 	private String _agentsFile = _bw_path + "data/levels/Agents-Blocksworld.xml";
 	private String _fscFile = _bw_path + "data/levels/States.xml";
 	
@@ -46,7 +47,13 @@ public class Main extends StateBasedGame {
 		
 		// addState(new SplashState(_fengWrapper, States.MainMenuState.ordinal()));
 		// addState(new MainMenuState(_fengWrapper));
-		addState(new CounterState(_fengWrapper, 5));
+
+		LinkedList<Params> params = new LinkedList<Params>();
+		params.add(new Params(_levelFile,false,20000));
+		params.add(new Params(_levelFile2,true,9000));
+		params.add(new Params(_levelFile3,true,9000));
+		
+		addState(new CounterState(_fengWrapper,params));
 		addState(new BlocksworldState(_fengWrapper, _levelFile, _agentsFile, _fscFile, _scenario));
 		
 		// enterState(States.SplashState.ordinal());

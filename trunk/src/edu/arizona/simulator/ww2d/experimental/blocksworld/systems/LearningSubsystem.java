@@ -61,7 +61,7 @@ public class LearningSubsystem implements Subsystem {
 	public void finish() {
 		// TODO: currently throwing a null pointer exception that I'm
 		// not sure what the cause is.
-//		rec.recorder.calculateData();
+		rec.recorder.calculateData();
 //		rec.output("tmp");
 	}
 

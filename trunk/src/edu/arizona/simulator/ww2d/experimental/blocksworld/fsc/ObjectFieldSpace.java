@@ -98,9 +98,9 @@ public class ObjectFieldSpace extends Space {
 	}
 	
 	public void update(PhysicsObject obj){
-		HashMap<String,Field> temp = info.get(obj);
-		info.put(obj, ephemeral.get(obj));
-		ephemeral.put(obj, temp);
+		//HashMap<String,Field> temp = info.get(obj);
+		//info.put(obj, ephemeral.get(obj));
+		//ephemeral.put(obj, temp);
 		updated.put(obj, true);
 	}
 	

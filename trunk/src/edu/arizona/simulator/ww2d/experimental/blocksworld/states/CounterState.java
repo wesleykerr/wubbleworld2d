@@ -1,25 +1,24 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.states;
 
+import java.util.LinkedList;
+
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
+import edu.arizona.simulator.ww2d.experimental.blocksworld.Params;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
-import edu.arizona.simulator.ww2d.level.DefaultLoader;
 import edu.arizona.simulator.ww2d.states.BHGameState;
-import edu.arizona.simulator.ww2d.system.GameSystem;
-import edu.arizona.simulator.ww2d.system.PhysicsSubsystem;
 import edu.arizona.simulator.ww2d.utils.enums.States;
-import edu.arizona.simulator.ww2d.utils.enums.SubsystemType;
 
 public class CounterState extends BHGameState{
-	private int count;
+	private LinkedList<Params> params;
 	private int curr = 0;
 
-	public CounterState(FengWrapper feng, int count) {
+	public CounterState(FengWrapper feng, LinkedList<Params> params) {
 		super(feng);
-		this.count = count;
+		this.params = params;
 	}
 
 	@Override
@@ -49,8 +48,11 @@ public class CounterState extends BHGameState{
 	
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException { 
 		super.enter(container, game);
-		++curr;
-		if(curr < count){
+		if(curr < params.size()){
+			((BlocksworldState) game.getState(States.MainMenuState.ordinal())).setLevel(params.get(curr).getLevel());
+			((BlocksworldState) game.getState(States.MainMenuState.ordinal())).setPhysics(params.get(curr).getPhysics());
+			((BlocksworldState) game.getState(States.MainMenuState.ordinal())).setDuration(params.get(curr).getDuration());
+			++curr;
 			game.enterState(States.MainMenuState.ordinal());
 		} else {
 			container.exit();
