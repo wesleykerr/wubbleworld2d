@@ -46,6 +46,7 @@ public class BlocksworldState extends BHGameState {
 	private long currTime = 0;
 	private boolean _update;
 	private boolean physics;
+	private int duration = 5000;
 
 	public BlocksworldState(FengWrapper feng, String levelFile,
 			String agentsFile, String fscFile, Scenario scenario) {
@@ -67,7 +68,21 @@ public class BlocksworldState extends BHGameState {
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
 	}
+	
+	public void setLevel(String levelFile){
+		if(levelFile != null){
+			_levelFile = levelFile;
+		}
+	}
+	
+	public void setPhysics(boolean phys){
+		physics = phys;
+	}
 
+	
+	public void setDuration(int len){
+		duration = len;
+	}
 
 	@Override
 	public void enter(GameContainer container, StateBasedGame game)
@@ -80,7 +95,11 @@ public class BlocksworldState extends BHGameState {
 		_gameSystem.addSubsystem(SubsystemType.PhysicsSubsystem, new PhysicsSubsystem());
 		_gameSystem.addSubsystem(SubsystemType.FSCSubsystem, new FSCSubsystem());
 		_gameSystem.addSubsystem(SubsystemType.LearningSubsystem, new LearningSubsystem("Physics 1"));
-		_gameSystem.disable(SubsystemType.FSCSubsystem);
+		if(physics){
+			_gameSystem.disable(SubsystemType.FSCSubsystem);
+		} else {
+			_gameSystem.disable(SubsystemType.PhysicsSubsystem);
+		}
 		FSCSubsystem.system = _gameSystem;
 		BlocksworldLoader loader = new BlocksworldLoader(_levelFile,
 				_agentsFile, _fscFile, _scenario);
@@ -101,6 +120,7 @@ public class BlocksworldState extends BHGameState {
 		_gameSystem.finish();
 		_feng.getDisplay().removeAllWidgets();
 	}
+	
 
 	public void finish() {
 	}
@@ -138,7 +158,7 @@ public class BlocksworldState extends BHGameState {
 			_gameSystem.update(millis);
 		
 		// NOTE: this is not an else if, so update happens, and then we leave 
-		if(_enterTime + 6000 < System.currentTimeMillis()){
+		if(_enterTime + duration < System.currentTimeMillis()){
 			game.enterState(States.GameplayState.ordinal());
 			return;
 		}
