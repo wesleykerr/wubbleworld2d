@@ -98,6 +98,7 @@ public class Recorder {
 		formatAndOutputAll();
 	}
 
+	// Behaviour is undefined if nothing moves, accelerates, or goes towards anything
 	public void formatAndOutputAll() {
 		StringBuilder sb = new StringBuilder("(1 (");
 		for (PhysicsObject obj : ((ObjectSpace) Blackboard.inst().getSpace(
@@ -124,6 +125,9 @@ public class Recorder {
 			boolean wasAccelerating = false;
 			LinkedList<Integer> acceleratingStartEnd = new LinkedList<Integer>();
 			
+			LinkedList<Integer> start = new LinkedList<Integer>();
+			LinkedList<Integer> stop = new LinkedList<Integer>();
+			
 			HashMap<String,Boolean> wasTowards = new HashMap<String,Boolean>();
 			HashMap<String,LinkedList<Integer>> towardsStartEnd = new HashMap<String,LinkedList<Integer>>();
 
@@ -148,6 +152,14 @@ public class Recorder {
 					acceleratingStartEnd.add(up.cycle);
 					wasAccelerating = accelerating;
 
+				}
+				
+				if((Boolean) up.fields.get("started").data){
+					start.add(up.cycle);
+				}
+				
+				if((Boolean) up.fields.get("stopped").data){
+					stop.add(up.cycle);
 				}
 				
 				// Go through all possible towards predicates (since they're recorded every update)
@@ -209,7 +221,7 @@ public class Recorder {
 				sb.append(movingStartEnd.poll());
 				sb.append(' ');
 				sb.append(movingStartEnd.poll());
-				sb.append(")\n");
+				sb.append(")\n    ");
 			}
 			
 			while(!acceleratingStartEnd.isEmpty()){
@@ -219,7 +231,27 @@ public class Recorder {
 				sb.append(acceleratingStartEnd.poll());
 				sb.append(' ');
 				sb.append(acceleratingStartEnd.poll());
-				sb.append(")\n");
+				sb.append(")\n    ");
+			}
+			
+			while(!start.isEmpty()){
+				sb.append("(\"started(");
+				sb.append(obj.getName());
+				sb.append(")\" ");
+				sb.append(start.peekFirst());
+				sb.append(' ');
+				sb.append(start.poll() + 1);
+				sb.append(")\n    ");
+			}
+			
+			while(!stop.isEmpty()){
+				sb.append("(\"stopped(");
+				sb.append(obj.getName());
+				sb.append(")\" ");
+				sb.append(stop.peekFirst());
+				sb.append(' ');
+				sb.append(stop.poll() + 1);
+				sb.append(")\n    ");
 			}
 			
 			for(String objName : towardsStartEnd.keySet()){
@@ -233,12 +265,12 @@ public class Recorder {
 					sb.append(startEnd.poll());
 					sb.append(' ');
 					sb.append(startEnd.poll());
-					sb.append(")\n");
+					sb.append(")\n    ");
 				}
 				
 			}
 		}
-		sb.deleteCharAt(sb.length() - 1);
+		sb.delete(sb.length() - 5, sb.length());
 		sb.append("))");
 		System.out.println(sb.toString());
 	}
@@ -344,12 +376,12 @@ public class Recorder {
 	private void isStopStart(Data data, ObjectFieldSpace rec) {
 		HashMap<String, Field> fields = rec.getMap(data.owner);
 		HashMap<String, Field> newFields = rec.getEphemeral().get(data.owner);
-		boolean stopped = (Boolean) newFields.get("moving").data
+		boolean started = (Boolean) newFields.get("moving").data
 				&& !(Boolean) fields.get("moving").data;
-		boolean started = !(Boolean) newFields.get("moving").data
+		boolean stopped = !(Boolean) newFields.get("moving").data
 				&& (Boolean) fields.get("moving").data;
 
-		rec.addTemp(data.owner, new Field("stopped", started));
+		rec.addTemp(data.owner, new Field("started", started));
 		rec.addTemp(data.owner, new Field("stopped", stopped));
 	}
 
