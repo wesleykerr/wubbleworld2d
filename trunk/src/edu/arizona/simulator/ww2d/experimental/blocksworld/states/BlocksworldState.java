@@ -47,6 +47,7 @@ public class BlocksworldState extends BHGameState {
 	private boolean _update;
 	private boolean physics;
 	private int duration = 5000;
+	private boolean leave = false;
 
 	public BlocksworldState(FengWrapper feng, String levelFile,
 			String agentsFile, String fscFile, Scenario scenario) {
@@ -158,7 +159,8 @@ public class BlocksworldState extends BHGameState {
 			_gameSystem.update(millis);
 		
 		// NOTE: this is not an else if, so update happens, and then we leave 
-		if(_enterTime + duration < System.currentTimeMillis()){
+		if(_enterTime + duration < System.currentTimeMillis() || leave){
+			leave = false;
 			game.enterState(States.GameplayState.ordinal());
 			return;
 		}
@@ -205,7 +207,14 @@ public class BlocksworldState extends BHGameState {
 				_gameSystem.enable(SubsystemType.PhysicsSubsystem);
 			}
 			break;
+		case Input.KEY_SPACE:
+			leave = true;
+			break;
+			
+		default:
+			
 		}
+			
 	}
 
 }
