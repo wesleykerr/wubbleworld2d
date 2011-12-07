@@ -274,11 +274,17 @@ public class Recorder {
 			sb.delete(sb.length() - 5, sb.length());
 			sb.append("))");
 			System.out.println(sb.toString());
+		} else {
+			System.out.println("Not enough samples to analyse predicates");
+			printall();
 		}
 	}
 
 	public void printall() {
 		System.out.println("Dumping positional data:");
+		if(positions.isEmpty()){
+			System.out.println("None!");
+		}
 		for (Data d : positions) {
 			System.out.println("Object: " + d.owner.getName() + " x - "
 					+ d.pos.x + " y - " + d.pos.y + " elapsed " + d.eps);
