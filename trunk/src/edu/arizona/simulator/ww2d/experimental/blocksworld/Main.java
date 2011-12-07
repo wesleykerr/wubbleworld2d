@@ -34,6 +34,10 @@ public class Main extends StateBasedGame {
 	private String _agentsFile = _bw_path + "data/levels/Agents-Blocksworld.xml";
 	private String _fscFile = _bw_path + "data/levels/States.xml";
 	
+	// False means .dump files will be generated in _bw_path/data/levels after each experiment
+	// true still has console output, but no dump files
+	public static final boolean QUIET_MODE = true;
+	
 	private Scenario _scenario; // new VisibleScenario("claw", "ball1");
 	
 	private FengWrapper _fengWrapper;
