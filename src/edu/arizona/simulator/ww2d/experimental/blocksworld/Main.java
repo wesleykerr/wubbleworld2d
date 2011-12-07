@@ -1,6 +1,9 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.newdawn.slick.AppGameContainer;
@@ -9,6 +12,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+import edu.arizona.simulator.ww2d.experimental.blocksworld.loaders.XMLMutator;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.states.BlocksworldState;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.states.CounterState;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
@@ -49,9 +53,12 @@ public class Main extends StateBasedGame {
 		// addState(new MainMenuState(_fengWrapper));
 
 		LinkedList<Params> params = new LinkedList<Params>();
-		params.add(new Params(_levelFile,false,20000));
-		params.add(new Params(_levelFile2,true,9000));
-		params.add(new Params(_levelFile3,true,9000));
+		//params.add(new Params(_levelFile,true,9000));
+		//params.add(new Params(_levelFile,false,20000));
+		for(int i = 0; i < 9; i++){
+			params.add(new Params(_bw_path + "data/levels/lvlFile_" + i + ".xml", true, 9000));
+			params.add(new Params(_bw_path + "data/levels/lvlFile_" + i + ".xml", false, 20000));
+		}
 		
 		addState(new CounterState(_fengWrapper,params));
 		addState(new BlocksworldState(_fengWrapper, _levelFile, _agentsFile, _fscFile, _scenario));

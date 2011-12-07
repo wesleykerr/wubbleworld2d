@@ -1,0 +1,5 @@
+define high y=2.0
+define medium y=10.0
+define low y=15.0
+objects physicsObject ball1 bodyDef attr: high medium low
+objects physicsObject ball2 bodyDef attr: high medium low

@@ -49,9 +49,10 @@ public class BlocksworldLoader extends DefaultLoader {
 	}
 
 	public void load(GameSystem gameSystem) {
-		Space systemSpace = Blackboard.inst().getSpace("system");
+		//Space systemSpace = Blackboard.inst().getSpace("system");
 
 		SAXReader reader = new SAXReader(false);
+		
 		super.load(gameSystem);
 		ObjectSpace objSpace = (ObjectSpace) Blackboard.inst().getSpace(
 				"object");
