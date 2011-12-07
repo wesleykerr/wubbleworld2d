@@ -1,7 +1,6 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.loaders;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
@@ -38,7 +37,6 @@ public class XMLMutator {
 		try {
 			doc = reader.read(url);
 		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Element root = doc.getRootElement();
@@ -49,7 +47,6 @@ public class XMLMutator {
 		try {
 			scan = new Scanner(url2.openStream());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.exit(0);
 		}

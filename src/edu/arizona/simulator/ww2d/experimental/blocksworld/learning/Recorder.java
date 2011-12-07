@@ -1,5 +1,8 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.learning;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -270,25 +273,72 @@ public class Recorder {
 				
 			}
 		}
+		
+		File dir = new File("src/edu/arizona/simulator/ww2d/experimental/blocksworld/data/levels");
+		File outputs = null;
+		try {
+			if(!quietMode)
+				outputs = File.createTempFile("output", ".dump", dir);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		FileWriter fw = null;
+		try {
+			if(!quietMode)
+				fw = new FileWriter(outputs);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		if(sb.length() - 5 >= 0) {
 			sb.delete(sb.length() - 5, sb.length());
 			sb.append("))");
 			System.out.println(sb.toString());
+			try {
+				if(!quietMode)
+					fw.write(sb.toString());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		} else {
-			System.out.println("Not enough samples to analyse predicates");
-			printall();
+			StringBuilder builder = new StringBuilder();
+			builder.append("Not enough samples to analyse predicates");
+			builder.append(printall());
+			System.out.println(builder.toString());
+			try {
+				if(!quietMode)
+					fw.write(builder.toString());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		try {
+			if(!quietMode)
+				fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
-	public void printall() {
-		System.out.println("Dumping positional data:");
+	public String printall() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Dumping positional data:\n");
 		if(positions.isEmpty()){
-			System.out.println("None!");
+			sb.append("None!\n");
 		}
 		for (Data d : positions) {
-			System.out.println("Object: " + d.owner.getName() + " x - "
-					+ d.pos.x + " y - " + d.pos.y + " elapsed " + d.eps);
+			sb.append("Object: " + d.owner.getName() + " x - "
+					+ d.pos.x + " y - " + d.pos.y + " elapsed " + d.eps + "\n");
 		}
+		
+		return sb.toString();
 	}
 
 	private void calculateEverything(Data d, ObjectFieldSpace rec, int iteration) {
@@ -438,6 +488,7 @@ public class Recorder {
 		rec.addTemp(data.owner, new Field("dy", dy));
 	}
 
+	@Deprecated 
 	protected void updateVelocity(int eps, PhysicsObject obj,
 			ObjectFieldSpace rec) {
 		HashMap<String, Field> fields = rec.getMap(obj);
@@ -483,9 +534,5 @@ public class Recorder {
 					+ " dx - " + dx + " dy - " + dy + " moving - " + moving
 					+ " stopped - " + stopped + " started - " + started);
 		}
-	}
-
-	public void print() {
-
 	}
 }

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import org.newdawn.slick.Graphics;
 
 import edu.arizona.simulator.ww2d.blackboard.Blackboard;
+import edu.arizona.simulator.ww2d.experimental.blocksworld.Main;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.fsc.ObjectFieldSpace;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.learning.Recorder;
 import edu.arizona.simulator.ww2d.system.Subsystem;
@@ -25,15 +26,11 @@ public class LearningSubsystem implements Subsystem {
 			this.info = info;
 		}
 		
-		public void output(String filename){
-			//TODO stub
-		}
-		
 	}
 	
 	public LearningSubsystem(String info){
 		prev = new LinkedList<Record>();
-		rec = new Record(info,new Recorder(true,false));
+		rec = new Record(info,new Recorder(true,Main.QUIET_MODE));
 		Blackboard.inst().addSpace("recorder", new ObjectFieldSpace());
 	}
 	
