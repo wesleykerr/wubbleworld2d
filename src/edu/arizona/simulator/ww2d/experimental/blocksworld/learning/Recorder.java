@@ -270,9 +270,11 @@ public class Recorder {
 				
 			}
 		}
-		sb.delete(sb.length() - 5, sb.length());
-		sb.append("))");
-		System.out.println(sb.toString());
+		if(sb.length() - 5 >= 0) {
+			sb.delete(sb.length() - 5, sb.length());
+			sb.append("))");
+			System.out.println(sb.toString());
+		}
 	}
 
 	public void printall() {
