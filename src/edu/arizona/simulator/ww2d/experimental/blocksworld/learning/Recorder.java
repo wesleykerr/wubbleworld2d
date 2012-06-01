@@ -451,8 +451,8 @@ public class Recorder {
 		float ay = (Float) newFields.get("dy").data
 				- (Float) fields.get("dy").data;
 
-		ax *= data.eps;
-		ay *= data.eps;
+		ax /= data.eps;
+		ay /= data.eps;
 
 		rec.addTemp(data.owner, new Field("ax", ax));
 		rec.addTemp(data.owner, new Field("ay", ay));
@@ -481,8 +481,8 @@ public class Recorder {
 		float dy = (Float) newFields.get("y").data
 				- (Float) fields.get("y").data;
 
-		dx *= data.eps;
-		dy *= data.eps;
+		dx /= data.eps;
+		dy /= data.eps;
 
 		rec.addTemp(data.owner, new Field("dx", dx));
 		rec.addTemp(data.owner, new Field("dy", dy));

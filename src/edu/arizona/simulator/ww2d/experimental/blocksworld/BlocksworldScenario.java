@@ -38,9 +38,9 @@ public class BlocksworldScenario implements Scenario {
 		// NOTE vertices must be in the counter-clockwise order
 		//_triangleFactory.create(new Vector2f(10.0f,30.0f),new Vector2f(10.0f,25.0f),new Vector2f(15.0f,25.0f),0.0f,1.0f,1.0f,.05f,0.2f,0.5f,true);
 		//_triangleFactory.create(new Vector2f(9.5f,9.5f),new Vector2f(9.5f,11.5f),new Vector2f(11.5f,11.5f),0.0f,1.0f,1.0f,.05f,0.2f,0.5f,false);
-		_rampFactory.create(new Vector2f(15f,30f), new Vector2f(10,25), true, 1.0f, 1.0f, .05f, .2f, .5f, false);
+		//_rampFactory.create(new Vector2f(15f,30f), new Vector2f(10,25), true, 1.0f, 1.0f, .05f, .2f, .5f, false);
 		//_triangleFactory.create( true, 1.0f, 1.0f, .05f, .2f, .5f, false);
-		_triangleFactory.create(new Vector2f(20f,25f), new Vector2f(25f,30f), new Vector2f(25,20), 1.0f, 1.0f, 1.0f, .05f, .2f, .5f, false);
+		//_triangleFactory.create(new Vector2f(20f,25f), new Vector2f(25f,30f), new Vector2f(25,20), 1.0f, 1.0f, 1.0f, .05f, .2f, .5f, false);
 //		_rampFactory.create(new Vector2f(10f,30f), new Vector2f(5,25), false, 1.0f, 1.0f, .05f, .2f, .5f, false);
 	}
 
