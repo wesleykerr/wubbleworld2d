@@ -70,4 +70,368 @@
 				dyScale="2.0"></func>
 		</transition>
 	</fsc>
+	
+	<fsc name="ramp suite">
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.5" ay="-.5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.25" ay="-.25">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.30" ay="-.30">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.0" ay="1.0">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.0" ay="1.0">
+				</func>
+			</action>
+		</state>
+		
+		<transition from="0" to="1">
+			<check name="TimeCheck" interval="5000"></check>
+		</transition>
+		<transition from="1" to="2">
+			<check name="TimeCheck" interval="2000"></check>
+			
+		</transition>
+		<transition from="2" to="3">
+			<check name="TimeCheck" interval="5000"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
+		<transition from="3" to="4">
+			<check name="TimeCheck" interval="3000"></check>
+		</transition>
+		<transition from="4" to="5">
+			<check name="TimeCheck" interval="6000"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
+		<transition from="5" to="6">
+			<check name="TimeCheck" interval="4850"></check>
+		</transition>
+		<transition from="6" to="7">
+			<check name="TimeCheck" interval="150"></check>
+		</transition>
+		<transition from="7" to="8">
+			<check name="TimeCheck" interval="1300"></check>
+		</transition>
+		<transition from="8" to="9">
+			<check name="TimeCheck" interval="500"></check>
+		</transition>
+		
+		
+	</fsc>
+	
+	
+	<fsc name="hang on">
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.5" ay="-.5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.25" ay="-.25">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.30" ay="-.30">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.0" ay="1.0">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.0" ay="1.0">
+				</func>
+			</action>
+		</state>
+		
+		<transition from="0" to="6">
+			<check name="TimeCheck" interval="12250"></check>
+		</transition>
+		<transition from="1" to="2">
+			<check name="TimeCheck" interval="2000"></check>
+			
+		</transition>
+		<transition from="2" to="3">
+			<check name="TimeCheck" interval="5000"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
+		<transition from="3" to="4">
+			<check name="TimeCheck" interval="3000"></check>
+		</transition>
+		<transition from="4" to="5">
+			<check name="TimeCheck" interval="6000"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
+		<transition from="5" to="6">
+			<check name="TimeCheck" interval="4850"></check>
+		</transition>
+		<transition from="6" to="7">
+			<check name="TimeCheck" interval="150"></check>
+		</transition>
+		<transition from="7" to="8">
+			<check name="TimeCheck" interval="1300"></check>
+		</transition>
+		<transition from="8" to="9">
+			<check name="TimeCheck" interval="500"></check>
+		</transition>
+		
+		
+	</fsc>
+	
+	<fsc name="turn around">
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.5" ay="-.5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.25" ay="-.25">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.30" ay="-.30">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.0" ay="1.0">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.0" ay="1.0">
+				</func>
+			</action>
+		</state>
+		
+		<transition from="0" to="1">
+			<check name="TimeCheck" interval="5000"></check>
+		</transition>
+		<transition from="1" to="2">
+			<check name="TimeCheck" interval="2000"></check>
+			
+		</transition>
+		<transition from="2" to="3">
+			<check name="TimeCheck" interval="5000"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
+		<transition from="3" to="4">
+			<check name="TimeCheck" interval="3000"></check>
+		</transition>
+		<transition from="4" to="5">
+			<check name="TimeCheck" interval="6000"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
+		
+		
+	</fsc>
+	
+	<fsc name="slow down">
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.5" ay="-.5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.25" ay="-.25">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-0.5" ay=".5">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.30" ay="-.30">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.0" ay="1.0">
+				</func>
+			</action>
+		</state>
+		
+		<state>
+		</state>
+		
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0.0" ay="1.0">
+				</func>
+			</action>
+		</state>
+		<transition from="0" to="3">
+			<check name="TimeCheck" interval="7000"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
+		<transition from="3" to="4">
+			<check name="TimeCheck" interval="6000"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
+		
+		
+	</fsc>
+	
+	<fsc name="ramp test">
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-4.0" ay="4.0">
+				</func>
+			</action>
+		</state>
+	</fsc>
+		
 </stateDec>

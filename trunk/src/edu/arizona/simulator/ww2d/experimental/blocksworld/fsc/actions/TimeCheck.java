@@ -10,6 +10,7 @@ import edu.arizona.simulator.ww2d.object.PhysicsObject;
 public class TimeCheck extends Check {
 	
 	private int interval;
+	private int time;
 
 	public TimeCheck(PhysicsObject owner, int interval) {
 		super(owner);
@@ -19,7 +20,7 @@ public class TimeCheck extends Check {
 	@Override
 	public boolean check(int elapsed) {
 		ObjectFieldSpace ofs = (ObjectFieldSpace) Blackboard.inst().getSpace("objectfield");
-		int currTime = 0;
+		/*int currTime = 0;
 		if(ofs.retrieve(owner, "currTime") != null){
 			currTime = (Integer)ofs.retrieve(owner, "currTime").getData();
 		}
@@ -29,7 +30,10 @@ public class TimeCheck extends Check {
 		if(ofs.retrieve(owner, "interval") == null){
 			return false;
 		}
-		return currTime > (Integer)ofs.retrieve(owner,"interval").getData() || currTime > interval && interval > -1;
+		return currTime > (Integer)ofs.retrieve(owner,"interval").getData() || currTime > interval && interval > -1;*/
+		
+		time += elapsed;
+		return time >= interval;
 	}
 	
 	public void reset(){

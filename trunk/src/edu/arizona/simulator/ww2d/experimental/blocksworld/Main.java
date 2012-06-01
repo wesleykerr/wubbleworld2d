@@ -29,8 +29,6 @@ public class Main extends StateBasedGame {
 	
 	private String _bw_path = "edu/arizona/simulator/ww2d/experimental/blocksworld/";
 	private String _levelFile = _bw_path + "data/levels/Room-Blocksworld-objs-angle-test-simple.xml";
-	private String _levelFile2 = _bw_path + "data/levels/Room-Blocksworld-objs-angle-test.xml";
-	private String _levelFile3 = _bw_path + "data/levels/Room-Blocksworld-objs.xml";
 	private String _agentsFile = _bw_path + "data/levels/Agents-Blocksworld.xml";
 	private String _fscFile = _bw_path + "data/levels/States.xml";
 	
@@ -44,7 +42,8 @@ public class Main extends StateBasedGame {
 	
 	public Main() {
 		super("Blocks World");
-	}
+	} 
+	
 	
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
@@ -59,10 +58,12 @@ public class Main extends StateBasedGame {
 		LinkedList<Params> params = new LinkedList<Params>();
 		//params.add(new Params(_levelFile,true,9000));
 		//params.add(new Params(_levelFile,false,20000));
-		for(int i = 0; i < 9; i++){
-			params.add(new Params(_bw_path + "data/levels/lvlFile_" + i + ".xml", true, 9000));
-			params.add(new Params(_bw_path + "data/levels/lvlFile_" + i + ".xml", false, 20000));
-		}
+		params.add(new Params(_bw_path + "data/levels/go.xml", true, 9000));
+		params.add(new Params(_bw_path + "data/levels/go.xml", false, 9000));
+		params.add(new Params(_bw_path + "data/levels/slow.xml", false, 15000));
+		params.add(new Params(_bw_path + "data/levels/turn.xml", false, 20000));
+		params.add(new Params(_bw_path + "data/levels/fall.xml", false, 15000));
+		params.add(new Params(_bw_path + "data/levels/scenario.xml", false, 25000));
 		
 		addState(new CounterState(_fengWrapper,params));
 		addState(new BlocksworldState(_fengWrapper, _levelFile, _agentsFile, _fscFile, _scenario));
