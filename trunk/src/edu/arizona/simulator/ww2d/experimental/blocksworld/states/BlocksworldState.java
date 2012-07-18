@@ -90,7 +90,7 @@ public class BlocksworldState extends BHGameState {
 	@Override
 	public void enter(GameContainer container, StateBasedGame game)
 			throws SlickException {
-		StateDatabase.PATH = "states/" + "scenario-" + count + "/";
+		//StateDatabase.PATH = "states/" + "scenario-" + count + "/";
 		super.enter(container, game);
 		_enterTime = System.currentTimeMillis();
 		

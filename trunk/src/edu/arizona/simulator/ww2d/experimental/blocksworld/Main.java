@@ -19,6 +19,7 @@ import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.states.AWTReplayState;
 import edu.arizona.simulator.ww2d.states.BHGameState;
+import edu.arizona.simulator.ww2d.states.RecordingState;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.States;
 
@@ -69,6 +70,7 @@ public class Main extends StateBasedGame {
 		
 		addState(new CounterState(_fengWrapper,params));
 		addState(new BlocksworldState(_fengWrapper, _levelFile, _agentsFile, _fscFile, _scenario));
+		addState(new RecordingState(_fengWrapper));
 		addState(new AWTReplayState(_fengWrapper));
 		
 		// enterState(States.SplashState.ordinal());
