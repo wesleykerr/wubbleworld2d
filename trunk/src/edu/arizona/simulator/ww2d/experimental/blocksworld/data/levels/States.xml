@@ -428,10 +428,20 @@
 	<fsc name="ramp test">
 		<state>
 			<action name="MoveAction">
-				<func name="AccelerateFunction" ax="-4.0" ay="4.0">
+				<func name="AccelerateFunction" ax="-3.0" ay="3.0">
 				</func>
 			</action>
 		</state>
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0" ay="20.5">
+				</func>
+			</action>
+		</state>
+		<transition from="0" to="1">
+			<check name="TimeCheck" interval="4700"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
 	</fsc>
 		
 </stateDec>
