@@ -18,6 +18,7 @@ import edu.arizona.simulator.ww2d.experimental.blocksworld.systems.FSCSubsystem;
 import edu.arizona.simulator.ww2d.experimental.blocksworld.systems.LearningSubsystem;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.gui.TWLInputAdapter;
+import edu.arizona.simulator.ww2d.logging.StateDatabase;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
 import edu.arizona.simulator.ww2d.states.BHGameState;
 import edu.arizona.simulator.ww2d.system.GameSystem;
@@ -48,6 +49,7 @@ public class BlocksworldState extends BHGameState {
 	private boolean physics;
 	private int duration = 5000;
 	private boolean leave = false;
+	protected static int count = 0;
 
 	public BlocksworldState(FengWrapper feng, String levelFile,
 			String agentsFile, String fscFile, Scenario scenario) {
@@ -88,6 +90,7 @@ public class BlocksworldState extends BHGameState {
 	@Override
 	public void enter(GameContainer container, StateBasedGame game)
 			throws SlickException {
+		StateDatabase.PATH = "states/" + "scenario-" + count + "/";
 		super.enter(container, game);
 		_enterTime = System.currentTimeMillis();
 		
@@ -161,6 +164,7 @@ public class BlocksworldState extends BHGameState {
 		// NOTE: this is not an else if, so update happens, and then we leave 
 		if(_enterTime + duration < System.currentTimeMillis() || leave){
 			leave = false;
+			++count;
 			game.enterState(States.GameplayState.ordinal());
 			return;
 		}

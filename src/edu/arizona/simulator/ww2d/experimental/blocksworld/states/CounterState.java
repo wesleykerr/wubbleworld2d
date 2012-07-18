@@ -9,6 +9,7 @@ import org.newdawn.slick.state.StateBasedGame;
 
 import edu.arizona.simulator.ww2d.experimental.blocksworld.Params;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
+import edu.arizona.simulator.ww2d.logging.StateDatabase;
 import edu.arizona.simulator.ww2d.states.BHGameState;
 import edu.arizona.simulator.ww2d.utils.enums.States;
 
@@ -49,13 +50,15 @@ public class CounterState extends BHGameState{
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException { 
 		super.enter(container, game);
 		if(curr < params.size()){
+			StateDatabase.PATH = "states/" + "scenario-" + curr + "/";
 			((BlocksworldState) game.getState(States.MainMenuState.ordinal())).setLevel(params.get(curr).getLevel());
 			((BlocksworldState) game.getState(States.MainMenuState.ordinal())).setPhysics(params.get(curr).getPhysics());
 			((BlocksworldState) game.getState(States.MainMenuState.ordinal())).setDuration(params.get(curr).getDuration());
 			++curr;
 			game.enterState(States.MainMenuState.ordinal());
 		} else {
-			container.exit();
+			game.enterState(States.RecordingState.ordinal());
+			//container.exit();
 		}
 	}
 

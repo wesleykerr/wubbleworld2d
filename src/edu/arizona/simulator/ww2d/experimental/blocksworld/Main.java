@@ -17,6 +17,7 @@ import edu.arizona.simulator.ww2d.experimental.blocksworld.states.BlocksworldSta
 import edu.arizona.simulator.ww2d.experimental.blocksworld.states.CounterState;
 import edu.arizona.simulator.ww2d.gui.FengWrapper;
 import edu.arizona.simulator.ww2d.scenario.Scenario;
+import edu.arizona.simulator.ww2d.states.AWTReplayState;
 import edu.arizona.simulator.ww2d.states.BHGameState;
 import edu.arizona.simulator.ww2d.utils.GameGlobals;
 import edu.arizona.simulator.ww2d.utils.enums.States;
@@ -58,15 +59,17 @@ public class Main extends StateBasedGame {
 		LinkedList<Params> params = new LinkedList<Params>();
 		//params.add(new Params(_levelFile,true,9000));
 		//params.add(new Params(_levelFile,false,20000));
-		params.add(new Params(_bw_path + "data/levels/go.xml", true, 9000));
-		params.add(new Params(_bw_path + "data/levels/go.xml", false, 9000));
-		params.add(new Params(_bw_path + "data/levels/slow.xml", false, 15000));
-		params.add(new Params(_bw_path + "data/levels/turn.xml", false, 20000));
-		params.add(new Params(_bw_path + "data/levels/fall.xml", false, 15000));
-		params.add(new Params(_bw_path + "data/levels/scenario.xml", false, 25000));
+		//params.add(new Params(_bw_path + "data/levels/go.xml", true, 9000));
+		//params.add(new Params(_bw_path + "data/levels/go.xml", false, 9000));
+		//params.add(new Params(_bw_path + "data/levels/slow.xml", false, 15000));
+		//params.add(new Params(_bw_path + "data/levels/turn.xml", false, 20000));
+		//params.add(new Params(_bw_path + "data/levels/fall.xml", false, 15000));
+		//params.add(new Params(_bw_path + "data/levels/scenario.xml", false, 25000));
+		params.add(new Params(_bw_path + "data/levels/go2.xml", true, 8000));
 		
 		addState(new CounterState(_fengWrapper,params));
 		addState(new BlocksworldState(_fengWrapper, _levelFile, _agentsFile, _fscFile, _scenario));
+		addState(new AWTReplayState(_fengWrapper));
 		
 		// enterState(States.SplashState.ordinal());
 		enterState(States.GameplayState.ordinal());
