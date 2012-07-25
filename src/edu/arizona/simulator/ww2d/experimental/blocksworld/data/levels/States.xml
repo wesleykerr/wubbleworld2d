@@ -443,5 +443,43 @@
 			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
 		</transition>
 	</fsc>
+	
+	<fsc name="ramp test slope 2">
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-3.0" ay="2.34">
+				</func>
+			</action>
+		</state>
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0" ay="20.5">
+				</func>
+			</action>
+		</state>
+		<transition from="0" to="1">
+			<check name="TimeCheck" interval="9000"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
+	</fsc>
+	
+	<fsc name="ramp test slope 2 speed 2">
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="-6.0" ay="4.68">
+				</func>
+			</action>
+		</state>
+		<state>
+			<action name="MoveAction">
+				<func name="AccelerateFunction" ax="0" ay="20.5">
+				</func>
+			</action>
+		</state>
+		<transition from="0" to="1">
+			<check name="TimeCheck" interval="9000"></check>
+			<func name="FractionalDecelerationFunction" dxScale="1.0" dyScale="1.0"></func>
+		</transition>
+	</fsc>
 		
 </stateDec>
