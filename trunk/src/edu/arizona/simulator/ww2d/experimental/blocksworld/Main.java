@@ -66,15 +66,15 @@ public class Main extends StateBasedGame {
 		//params.add(new Params(_bw_path + "data/levels/turn.xml", false, 20000));
 		//params.add(new Params(_bw_path + "data/levels/fall.xml", false, 15000));
 		//params.add(new Params(_bw_path + "data/levels/scenario.xml", false, 25000));
-		params.add(new Params(_bw_path + "data/levels/go2.xml", true, 8000));
+		params.add(new Params(_bw_path + "data/levels/go3.xml", false, 8000));
 		
 		addState(new CounterState(_fengWrapper,params));
 		addState(new BlocksworldState(_fengWrapper, _levelFile, _agentsFile, _fscFile, _scenario));
-		addState(new RecordingState(_fengWrapper));
+		//addState(new RecordingState(_fengWrapper));
 		addState(new AWTReplayState(_fengWrapper));
 		
 		// enterState(States.SplashState.ordinal());
-		enterState(States.GameplayState.ordinal());
+		enterState(States.ReplayState.ordinal());
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package edu.arizona.simulator.ww2d.experimental.blocksworld.states;
 
+import java.io.File;
 import java.util.LinkedList;
 
 import org.newdawn.slick.GameContainer;
@@ -30,7 +31,7 @@ public class CounterState extends BHGameState{
 	}
 	
 	public int getID() {
-		return States.GameplayState.ordinal();
+		return States.RecordingState.ordinal();
 	}
 
 	@Override
@@ -50,14 +51,16 @@ public class CounterState extends BHGameState{
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException { 
 		super.enter(container, game);
 		if(curr < params.size()){
-			//StateDatabase.PATH = "states/" + "scenario-" + curr + "/";
+			StateDatabase.PATH = "edu/arizona/simulator/ww2d/experimental/blocksworld/movies/" + "scenario-" + curr + "/";
 			((BlocksworldState) game.getState(States.MainMenuState.ordinal())).setLevel(params.get(curr).getLevel());
 			((BlocksworldState) game.getState(States.MainMenuState.ordinal())).setPhysics(params.get(curr).getPhysics());
 			((BlocksworldState) game.getState(States.MainMenuState.ordinal())).setDuration(params.get(curr).getDuration());
+			String directory = "blocksworld-" + curr;
+			File f = new File("edu/arizona/simulator/ww2d/experimental/blocksworld/movies/" + directory + "/");
 			++curr;
 			game.enterState(States.MainMenuState.ordinal());
 		} else {
-			game.enterState(States.ReplayState.ordinal());
+			//game.enterState(States.ReplayState.ordinal());
 			//container.exit();
 		}
 	}

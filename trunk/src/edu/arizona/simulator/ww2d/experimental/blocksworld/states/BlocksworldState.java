@@ -165,7 +165,7 @@ public class BlocksworldState extends BHGameState {
 		if(_enterTime + duration < System.currentTimeMillis() || leave){
 			leave = false;
 			++count;
-			game.enterState(States.GameplayState.ordinal());
+			game.enterState(States.ReplayState.ordinal());
 			return;
 		}
 		// twlInputAdapter.update();

@@ -44,10 +44,10 @@ import edu.arizona.simulator.ww2d.utils.enums.ObjectType;
 import edu.arizona.simulator.ww2d.utils.enums.States;
 
 public class AWTReplayState extends BHGameState {
-	private static Logger logger = Logger.getLogger( AWTReplayState.class );
+	private static Logger logger = Logger.getLogger(AWTReplayState.class);
 
 	private int _index;
-	private List<String> _agents; 
+	private List<String> _agents;
 
 	private int _time;
 	private long _maxTime;
@@ -63,7 +63,7 @@ public class AWTReplayState extends BHGameState {
 	private BufferedImage _offscreen;
 	private IMediaWriter _writer;
 
-	public AWTReplayState(FengWrapper feng) { 
+	public AWTReplayState(FengWrapper feng) {
 		super(feng);
 	}
 
@@ -73,61 +73,68 @@ public class AWTReplayState extends BHGameState {
 	}
 
 	@Override
-	public void init(GameContainer container, StateBasedGame game) throws SlickException {
+	public void init(GameContainer container, StateBasedGame game)
+			throws SlickException {
 		_objects = new LinkedList<AWTGameObject>();
 
 		float x = (float) container.getWidth() / 2.0f;
 		float y = (float) container.getHeight() / 2.0f;
 
-		_center = new Vec2(x,y);
-		_offscreen = new BufferedImage(container.getWidth(), container.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+		_center = new Vec2(x, y);
+		_offscreen = new BufferedImage(container.getWidth(),
+				container.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 	}
 
-	private void isCognitiveAgent(String xml) { 
+	private void isCognitiveAgent(String xml) {
 		StringReader stringReader = new StringReader(xml);
 		SAXReader reader = new SAXReader(false);
 		try {
 			Document doc = reader.read(stringReader);
 			Element root = doc.getRootElement();
 			String name = root.attributeValue("name");
-			ObjectType objectType = ObjectType.valueOf(root.attributeValue("type"));
+			ObjectType objectType = ObjectType.valueOf(root
+					.attributeValue("type"));
 			if (objectType == ObjectType.cognitiveAgent)
 				_agents.add(name);
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void loadObject(String xml) { 
+	private void loadObject(String xml) {
 		StringReader stringReader = new StringReader(xml);
 		SAXReader reader = new SAXReader(false);
 		try {
 			Document doc = reader.read(stringReader);
 			Element root = doc.getRootElement();
-			root.addAttribute("scale", _scale+"");
+			root.addAttribute("scale", _scale + "");
 
 			String name = root.attributeValue("name");
-			int renderPriority = Integer.parseInt(root.attributeValue("renderPriority"));
-			ObjectType objectType = ObjectType.valueOf(root.attributeValue("type"));
+			int renderPriority = Integer.parseInt(root
+					.attributeValue("renderPriority"));
+			ObjectType objectType = ObjectType.valueOf(root
+					.attributeValue("type"));
 
-			AWTGameObject obj = new AWTGameObject(name, objectType, renderPriority);
+			AWTGameObject obj = new AWTGameObject(name, objectType,
+					renderPriority);
 			logger.debug(" NAMES: " + obj.getName() + " " + _agents.get(_index));
 			if (obj.getName().equals(_agents.get(_index))) {
 				_following = obj;
 				_following.setPriority(200);
 				_following.addComponent(new AWTInternalComponent(_following));
-				logger.debug("We are choosing to follow: " + _following.getName());
+				logger.debug("We are choosing to follow: "
+						+ _following.getName());
 			}
 
 			List components = root.element("components").elements("component");
 			for (int i = 0; i < components.size(); ++i) {
 				Element comp = (Element) components.get(i);
 				String className = comp.attributeValue("className");
-				if (ShapeVisual.class.getName().equals(className)) { 
+				if (ShapeVisual.class.getName().equals(className)) {
 					AWTComponent awtComp = new AWTShapeVisual(obj);
 					awtComp.fromXML(comp);
 					obj.addComponent(awtComp);
-				} else if (SpriteVisual.class.getName().equals(className)) { 
+				} else if (SpriteVisual.class.getName().equals(className)) {
 					AWTComponent awtComp = new AWTSpriteVisual(obj);
 					awtComp.fromXML(comp);
 					obj.addComponent(awtComp);
@@ -136,35 +143,39 @@ public class AWTReplayState extends BHGameState {
 
 			_objects.add(obj);
 			Collections.sort(_objects, AWTGameObject.render);
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	@Override 
-	public void enter(GameContainer container, StateBasedGame game) throws SlickException { 
+	@Override
+	public void enter(GameContainer container, StateBasedGame game)
+			throws SlickException {
 		super.enter(container, game);
 
 		_db = new StateDatabase(StateDatabase.PATH + "state-replay.db", false);
 		_scale = Float.parseFloat(_db.getParameter("scale"));
-		_maxTime = Long.parseLong(_db.queryEvent(FinishEvent.class.getName(), 0));
+		_maxTime = Long
+				.parseLong(_db.queryEvent(FinishEvent.class.getName(), 0));
 
 		_agents = new ArrayList<String>();
 		_index = -1;
-		for (String params : _db.queryEvents(CreatePhysicsObject.class.getName(), 1)) {
+		for (String params : _db.queryEvents(
+				CreatePhysicsObject.class.getName(), 1)) {
 			isCognitiveAgent(params);
 		}
 
 		newRecording(container, game);
-		//		layout(_feng.getDisplay());
+		// layout(_feng.getDisplay());
 
 	}
 
 	/**
 	 * Begin a new recording and move forward in the list of agents.
+	 * 
 	 * @param container
 	 */
-	private void newRecording(GameContainer container, StateBasedGame game) { 
+	private void newRecording(GameContainer container, StateBasedGame game) {
 		_objects.clear();
 		_index += 1;
 		if (_index >= _agents.size()) {
@@ -172,94 +183,111 @@ public class AWTReplayState extends BHGameState {
 			game.enterState(States.RecordingState.ordinal());
 			return;
 		}
-		
 
 		logger.debug("Recording: " + _index);
 		_time = 1;
-		_writer = ToolFactory.makeWriter(StateDatabase.PATH + "movie-" + _agents.get(_index) + ".mov");
-		_writer.addVideoStream(0, 0, container.getWidth(), container.getHeight());
-		
-//		IStream stream = _writer.getContainer().getStream(0);
-//		IStreamCoder coder = stream.getStreamCoder();
-////		IStreamCoder coder = IStreamCoder.make(Direction.ENCODING);
-//		coder.setCodec(ICodec.ID.CODEC_ID_H264);
-//		int retval =
-//			Configuration.configure("/usr/local/xuggler/share/ffmpeg/libx264-hq.ffpreset",
-//					coder);
-//		if (retval < 0)
-//			throw new RuntimeException("could not configure coder from preset file");
-//		_writer.addVideoStream(0, 0, container.getWidth(), container.getHeight());
+		_writer = ToolFactory.makeWriter(StateDatabase.PATH + "movie-"
+				+ _agents.get(_index) + ".mov");
+		_writer.addVideoStream(0, 0, container.getWidth(),
+				container.getHeight());
+
+		// IStream stream = _writer.getContainer().getStream(0);
+		// IStreamCoder coder = stream.getStreamCoder();
+		// // IStreamCoder coder = IStreamCoder.make(Direction.ENCODING);
+		// coder.setCodec(ICodec.ID.CODEC_ID_H264);
+		// int retval =
+		// Configuration.configure("/usr/local/xuggler/share/ffmpeg/libx264-hq.ffpreset",
+		// coder);
+		// if (retval < 0)
+		// throw new
+		// RuntimeException("could not configure coder from preset file");
+		// _writer.addVideoStream(0, 0, container.getWidth(),
+		// container.getHeight());
 	}
 
 	/**
 	 * Called after we finished a recording in order to clean things up.
+	 * 
 	 * @param container
 	 */
-	private void finishRecording(GameContainer container) { 
-		try { 
+	private void finishRecording(GameContainer container) {
+		try {
 			_writer.close();
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			logger.error("Error closing the damn thing: " + e.getMessage());
 			e.printStackTrace();
 		}
 
-//		// now transcode it...
-//		IMediaReader reader = ToolFactory.makeReader(StateDatabase.PATH + "movie" + _index + ".mp4");
-//		reader.addListener(ToolFactory.makeWriter(StateDatabase.PATH + "movie" + _index + ".mov", reader));
-//
-//		while (reader.readPacket() == null);
+		// // now transcode it...
+		// IMediaReader reader = ToolFactory.makeReader(StateDatabase.PATH +
+		// "movie" + _index + ".mp4");
+		// reader.addListener(ToolFactory.makeWriter(StateDatabase.PATH +
+		// "movie" + _index + ".mov", reader));
+		//
+		// while (reader.readPacket() == null);
 	}
 
 	@Override
 	public void leave(GameContainer container, StateBasedGame game)
-	throws SlickException {
+			throws SlickException {
 		super.leave(container, game);
 
 		// Don't forget to remove all of the widgets before moving
-		// to the next state.  If you forget then the widgets (although not rendered)
+		// to the next state. If you forget then the widgets (although not
+		// rendered)
 		// could actually receive button presses.
 		_feng.getDisplay().removeAllWidgets();
 	}
 
-	public void finish() { 
+	public void finish() {
 
 	}
 
 	@Override
-	public void render(GameContainer container, StateBasedGame game, Graphics ignore) throws SlickException {
+	public void render(GameContainer container, StateBasedGame game,
+			Graphics ignore) throws SlickException {
 		updateSequential(container, game);
 
-		if (_following == null || _writer == null)
+		if (/* _following == null || */_writer == null)
 			return;
 
 		Graphics2D g = (Graphics2D) _offscreen.getGraphics();
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g.setColor(Color.green);
 		g.fillRect(0, 0, _offscreen.getWidth(), _offscreen.getHeight());
 
 		AffineTransform defaultXForm = new AffineTransform();
-		defaultXForm.translate(-_following.getPosition().x+_center.x, -_following.getPosition().y+_center.y);
+		if (_following != null) {
+			defaultXForm.translate(-_following.getPosition().x + _center.x,
+					-_following.getPosition().y + _center.y);
+		} else {
+			defaultXForm.translate(_center.x, _center.y);
+		}
 		g.setTransform(defaultXForm);
-		for (AWTGameObject obj : _objects) { 
+		for (AWTGameObject obj : _objects) {
 			obj.render(g);
 		}
-		
-		_writer.encodeVideo(0, _offscreen, _time*12, TimeUnit.MILLISECONDS);
+
+		_writer.encodeVideo(0, _offscreen, _time * 12, TimeUnit.MILLISECONDS);
 	}
 
-	private void updateSequential(GameContainer container, StateBasedGame game) { 
-		for (String params : _db.queryEvents(CreatePhysicsObject.class.getName(), _time)) {
+	private void updateSequential(GameContainer container, StateBasedGame game) {
+		for (String params : _db.queryEvents(
+				CreatePhysicsObject.class.getName(), _time)) {
 			loadObject(params);
 		}
 
-		for (String params : _db.queryEvents(CreateGameObject.class.getName(), _time)) {
+		for (String params : _db.queryEvents(CreateGameObject.class.getName(),
+				_time)) {
 			loadObject(params);
 		}
 
 		Set<Integer> removeSet = new HashSet<Integer>();
-		for (String params : _db.queryEvents(RemoveGameObject.class.getName(), _time)) { 
-			for (int i = 0; i < _objects.size(); ++i) { 
+		for (String params : _db.queryEvents(RemoveGameObject.class.getName(),
+				_time)) {
+			for (int i = 0; i < _objects.size(); ++i) {
 				if (_objects.get(i).getName().equals(params)) {
 					removeSet.add(i);
 					break;
@@ -268,52 +296,74 @@ public class AWTReplayState extends BHGameState {
 		}
 
 		List<AWTGameObject> tmp = new LinkedList<AWTGameObject>();
-		for (int i = 0; i < _objects.size(); ++i) { 
+		for (int i = 0; i < _objects.size(); ++i) {
 			if (!removeSet.contains(i))
 				tmp.add(_objects.get(i));
 		}
 		Collections.sort(tmp, AWTGameObject.render);
 		_objects = tmp;
 
-		for (AWTGameObject obj : _objects) { 
+		for (AWTGameObject obj : _objects) {
 			// get the position.
 			String queryX = _db.queryFluent("x", obj.getName(), _time);
 			if (queryX.equals("unknown")) {
 				logger.debug("FUCK ME: " + obj.getName() + " " + _time);
 			}
-			float x = Float.parseFloat(_db.queryFluent("x", obj.getName(), _time));
-			float y = Float.parseFloat(_db.queryFluent("y", obj.getName(), _time));
+			float x = Float.parseFloat(_db.queryFluent("x", obj.getName(),
+					_time));
+			float y = Float.parseFloat(_db.queryFluent("y", obj.getName(),
+					_time));
 
-			float heading = Float.parseFloat(_db.queryFluent("heading", obj.getName(), _time));
+			float heading = Float.parseFloat(_db.queryFluent("heading",
+					obj.getName(), _time));
 
-			obj.setPosition(new Vec2(x,y));
+			obj.setPosition(new Vec2(x, y));
 			obj.setHeading(heading);
 		}
-		
+
 		// update the internal state of the agent that we are following
-		try { 
-			_following.setUserData("energy", Float.parseFloat(_db.queryFluent("energy", _following.getName(), _time)));
-			_following.setUserData("energyMax", Float.parseFloat(_db.queryFluent("energyMax", _following.getName(), _time)));
+		if (_following != null) {
+			try {
+				_following.setUserData(
+						"energy",
+						Float.parseFloat(_db.queryFluent("energy",
+								_following.getName(), _time)));
+				_following
+						.setUserData("energyMax", Float.parseFloat(_db
+								.queryFluent("energyMax", _following.getName(),
+										_time)));
 
-			_following.setUserData("arousal", Float.parseFloat(_db.queryFluent("arousal", _following.getName(), _time)));
-			_following.setUserData("arousalMax", Float.parseFloat(_db.queryFluent("arousalMax", _following.getName(), _time)));
+				_following.setUserData(
+						"arousal",
+						Float.parseFloat(_db.queryFluent("arousal",
+								_following.getName(), _time)));
+				_following.setUserData("arousalMax",
+						Float.parseFloat(_db.queryFluent("arousalMax",
+								_following.getName(), _time)));
 
-			_following.setUserData("valence", Float.parseFloat(_db.queryFluent("valence", _following.getName(), _time)));
-			_following.setUserData("valenceMax", Float.parseFloat(_db.queryFluent("valenceMax", _following.getName(), _time)));
-		} catch (Exception e) { 
-			logger.debug(_following.getName() + " " + _time);
-			e.printStackTrace();
+				_following.setUserData(
+						"valence",
+						Float.parseFloat(_db.queryFluent("valence",
+								_following.getName(), _time)));
+				_following.setUserData("valenceMax",
+						Float.parseFloat(_db.queryFluent("valenceMax",
+								_following.getName(), _time)));
+			} catch (Exception e) {
+				logger.debug(_following.getName() + " " + _time);
+				e.printStackTrace();
+			}
 		}
-		
+
 		++_time;
 		if (_time >= _maxTime) {
 			finishRecording(container);
 			newRecording(container, game);
-		}		
+		}
 	}
 
 	@Override
-	public void update(GameContainer container, StateBasedGame game, int millis) throws SlickException {
+	public void update(GameContainer container, StateBasedGame game, int millis)
+			throws SlickException {
 
 	}
 
@@ -322,6 +372,6 @@ public class AWTReplayState extends BHGameState {
 	}
 
 	@Override
-	public void keyReleased(int key, char c) { 
-	}		
+	public void keyReleased(int key, char c) {
+	}
 }
